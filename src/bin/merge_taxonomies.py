@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # Parse taxonomy outputs and make one taxonomy table for qiime
-# 
+#
 # Note: delete headers add filename to each line and merge files:
 # for i in *.txt; do sed '1d' $i > $i.bk; done
 # for i in *.bk; do nawk '{print FILENAME","$0}' $i > $i.kk; mv $i.kk $i; done
@@ -45,10 +46,10 @@ def create_taxonomy_dict(input_file):
 		Species = words[3].strip('"').replace(" ","").replace("_","-")
 		Taxonomy = Genus + "_" + Species
 		Count = words[4].strip('"')
-	
+
         # For each line in input_file check to see if
 		# the bacteria is in the taxonomy_dict, if not, add it as a dict
-		# then for that given taxonomy add the 
+		# then for that given taxonomy add the
 		# sampleID on that line to the given to the dict
 		if not taxonomy_dict.has_key(Taxonomy):
 			taxonomy_dict[Taxonomy] = set()
@@ -68,7 +69,7 @@ def write_header(sampleID_set, output_file):
 	output_file.write('#OTU_ID')
 	for IDs in sampleID_set:
            output_file.write('\t' + IDs)
-	output_file.write('\n') 
+	output_file.write('\n')
 
 def write_rows(taxonomy_dict, sampleID_set, output_file):
 	# For each taxon
@@ -83,31 +84,31 @@ def write_rows(taxonomy_dict, sampleID_set, output_file):
 				output_file.write('\t' + str(taxonomy_dict[taxon][ID]))
 			else:
 				output_file.write('\t0')
-		output_file.write('\n')      
-	 	
+		output_file.write('\n')
+
 def main(opts):
 	# open input file
 	input_file = open(opts.input, "r")
-	
-    # create an output file and open it 
+
+    # create an output file and open it
 	output_file = open(opts.output, "w")
-               
+
 	# a dict mapping img IDs to a list of resfams_IDs
 	taxonomy_dict = create_taxonomy_dict(input_file)
 
  	# a set of all sample IDs (no duplicates)
 	sampleID_set = create_sampleID_set(taxonomy_dict)
-        
-    # make sample_ID set and write header        
+
+    # make sample_ID set and write header
 	write_header(sampleID_set, output_file)
-	
+
 	# write the rows
 	write_rows(taxonomy_dict, sampleID_set, output_file)
-		
+
 	# close the output file
 	output_file.close
-	      
+
 if __name__ == '__main__':
 	opts, args = get_opts()
 	check_opts(opts)
-	main(opts)	
+	main(opts)
