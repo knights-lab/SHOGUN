@@ -124,7 +124,7 @@ def mason(fa_infile, fq_outfile, number, prefix, seed):
 
 
 def dwgsim(fa_infile, fq_outfile, number, seed):
-    process = subprocess.Popen(['dwgsim', '-e', '0.001', '-r', '0.001', '-q', 'f', '-c', '0', '-2', '0', '-N', str(number), '-z', str(seed), fa_infile, fq_outfile])
+    process = subprocess.Popen(['dwgsim', '-e', '0.001', '-r', '0.001', '-q', 'f', '-c', '0', '-2', '0', '-N', '-y', '0.0', str(number), '-z', str(seed), fa_infile, fq_outfile])
     process.communicate()
 
 def write_taxon_counts(m, counts, outf):
@@ -189,11 +189,14 @@ def main():
             with open(filename, 'rb') as readfile:
                 shutil.copyfileobj(readfile, outfile)
 
-    taxon_oids_set_used = set(taxon_oids_used)
-    m = [row for row in m if row[0] in taxon_oids_set_used]
+    taxon_oids_set_used = dict(zip(taxon_oids_used, range(len(taxon_oids_used))))
+    m_2 = [None]*len(taxon_oids_used)
+    for i, row in enumerate(m):
+        if row[0] in taxon_oids_set_used:
+            m_2[taxon_oids_set_used[row[0]]] = row
 
     with open(os.path.join(args.output, 'expected_counts.csv'), 'wb') as outf_counts:
-        write_taxon_counts(m, r, outf_counts)
+        write_taxon_counts(m_2, r, outf_counts)
 
 if __name__ == '__main__':
     main()
