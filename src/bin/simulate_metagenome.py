@@ -128,12 +128,12 @@ def dwgsim(fa_infile, fq_outfile, number, seed):
     process.communicate()
 
 def write_taxon_counts(m, counts, outf):
-    columns = ['domain', 'genus', 'species', 'count']
+    columns = ['taxon_oid', 'ncbi_taxon_id',    'domain', 'genus', 'species', 'count']
 
     wr = csv.writer(outf, quoting=csv.QUOTE_ALL)
     wr.writerow(columns)
 
-    map(wr.writerow, [row[2:] + [counts[i]] for i, row in enumerate(m)])
+    map(wr.writerow, [row + [counts[i]] for i, row in enumerate(m)])
     outf.close()
 
 

@@ -24,10 +24,10 @@ for i in ${k[@]}; do
     test -d ${TRIAL_HOME}/hits_${i} | mkdir -p ${TRIAL_HOME}/hits_${i}
     for j in `seq 1 10`; do
         # An experiment
-        python subset_fasta.py -n ${NUM_READS} -k ${i} ${IN_FILE}\
+        subset_fasta.py -n ${NUM_READS} -k ${i} ${IN_FILE}\
         | bowtie2 --no-unal --no-hd -x /dev/shm/bowtie_indx/img.gene.bacteria.bowtie  --np 0 --mp "1,1" \
         --rdg "0,1" --rfg "0,1" --score-min "L,0,-0.02" --norc -f - --very-sensitive -a -p 48 \
-        | python unsorted_last_common_ancestor.py -x  /project/flatiron/data/img/00.taxon.tab.txt \
+        | unsorted_last_common_ancestor.py -x  /project/flatiron/data/img/00.taxon.tab.txt \
         -o ${TRIAL_HOME}/hits_${i}/results_${j}.csv -
     done
 done
