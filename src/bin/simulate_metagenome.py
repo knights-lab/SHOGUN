@@ -10,16 +10,13 @@ import shutil
 from scipy.stats import powerlaw
 import numpy as np
 
-
 # The arg parser for this wrapper
 def make_arg_parser():
-    parser = argparse.ArgumentParser(description='Get least common ancestor for alignments in unsorted BAM/SAM file')
+    parser = argparse.ArgumentParser(description='Simulate a metagenomic community from DWGSIM according to a powerlaw.')
     parser.add_argument('input', type=str, help='The species name file. One species name per line.')
-    parser.add_argument('-x', '--index', help='The taxonomy index.', required=True)
-    parser.add_argument('-d', '--database', help='The database. Sorted by taxon oid will '
-                                                 'significantly increase speed.', required=True)
-    parser.add_argument('-o', '--output', help='The output folder.')
-    parser.add_argument('-v', '--verbose', help='Print extra statistics', action='store_true', default=False)
+    parser.add_argument('-x', '--index', help='The FASTA fil  index.', required=True)
+    parser.add_argument('-d', '--database', help='The fasta file to simulate reads from.', required=True)
+    parser.add_argument('-o', '--output', help='The output folder.', required=True)
     parser.add_argument('-s', '--seed', help='The seed for the random number generator. (default=0)', default=0, type=int)
     parser.add_argument('-n', '--num', help='The number of reads to simulate', default=100, type=int)
     return parser
@@ -124,7 +121,7 @@ def mason(fa_infile, fq_outfile, number, prefix, seed):
 
 
 def dwgsim(fa_infile, fq_outfile, number, seed):
-    process = subprocess.Popen(['dwgsim', '-e', '0.001', '-r', '0.001', '-q', 'f', '-c', '0', '-2', '0', '-N', '-y', '0.0', str(number), '-z', str(seed), fa_infile, fq_outfile])
+    process = subprocess.Popen(['dwgsim', '-e', '0.001', '-r', '0.001', '-q', 'f', '-c', '0', '-2', '0', '-N', str(number), '-y', '0.0', '-z', str(seed), fa_infile, fq_outfile])
     process.communicate()
 
 def write_taxon_counts(m, counts, outf):
