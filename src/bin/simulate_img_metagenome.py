@@ -89,7 +89,7 @@ def read_fasta(f):
     yield (title.strip(), data)
 
 
-def write_genomes(taxon_oids_set, database_gen, outfolder, make_genomes):
+def write_genomes(taxon_oids_set, database_gen, outfolder):
     find = re.compile(r"^[^_]*")
 
     taxon_oids_set_used = set()
@@ -99,19 +99,18 @@ def write_genomes(taxon_oids_set, database_gen, outfolder, make_genomes):
         taxon_old = taxon_oid
 
         if taxon_oid in taxon_oids_set:
-            if make_genomes:
-                with open(os.path.join(outfolder, taxon_oid + '.fa'), 'a') as outf:
-                    # We can leverage runs to write to file faster
-                    while taxon_oid == taxon_old and title:
-                        if len(line) > 500:
-                            outf.write('>' + title + os.linesep)
-                            outf.write(line + os.linesep)
-                        taxon_old = taxon_oid
-                        try:
-                            title, line = next(database_gen)
-                            taxon_oid = re.search(find, title).group(0)
-                        except StopIteration:
-                            break
+            with open(os.path.join(outfolder, taxon_oid + '.fa'), 'a') as outf:
+                # We can leverage runs to write to file faster
+                while taxon_oid == taxon_old and title:
+                    if len(line) > 500:
+                        outf.write('>' + title + os.linesep)
+                        outf.write(line + os.linesep)
+                    taxon_old = taxon_oid
+                    try:
+                        title, line = next(database_gen)
+                        taxon_oid = re.search(find, title).group(0)
+                    except StopIteration:
+                        break
             taxon_oids_set_used.add(taxon_old)
 
     return taxon_oids_set_used
@@ -171,7 +170,7 @@ def main():
         taxon_oids_set = set([row[0] for row in m])
 
         with open(args.database, 'rb') as d:
-            taxon_oids_set_used = write_genomes(taxon_oids_set, read_fasta(d), outfolder_genomes, make_genomes)
+            taxon_oids_set_used = write_genomes(taxon_oids_set, read_fasta(d), outfolder_genomes)
         taxon_oids_used = list(taxon_oids_set_used)
 
     a = .5
