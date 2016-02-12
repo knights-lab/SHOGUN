@@ -173,6 +173,7 @@ def main():
             taxon_oids_set_used = write_genomes(taxon_oids_set, read_fasta(d), outfolder_genomes, make_genomes)
         taxon_oids_used = list(taxon_oids_set_used)
 
+    print(taxon_oids_used)
     a = .5
     np.random.seed(args.seed)
     size = len(taxon_oids_used)
