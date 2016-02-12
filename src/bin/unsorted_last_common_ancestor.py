@@ -104,8 +104,9 @@ def write_taxon_counts(taxon_counts, outf, verbose=False):
     columns = ['domain', 'genus', 'species', 'count']
 
     def map_counts(taxon):
-        taxa = taxon.split(';')
-        return taxa + list(repeat(None, 3 - len(taxa))) + [taxon_counts[taxon]]
+        if taxon:
+            taxa = taxon.split(';')
+            return taxa + list(repeat(None, 3 - len(taxa))) + [taxon_counts[taxon]]
 
     wr = csv.writer(outf, quoting=csv.QUOTE_ALL)
     wr.writerow(columns)
