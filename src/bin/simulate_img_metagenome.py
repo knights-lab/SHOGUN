@@ -166,7 +166,6 @@ def main():
         name_set = parse_names(inf)
 
         m = cross_reference_names(name_set, args.index)
-        print(m)
         taxon_oids_set = set([row[0] for row in m])
 
         with open(args.database, 'rb') as d:

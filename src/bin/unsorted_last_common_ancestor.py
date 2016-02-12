@@ -70,8 +70,10 @@ def build_lca_map(align_gen, taxa_path, verbose=False):
     for qname, rname in align_gen:
         if qname in lca_map:
             new_taxon = get_taxa_name(rname)
-            if lca_map[qname] != new_taxon:
-                lca_map[qname] = longest_common_ancestor(lca_map[qname], new_taxon)
+            current_qname = lca_map[qname]
+            if current_qname and new_taxon:
+                if current_qname != new_taxon:
+                    lca_map[qname] = longest_common_ancestor(current_qname, new_taxon)
         else:
             lca_map[qname] = get_taxa_name(rname)
     # taxon count here
