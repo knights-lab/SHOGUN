@@ -1,0 +1,90 @@
+# NCBI taxonomy notes
+# author: Daniel McDonald (mcdonadt@colorado.edu)
+
+# obtain the necessary files from NCBI
+$ wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdmp.zip
+$ unzip taxdmp.zip
+
+# start python and load up the NCBI taxonomy parser
+$ python
+>>> from cogent.parse.ncbi_taxonomy import NcbiTaxonomyFromFiles
+>>> tree = NcbiTaxonomyFromFiles(open('nodes.dmp'), open('names.dmp'))
+>>> root = tree.Root
+
+# Here is an example of how to get the NCBI taxon IDs for all Eukaryota phylums
+>>> euks = root.getNodeMatchingName('Eukaryota')
+>>> for node in euks.getRankedDescendants('phylum'):
+...   print node.Name, node.TaxonId
+... 
+Chlorophyta 3041
+Streptophyta 35493
+Chytridiomycota 4761
+Microsporidia 6029
+Glomeromycota 214504
+Neocallimastigomycota 451455
+Blastocladiomycota 451459
+Ascomycota 4890
+Basidiomycota 5204
+Porifera 6040
+Cnidaria 6073
+Ctenophora 10197
+Platyhelminthes 6157
+Nematoda 6231
+Rotifera 10190
+Acanthocephala 10232
+Nematomorpha 33310
+Gastrotricha 33313
+Kinorhyncha 51516
+Cycliophora 69815
+Loricifera 310840
+Nemertea 6217
+Sipuncula 6433
+Mollusca 6447
+Brachiopoda 7568
+Bryozoa 10205
+Priapulida 33467
+Entoprocta 43120
+Arthropoda 6656
+Onychophora 27563
+Tardigrada 42241
+Myzostomida 104731
+Annelida 6340
+Echiura 6427
+Echinodermata 7586
+Chordata 7711
+Hemichordata 10219
+Chaetognatha 10229
+Xenoturbellida 110814
+Gnathostomulida 66780
+Rhombozoa 10214
+Orthonectida 33209
+Placozoa 10226
+Apicomplexa 5794
+Chromerida 877183
+Bacillariophyta 2836
+Eustigmatophyceae 5747
+Bolidophyceae 91989
+Pinguiophyceae 157124
+Picobiliphytes 419944
+Xanthophyceae 2833
+Phaeophyceae 2870
+Aurearenophyceae 569577
+Euglenida 3035
+Haplosporidia 31291
+
+# to get the full lineage for defined ranks based on an input Taxon id
+>>> ranks = ['superkingdom','phylum','class','order','family','genus','species']
+>>> def get_lineage(node, my_ranks):
+...   """returns lineage information in my_ranks order"""
+...   ranks_lookup = dict([(r,idx) for idx,r in enumerate(my_ranks)])
+...   lineage = [None] * len(my_ranks)
+...   curr = node
+...   while curr.Parent is not None:
+...     if curr.Rank in ranks_lookup:
+...       lineage[ranks_lookup[curr.Rank]] = curr.Name
+...     curr = curr.Parent
+...   return lineage
+...
+>>> node = tree.ById[192150] # some taxon id...
+>>> get_lineage(node, ranks)
+['Bacteria', 'Bacteroidetes', 'Flavobacteria', 'Flavobacteriales', 'Flavobacteriaceae', 'Muricauda', 'Muricauda sp. LSc-7']
