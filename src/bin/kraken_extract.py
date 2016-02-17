@@ -19,6 +19,8 @@ def main(args):
         with open(args.output, 'wb') if args.output else sys.stdout as outf:
             csvwriter = csv.writer(outf, quoting=csv.QUOTE_ALL)
             taxon_ids = [line[2] for line in csvreader if line[0] == 'C']
+            for line in taxon_ids:
+                outf.write(line)
             counter_taxon_ids = Counter(taxon_ids)
             [csvwriter.writerow(row) for row in counter_taxon_ids.items()]
 
