@@ -20,7 +20,7 @@ def main(args):
             csvwriter = csv.writer(outf, quoting=csv.QUOTE_ALL)
             taxon_ids = [line[2] for line in csvreader if line[0] == 'C']
             counter_taxon_ids = Counter(taxon_ids)
-            [csvwriter.writerow(row) for row in counter_taxon_ids.items]
+            [csvwriter.writerow(row) for row in counter_taxon_ids.items()]
 
 
 if __name__ == '__main__':
