@@ -9,7 +9,7 @@ def make_arg_parser():
     return parser
 
 def main(args):
-    with if args.input == "-" sys.stdin else open(args.input, 'rb') as inf:
+    with sys.stdin if args.input == "-" else open(args.input, 'rb') as inf:
         for line in inf:
             print(line)
 
