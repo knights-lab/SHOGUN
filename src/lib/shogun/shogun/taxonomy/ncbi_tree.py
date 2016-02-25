@@ -115,7 +115,7 @@ class NCBITree:
             name_lineage.append((name, rank))
         return name_lineage
 
-    def get_name_path_with_name(self, name):
+    def get_name_lineage_with_name(self, name):
         if name not in self.name2taxon_id:
             return []
         path = self.get_name_lineage_with_taxon_id(self.name2taxon_id[name])
@@ -129,7 +129,7 @@ class NCBITree:
                 return tid, name
         return None, None
 
-    def get_rank_with_name(self, name, rank):
+    def get_name_at_rank(self, name, rank):
         if name not in self.name2taxon_id:
             return None, None
         return self.get_rank_with_taxon_id(self.name2taxon_id[name], rank)
@@ -140,9 +140,10 @@ class NCBITree:
             tfile = tarfile.open(fileobj=ftp_stream, mode='r|gz')
             tfile.extractall(self._ncbi_taxdmp_path)
 
+
 def main():
     ncbi_tree = NCBITree.load()
-    print("Hello World!")
+    print("Hello, World")
 
 if __name__ == '__main__':
     main()
