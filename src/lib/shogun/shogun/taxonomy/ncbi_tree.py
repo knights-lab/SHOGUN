@@ -30,12 +30,12 @@ from shogun import SETTINGS
 
 class NCBITree:
     def __init__(self, cache=True, _ncbi_taxdmp_url=SETTINGS.ncbi_taxdmp_url,
-                 _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"), _cache_path=SETTINGS.cache_path):
+                 _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"), _pickle_path=SETTINGS.pickle_path):
                 self.tree = nx.DiGraph()
                 # construct name -> taxon_id mapping
                 self.name2taxon_id = {}
                 self.taxon_id2name = {}
-                self._cache_path = _cache_path
+                self._pickle_path = _pickle_path
                 self._ncbi_taxdmp_url = _ncbi_taxdmp_url
                 self._ncbi_taxdmp_path = _ncbi_taxdmp_path
 
@@ -75,18 +75,18 @@ class NCBITree:
         nx.set_node_attributes(self.tree, 'rank', nodes)
 
     def save(self):
-        self_dump = os.path.join(self._cache_path, "ncbi_taxon_tree.pklz")
-        with gzip.open(self_dump, 'wb') as handle:
+        self_dump = os.path.join(self._pickle_path, "ncbi_taxon_tree.pkl")
+        with open(self_dump, 'wb') as handle:
             pickle.dump(self, handle)
 
     @classmethod
-    def load(cls, _cache_dir=SETTINGS.cache_path):
+    def load(cls, _pickle_dir=SETTINGS.pickle_path):
         try:
-            self_dump = os.path.join(_cache_dir, "ncbi_taxon_tree.pklz")
-            with gzip.open(self_dump, 'rb') as handle:
+            self_dump = os.path.join(_pickle_dir, "ncbi_taxon_tree.pkl")
+            with open(self_dump, 'rb') as handle:
                 return pickle.load(handle)
         except FileNotFoundError as error:
-            return NCBITree(cache=True)
+            raise
 
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
         path = [taxon_id]
@@ -144,7 +144,6 @@ class NCBITree:
 
 def main():
     ncbi_tree = NCBITree.load()
-    print("Hello, World")
 
 if __name__ == '__main__':
     main()
