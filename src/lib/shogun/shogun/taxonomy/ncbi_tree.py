@@ -35,12 +35,12 @@ class NCBITree(PickleClass):
         # Private variables (should be set in settings)
         self._ncbi_taxdmp_dir = _ncbi_taxdmp_dir
 
-        self._parse_taxonomy()
+        self._parse_ncbi_taxonomy()
 
         if cache:
             self.save()
 
-    def _parse_taxonomy(self):
+    def _parse_ncbi_taxonomy(self):
         with open(os.path.join(self._ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
@@ -115,7 +115,8 @@ class NCBITree(PickleClass):
 
 
 def main():
-    ncbi_tree = NCBITree.load()
+    ncbi_tree = NCBITree()
+    ncbi_tree.save()
 
 if __name__ == '__main__':
     main()

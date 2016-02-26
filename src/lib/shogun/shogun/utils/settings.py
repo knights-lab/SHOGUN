@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from collections import namedtuple
 import multiprocessing
 import os
@@ -6,7 +7,8 @@ import json
 from shogun.utils.path import verify_make_dir
 
 Settings = namedtuple('Settings', ('default_dir', 'docs_dir', 'data_dir', 'results_dir', 'pickle_dir',
-                                   'ncbi_taxdmp_url', 'ncbi_taxdmp_dir', 'silva_taxdmp_urls', 'N_jobs'))
+                                   'ncbi_taxdmp_url', 'ncbi_taxdmp_dir', 'silva_taxdmp_urls', 'silva_taxdmp_dir',
+                                   'N_jobs'))
 
 
 def initialize_settings(config_dir=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -21,6 +23,7 @@ def initialize_settings(config_dir=os.path.abspath(os.path.join(os.path.dirname(
         'ncbi_taxdmp_url',
         'ncbi_taxdmp_dir',
         'silva_taxdmp_urls',
+        'silva_taxdmp_dir',
         'N_jobs'
     )
 
@@ -57,6 +60,7 @@ def make_default_values(default_dir):
         os.path.join(default_dir, 'data', 'ncbi_taxdmp'),
         ['http://www.arb-silva.de/fileadmin/silva_databases/release_119/Exports/taxonomy/taxmap_embl_ssu_parc_119.txt',
          'http://www.arb-silva.de/fileadmin/silva_databases/release_119/Exports/taxonomy/taxmap_embl_lsu_parc_119.txt'],
+        os.path.join(default_dir, 'data', 'silva_taxdmp'),
         multiprocessing.cpu_count()
     )
 
