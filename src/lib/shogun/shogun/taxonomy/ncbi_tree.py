@@ -29,23 +29,24 @@ from shogun import SETTINGS
 
 
 class NCBITree:
-    def __init__(self, cache=True, _ncbi_taxdmp_url=SETTINGS.ncbi_taxdmp_url, _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"), _cache_path=SETTINGS.cache_path):
-            self.tree = nx.DiGraph()
-            # construct name -> taxon_id mapping
-            self.name2taxon_id = {}
-            self.taxon_id2name = {}
-            self._cache_path = _cache_path
-            self._ncbi_taxdmp_url = _ncbi_taxdmp_url
-            self._ncbi_taxdmp_path = _ncbi_taxdmp_path
+    def __init__(self, cache=True, _ncbi_taxdmp_url=SETTINGS.ncbi_taxdmp_url,
+                 _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"), _cache_path=SETTINGS.cache_path):
+                self.tree = nx.DiGraph()
+                # construct name -> taxon_id mapping
+                self.name2taxon_id = {}
+                self.taxon_id2name = {}
+                self._cache_path = _cache_path
+                self._ncbi_taxdmp_url = _ncbi_taxdmp_url
+                self._ncbi_taxdmp_path = _ncbi_taxdmp_path
 
-            if not os.path.exists(self._ncbi_taxdmp_path):
-                os.makedirs(self._ncbi_taxdmp_path)
-                self._ncbi_taxdmp_url()
+                if not os.path.exists(self._ncbi_taxdmp_path):
+                    os.makedirs(self._ncbi_taxdmp_path)
+                    self._ncbi_taxdmp_url()
 
-            self._parse_taxonomy()
+                self._parse_taxonomy()
 
-            if cache:
-                self.save()
+                if cache:
+                    self.save()
 
     def _parse_taxonomy(self):
         with open(os.path.join(self._ncbi_taxdmp_path, 'names.dmp'), 'r') as handle:

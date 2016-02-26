@@ -1,7 +1,7 @@
-from __future__ import print_function
 import pandas as pd
 import numpy as np
 from collections import defaultdict
+
 
 def parse_line(line):
     line = np.array(line.split('\t')[:-1])
@@ -12,10 +12,12 @@ def parse_line(line):
         species = names[1]
     return np.append(np.delete(line, 2), [names[0], species])
 
+
 def parse_taxonomy(path):
     with open(path, 'r') as f:
         df = pd.DataFrame([parse_line(line) for line in f], columns=['species_id', 'strain_id', 'domain', 'genus', 'species'])
     return df
+
 
 def return_taxa_map(path):
     with open(path, 'r') as f:
