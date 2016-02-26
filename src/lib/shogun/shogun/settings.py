@@ -1,26 +1,43 @@
 from collections import namedtuple
 import multiprocessing
 import os
+import json
 
-Settings = namedtuple('Settings', ['data_path', 'cache_path', 'results_path', 'ncbi_taxdmp_url', 'silva_taxdmp_urls',
-                                   'N_jobs'])
+from shogun.utils.path import verify_make_path
 
 
-def initialize_settings(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..')):
+def initialize_settings(lib_path=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                          '..', '..', '..', '..'))):
+    keys = ('lib_path', 'data_path', 'results_path', 'ncbi_taxdmp_url', 'silva_taxdmp_urls', 'N_jobs')
+    Settings = namedtuple('Settings', keys)
 
-    cache_path = os.path.join(path, 'cache')
-    data_path = os.path.join(path, 'data')
-    results_path = os.path.join(path, 'results')
-    ncbi_taxdmp_url = 'ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz'
-    silva_taxdmp_urls = [
-        'http://www.arb-silva.de/fileadmin/silva_databases/release_119/Exports/taxonomy/taxmap_embl_ssu_parc_119.txt',
-        'http://www.arb-silva.de/fileadmin/silva_databases/release_119/Exports/taxonomy/taxmap_embl_lsu_parc_119.txt']
+    default_values = (
+        lib_path,
+        os.path.join(lib_path, 'data'),
+        os.path.join(lib_path, 'results'),
+        'ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz',
+        ['http://www.arb-silva.de/fileadmin/silva_databases/release_119/Exports/taxonomy/taxmap_embl_ssu_parc_119.txt',
+         'http://www.arb-silva.de/fileadmin/silva_databases/release_119/Exports/taxonomy/taxmap_embl_lsu_parc_119.txt'],
+        multiprocessing.cpu_count()
+    )
 
-    for path in [path, cache_path, data_path, results_path]:
-        if not os.path.exists(path):
-            os.makedirs(path)
+    settings_dict = dict(zip(keys, default_values))
 
-    N_jobs = multiprocessing.cpu_count()
+    if os.path.exists(os.path.join(lib_path, 'SETTINGS.json')):
+        with open(os.path.join(lib_path, 'SETTINGS.json')) as inf_handle:
+            j = json.load(inf_handle)
+            for key in j.keys():
+                if j[key] != 'DEFAULT' and key in settings_dict:
+                    settings_dict[key] = j[key]
 
-    return Settings(silva_taxdmp_urls=silva_taxdmp_urls, ncbi_taxdmp_url=ncbi_taxdmp_url, data_path=data_path,
-                    cache_path=cache_path, results_path=results_path, N_jobs=N_jobs)
+    for path in ['data_path', 'results_path']:
+        verify_make_path(settings_dict[path])
+
+    return Settings(**settings_dict)
+
+
+def main():
+    initialize_settings()
+
+if __name__ == '__main__':
+    main()

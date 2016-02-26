@@ -20,28 +20,27 @@ path = t_tree.get_name_path_with_taxon_id(taxon_id)
 import os
 import networkx as nx
 import pickle
-import gzip
 import tarfile
 import urllib.request
 import csv
 
 from shogun import SETTINGS
+from shogun.utils.path import verify_make_path
 
 
 class NCBITree:
     def __init__(self, cache=True, _ncbi_taxdmp_url=SETTINGS.ncbi_taxdmp_url,
-                 _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"), _pickle_path=SETTINGS.pickle_path):
+                 _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"),
+                 _pickle_path=os.path.join(SETTINGS.data_path, 'pickle')):
                 self.tree = nx.DiGraph()
                 # construct name -> taxon_id mapping
                 self.name2taxon_id = {}
                 self.taxon_id2name = {}
                 self._pickle_path = _pickle_path
+                verify_make_path(self._pickle_path)
                 self._ncbi_taxdmp_url = _ncbi_taxdmp_url
                 self._ncbi_taxdmp_path = _ncbi_taxdmp_path
-
-                if not os.path.exists(self._ncbi_taxdmp_path):
-                    os.makedirs(self._ncbi_taxdmp_path)
-                    self._ncbi_taxdmp_url()
+                verify_make_path(self._ncbi_taxdmp_path)
 
                 self._parse_taxonomy()
 
@@ -80,9 +79,9 @@ class NCBITree:
             pickle.dump(self, handle)
 
     @classmethod
-    def load(cls, _pickle_dir=SETTINGS.pickle_path):
+    def load(cls, _pickle_path=os.path.join(SETTINGS.data_path, 'pickle')):
         try:
-            self_dump = os.path.join(_pickle_dir, "ncbi_taxon_tree.pkl")
+            self_dump = os.path.join(_pickle_path, "ncbi_taxon_tree.pkl")
             with open(self_dump, 'rb') as handle:
                 return pickle.load(handle)
         except FileNotFoundError as error:
