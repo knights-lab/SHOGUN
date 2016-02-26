@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 This library was adapted from:
         https://github.com/luo-chengwei/utilitomics
@@ -19,36 +18,30 @@ path = t_tree.get_name_path_with_taxon_id(taxon_id)
 
 import os
 import networkx as nx
-import pickle
-import tarfile
-import urllib.request
 import csv
 
+from shogun.utils.pickle_class import PickleClass
 from shogun import SETTINGS
-from shogun.utils.path import verify_make_path
 
 
-class NCBITree:
-    def __init__(self, cache=True, _ncbi_taxdmp_url=SETTINGS.ncbi_taxdmp_url,
-                 _ncbi_taxdmp_path=os.path.join(SETTINGS.data_path, "ncbi_taxdmp"),
-                 _pickle_path=os.path.join(SETTINGS.data_path, 'pickle')):
-                self.tree = nx.DiGraph()
-                # construct name -> taxon_id mapping
-                self.name2taxon_id = {}
-                self.taxon_id2name = {}
-                self._pickle_path = _pickle_path
-                verify_make_path(self._pickle_path)
-                self._ncbi_taxdmp_url = _ncbi_taxdmp_url
-                self._ncbi_taxdmp_path = _ncbi_taxdmp_path
-                verify_make_path(self._ncbi_taxdmp_path)
+class NCBITree(PickleClass):
+    def __init__(self, cache=True, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
+        super().__init__()
+        self.tree = nx.DiGraph()
+        # construct name -> taxon_id mapping
+        self.name2taxon_id = {}
+        self.taxon_id2name = {}
 
-                self._parse_taxonomy()
+        # Private variables (should be set in settings)
+        self._ncbi_taxdmp_dir = _ncbi_taxdmp_dir
 
-                if cache:
-                    self.save()
+        self._parse_taxonomy()
+
+        if cache:
+            self.save()
 
     def _parse_taxonomy(self):
-        with open(os.path.join(self._ncbi_taxdmp_path, 'names.dmp'), 'r') as handle:
+        with open(os.path.join(self._ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
                 taxon_id = cols[0]
@@ -60,7 +53,7 @@ class NCBITree:
         # construct node tree
         edges = []
         nodes = {}
-        with open(os.path.join(self._ncbi_taxdmp_path, 'nodes.dmp'), 'r') as handle:
+        with open(os.path.join(self._ncbi_taxdmp_dir, 'nodes.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
                 parent_node = cols[2]
@@ -72,20 +65,6 @@ class NCBITree:
 
         self.tree.add_edges_from(edges)
         nx.set_node_attributes(self.tree, 'rank', nodes)
-
-    def save(self):
-        self_dump = os.path.join(self._pickle_path, "ncbi_taxon_tree.pkl")
-        with open(self_dump, 'wb') as handle:
-            pickle.dump(self, handle)
-
-    @classmethod
-    def load(cls, _pickle_path=os.path.join(SETTINGS.data_path, 'pickle')):
-        try:
-            self_dump = os.path.join(_pickle_path, "ncbi_taxon_tree.pkl")
-            with open(self_dump, 'rb') as handle:
-                return pickle.load(handle)
-        except FileNotFoundError as error:
-            raise
 
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
         path = [taxon_id]
@@ -133,12 +112,6 @@ class NCBITree:
         if name not in self.name2taxon_id:
             return None, None
         return self.get_rank_with_taxon_id(self.name2taxon_id[name], rank)
-
-    def _download_ncbi_dump(self):
-        req = urllib.request.Request(self._ncbi_taxdmp_url)
-        with urllib.request.urlopen(req, 'rb') as ftp_stream:
-            tfile = tarfile.open(fileobj=ftp_stream, mode='r|gz')
-            tfile.extractall(self._ncbi_taxdmp_path)
 
 
 def main():

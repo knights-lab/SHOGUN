@@ -1,6 +1,6 @@
 import os
 
 
-def verify_make_path(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
+def verify_make_dir(outdir):
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
