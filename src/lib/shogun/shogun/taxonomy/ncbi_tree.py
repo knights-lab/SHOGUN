@@ -25,7 +25,7 @@ from shogun import SETTINGS
 
 
 class NCBITree(PickleClass):
-    def __init__(self, cache=True, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
+    def __init__(self, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
         super().__init__()
         self.tree = nx.DiGraph()
         # construct name -> taxon_id mapping
@@ -37,14 +37,11 @@ class NCBITree(PickleClass):
 
         self._parse_ncbi_taxonomy()
 
-        if cache:
-            self.save()
-
     def _parse_ncbi_taxonomy(self):
         with open(os.path.join(self._ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
-                taxon_id = cols[0]
+                taxon_id = int(cols[0])
                 name = cols[2]
                 self.name2taxon_id[name] = taxon_id
                 if cols[-2] == 'scientific name':
@@ -56,12 +53,12 @@ class NCBITree(PickleClass):
         with open(os.path.join(self._ncbi_taxdmp_dir, 'nodes.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
-                parent_node = cols[2]
-                children_node = cols[0]
+                parent_node = int(cols[2])
+                child_node = int(cols[0])
                 rank = cols[4]
-                nodes[children_node] = rank
-                if children_node != parent_node:
-                    edges.append((children_node, parent_node))
+                nodes[child_node] = rank
+                if child_node != parent_node:
+                    edges.append((child_node, parent_node))
 
         self.tree.add_edges_from(edges)
         nx.set_node_attributes(self.tree, 'rank', nodes)
@@ -113,10 +110,24 @@ class NCBITree(PickleClass):
             return None, None
         return self.get_rank_with_taxon_id(self.name2taxon_id[name], rank)
 
+    def get_lineage(self, taxon_id, ranks={'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}):
+        taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
+        name_lineage = []
+        for x in taxon_id_lineage:
+            rank = self.tree.node[x]['rank']
+            try:
+                name = self.taxon_id2name[x]
+            except KeyError:
+                name = ''
+            if rank in ranks:
+                name_lineage.append((name, x, rank))
+        return name_lineage[::-1]
 
 def main():
-    ncbi_tree = NCBITree()
-    ncbi_tree.save()
+    # ncbi_tree = NCBITree()
+    # ncbi_tree.save()
+    ncbi_tree = NCBITree.load()
+    print(ncbi_tree.get_lineage(511145))
 
 if __name__ == '__main__':
     main()
