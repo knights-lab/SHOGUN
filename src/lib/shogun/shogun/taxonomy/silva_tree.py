@@ -28,7 +28,6 @@ class SilvaTree(PickleClass):
 
         self.silva_acc2taxon_id = self._parse_silva_taxonomy_file()
 
-
     def _parse_silva_taxonomy_file(self):
         silva_acc2taxon_id = {}
         files = glob(os.path.join(self._silva_taxdmp_dir, "*.txt"))
@@ -36,8 +35,10 @@ class SilvaTree(PickleClass):
             with open(file) as inf:
                 csv_inf = csv.reader(inf, delimiter='\t')
                 for row in csv_inf:
-                    if row[0] in self.ncbi_tree.taxon_id2name:
-                        silva_acc2taxon_id[row[0]] = row[-1].replace(" ", "")
+                    silva_acc = row[0].replace(" ", "")
+                    ncbi_taxon_id = row[-1].replace(" ", "")
+                    if ncbi_taxon_id in self.ncbi_tree.taxon_id2name:
+                        silva_acc2taxon_id[silva_acc] = ncbi_taxon_id
         return silva_acc2taxon_id
 
 
