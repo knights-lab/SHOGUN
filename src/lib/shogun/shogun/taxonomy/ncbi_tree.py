@@ -1,70 +1,65 @@
 #!/usr/bin/env python
-"""
-This library was adapted from:
-        https://github.com/luo-chengwei/utilitomics
-
-This library works with the taxonomy db download from NCBI FTP:
-
-ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz
-
-basically you can init an taxonomy tree obj by:
-
-t_tree = ncbi.NCBITree(path)   # tree being the tax dump db unzip dir
-then you can basically get the taxonomy ranks using:
-
-path = t_tree.get_name_path_with_taxon_id(taxon_id)
-
-"""
-
 import os
-import networkx as nx
 import csv
+import pandas as pd
+from collections import namedtuple
 
 from shogun.utils.pickle_class import PickleClass
 from shogun import SETTINGS
 
 
 class NCBITree(PickleClass):
-    def __init__(self, cache=True, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
+    def __init__(self, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
+        """
+        This class was adapted from:
+            https://github.com/luo-chengwei/utilitomics
+
+        This library works with the taxonomy db download from NCBI FTP:
+
+        ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz
+
+        basically you can init an taxonomy tree obj by:
+
+        t_tree = ncbi.NCBITree(path)   # tree being the tax dump db unzip dir
+        then you can basically get the taxonomy ranks using:
+
+        path = t_tree.get_name_path_with_taxon_id(taxon_id)
+        """
         super().__init__()
-        self.tree = nx.DiGraph()
+        self.df = pd.DataFrame(columns=['name', 'rank', 'parent'])
         # construct name -> taxon_id mapping
-        self.name2taxon_id = {}
-        self.taxon_id2name = {}
+        # self.name2taxon_id = {}
+        # self.taxon_id2name = {}
 
         # Private variables (should be set in settings)
         self._ncbi_taxdmp_dir = _ncbi_taxdmp_dir
 
         self._parse_ncbi_taxonomy()
 
-        if cache:
-            self.save()
-
     def _parse_ncbi_taxonomy(self):
+        col_names = ['ncbi_taxon_id', 'scientific_name', 'rank', 'parent']
+        tree_dict = {}
+
         with open(os.path.join(self._ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
-                taxon_id = cols[0]
-                name = cols[2]
-                self.name2taxon_id[name] = taxon_id
                 if cols[-2] == 'scientific name':
-                    self.taxon_id2name[taxon_id] = name
+                    tree_dict[int(cols[0])] = [cols[2], None, None]
 
-        # construct node tree
-        edges = []
-        nodes = {}
         with open(os.path.join(self._ncbi_taxdmp_dir, 'nodes.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
-                parent_node = cols[2]
-                children_node = cols[0]
-                rank = cols[4]
-                nodes[children_node] = rank
+                children_node = int(cols[0])
+                parent_node = int(cols[2])
                 if children_node != parent_node:
-                    edges.append((children_node, parent_node))
+                    if children_node in tree_dict:
+                        tree_dict[children_node][1:] = (cols[4], parent_node)
+        df_ranks = pd.DataFrame(tree_dict, columns=col_names)
+        print("Hello World")
 
-        self.tree.add_edges_from(edges)
-        nx.set_node_attributes(self.tree, 'rank', nodes)
+        # self.tree.add_edges_from(edges)
+        # nx.set_node_attributes(self.tree, 'rank', nodes)
+        self.df = df_ranks
 
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
         path = [taxon_id]
@@ -116,7 +111,8 @@ class NCBITree(PickleClass):
 
 def main():
     ncbi_tree = NCBITree()
-    ncbi_tree.save()
+    # ncbi_tree.save()
+    print("Hello World")
 
 if __name__ == '__main__':
     main()
