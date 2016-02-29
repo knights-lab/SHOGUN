@@ -25,7 +25,7 @@ from shogun import SETTINGS
 
 
 class NCBITree(PickleClass):
-    def __init__(self, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
+    def __init__(self, cache=True, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
         super().__init__()
         self.tree = nx.DiGraph()
         # construct name -> taxon_id mapping
@@ -35,25 +35,24 @@ class NCBITree(PickleClass):
         # Private variables (should be set in settings)
         self._ncbi_taxdmp_dir = _ncbi_taxdmp_dir
 
-        self.name2taxon_id, self.taxon_id2name, self.tree = self._parse_ncbi_taxonomy()
+        self._parse_ncbi_taxonomy()
+
+        if cache:
+            self.save()
 
     def _parse_ncbi_taxonomy(self):
-        name2taxon_id = {}
-        taxon_id2name = {}
-
         with open(os.path.join(self._ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
                 taxon_id = cols[0]
                 name = cols[2]
-                name2taxon_id[name] = taxon_id
+                self.name2taxon_id[name] = taxon_id
                 if cols[-2] == 'scientific name':
-                    taxon_id2name[taxon_id] = name
+                    self.taxon_id2name[taxon_id] = name
 
         # construct node tree
         edges = []
         nodes = {}
-        tree = nx.DiGraph()
         with open(os.path.join(self._ncbi_taxdmp_dir, 'nodes.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
@@ -64,9 +63,8 @@ class NCBITree(PickleClass):
                 if children_node != parent_node:
                     edges.append((children_node, parent_node))
 
-        tree.add_edges_from(edges)
+        self.tree.add_edges_from(edges)
         nx.set_node_attributes(self.tree, 'rank', nodes)
-        return name2taxon_id, taxon_id2name, tree
 
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
         path = [taxon_id]
