@@ -8,8 +8,8 @@
 #TRIAL_HOME=/project/flatiron/ben/shallow-seq/results/SKTSL-downsampling-2015-12-31-15
 #IN_FILE=${TRIAL_HOME}/SKSTL0069.trimmed.hostRemoved_1.fasta
 
-FASTQ_RNA=/project/flatiron/ben/data/ribo/fastq_rna.txt
-FASTQ_DNA=/project/flatiron/ben/data/ribo/fasta_dna.txt
+FASTQ_RNA=/project/flatiron/ben/NINJA-Shogun/data/ribo/fastq_rna.txt
+FASTQ_DNA=/project/flatiron/ben/NINJA-Shogun/data/ribo/fasta_dna.txt
 
 while read file; do
   echo $file
