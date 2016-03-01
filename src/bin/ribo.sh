@@ -1,56 +1,58 @@
 #!/usr/bin/env bash
 
-# Copy the index into ramdisk
-#mkdir /dev/shm/bowtie_indx/
-#cp /project/flatiron/tonya/img_bowtie_builds/*.bt2l /dev/shm/bowtie_indx
-
 # Set up the experiment parameters
-TRIAL_HOME=/project/flatiron/ben/shallow-seq/results/SKTSL-downsampling-2015-12-31-15
-PROJECT_HOME=/project/flatiron/ben/NINJA-Shogun
 DATA_HOME=/project/flatiron/ben/data/ribo
 
-FASTQ_HOME=/export/scratch/ben/msi
-FASTQ_RNA=${PROJECT_HOME}/data/ribo/fastq_rna.txt
-FASTQ_DNA=${PROJECT_HOME}/data/ribo/fasta_dna.txt
+# Location of the sshfs from msi
+FASTQ_DIR=/export/scratch/ben/msi
 
-# test for directory
-test -d ${DATA_HOME}/dna | mkdir -p  ${DATA_HOME}/dna
-while read line; do
-  echo ${FASTQ_HOME}/${line}
-  LINE_WITHOUT_EXTENSION=${line%.fastq}
-  time java -jar /project/flatiron/ben/bin/Trimmomatic-0.35/trimmomatic-0.35.jar \
-    SE -phred33 ${FASTQ_HOME}/${line} \
-    ${DATA_HOME}/dna/${LINE_WITHOUT_EXTENSION}.trimmed.fastq \
-    -threads 16 \
-    ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
-    LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 >> ${DATA_HOME}/dna/README.txt
-done <$FASTQ_RNA
+#location of the fastq files
+DNA_FILE_LIST=${DATA_HOME}/fastq_dna.txt
+RNA_FILE_LIST=${DATA_HOME}/fastq_rna.txt
 
+trimm_align () {
+    output_dir=$1
+    fastq_dir=$2
+    file_list=$3
+    bt2_indx=$4
 
+    test -d ${output_dir} | mkdir -p  ${output_dir}
+    output_fastq_dir=${output_dir}/fastq
+    test -d ${output_fastq_dir} | mkdir -p  ${output_fastq_dir}
+    while read IN_FILE; do
+      OUT_FILE=${IN_FILE%.fastq}.trimmed.fastq
+      java -jar /project/flatiron/ben/bin/Trimmomatic-0.35/trimmomatic-0.35.jar \
+        SE -phred33 ${output_fastq_dir}/${IN_FILE} \
+        ${output_fastq_dir}/${OUT_FILE} \
+        -threads 16 \
+        ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
+        LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+    done <${file_list}
 
-# Run the full trial
-#bowtie2 --no-unal --no-hd -x /dev/shm/bowtie_indx/img.gene.bacteria.bowtie  --np 0 --mp "1,1" \
-#--rdg "0,1" --rfg "0,1" --score-min "L,0,-0.02" --norc -f ${IN_FILE} --very-sensitive -a -p 48 \
-#| python unsorted_last_common_ancestor.py -x  /project/flatiron/data/img/00.taxon.tab.txt \
-#-o ${TRIAL_HOME}/results_full.csv -
+    # test for directory
+    output_sam_dir=${output_dir}/sam
+    test -d ${output_sam_dir} | mkdir -p  ${output_sam_dir}
+    # Run bowtie2
+    for IN_FILE in ${output_fastq_dir}/*.fastq; do
+        OUT_FILE=${IN_FILE%.fastq}.sam
+        bowtie2 --no-unal --no-head -x ${bt2_indx} \
+            -S ${output_sam_dir}/${OUT_FILE} --np 0 --mp "1,1" --rdg "0,1" --rfg "0,1" \
+            --score-min "L,0,-0.02" --norc -q ${output_fastq_dir}/${IN_FILE} -a -p 48
+    done
+}
 
-## Grab the entire number of reads once for downsampling
-#NUM_READS="$(grep -c "^>" ${IN_FILE})"
-#
-#k=(1000 10000 100000 1000000 10000000)
-#
-#for i in ${k[@]}; do
-#    # Make the directory to store down-sampling results
-#    test -d ${TRIAL_HOME}/hits_${i} | mkdir -p ${TRIAL_HOME}/hits_${i}
-#    for j in `seq 1 10`; do
-#        # An experiment
-#        subset_fasta.py -n ${NUM_READS} -k ${i} ${IN_FILE}\
-#        | bowtie2 --no-unal --no-hd -x /dev/shm/bowtie_indx/img.gene.bacteria.bowtie  --np 0 --mp "1,1" \
-#        --rdg "0,1" --rfg "0,1" --score-min "L,0,-0.02" --norc -f - --very-sensitive -a -p 48 \
-#        | unsorted_last_common_ancestor.py -x  /project/flatiron/data/img/00.taxon.tab.txt \
-#        -o ${TRIAL_HOME}/hits_${i}/results_${j}.csv -
-#    done
-#done
-#
-## Clear the ramdisk
-#rm -r /dev/shm/bowtie_indx
+# Copy the index into ramdisk
+mkdir /dev/shm/bt2_indx/
+cp /project/flatiron/gabe/IMGENES.* /dev/shm/bt2_indx
+DNA_BT2_INDX=/dev/shm/bt2_indx/IMGENES
+trimm_align ${DATA_HOME}/dna FASTQ_DIR DNA_FILE_LIST DNA_BT2_INDX
+# Clear the ramdisk
+rm -r /dev/shm/bt2_indx
+
+#Copy the index into ramdisk
+mkdir /dev/shm/bt2_indx/
+cp /project/flatiron/data/db/fasta/bt2/SILVA_119_SSU_LSU_combined.* /dev/shm/bt2_indx
+RNA_BT2_INDX=/dev/shm/bt2_indx/SILVA_119_SSU_LSU_combined
+trimm_align ${DATA_HOME}/rna FASTQ_DIR RNA_FILE_LIST RNA_BT2_INDX
+# Clear the ramdisk
+rm -r /dev/shm/bt2_indx
