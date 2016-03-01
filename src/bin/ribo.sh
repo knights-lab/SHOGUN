@@ -7,8 +7,8 @@ DATA_DIR=/project/flatiron/ben/data/ribo
 FASTQ_DIR=/export/scratch/ben/msi
 
 #location of the fastq files
-DNA_FILE_LIST=${DATA_HOME}/fastq_dna.txt
-RNA_FILE_LIST=${DATA_HOME}/fastq_rna.txt
+DNA_FILE_LIST=${DATA_DIR}/fastq_dna.txt
+RNA_FILE_LIST=${DATA_DIR}/fastq_rna.txt
 
 trimm_align () {
     output_dir=$1
@@ -45,7 +45,7 @@ trimm_align () {
 #mkdir /dev/shm/bt2_indx/
 #cp /project/flatiron/gabe/IMGENES.* /dev/shm/bt2_indx
 #DNA_BT2_INDX=/dev/shm/bt2_indx/IMGENES
-trimm_align ${DATA_HOME}/dna FASTQ_DIR DNA_FILE_LIST DNA_BT2_INDX
+trimm_align ${DATA_DIR}/dna FASTQ_DIR DNA_FILE_LIST DNA_BT2_INDX
 # Clear the ramdisk
 #rm -r /dev/shm/bt2_indx
 
