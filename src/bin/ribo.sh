@@ -20,7 +20,7 @@ while read line; do
     SE -phred33 {$FASTQ_HOME}/{$line} \
     {$DATA_HOME}\dna\{$LINE_WITHOUT_EXTENSION}.trimmed.fastq \
     -threads 16 \
-    ILLUMINACLIP:/project/flatiron/be   n/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
+    ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
     LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 >> {$DATA_HOME}\dna\README.txt
 done <$FASTQ_RNA
 
