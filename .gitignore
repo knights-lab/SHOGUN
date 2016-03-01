@@ -191,4 +191,4 @@ vignettes/*.pdf
 !src/lib
 
 # Ignore custom json
-SETTINGS.json
+#SETTINGS.json
