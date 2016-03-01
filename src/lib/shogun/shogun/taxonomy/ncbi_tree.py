@@ -127,7 +127,7 @@ def main():
     # ncbi_tree = NCBITree()
     # ncbi_tree.save()
     ncbi_tree = NCBITree.load()
-    print(ncbi_tree.get_lineage(511145))
+    print(ncbi_tree.get_taxon_id_lineage_with_taxon_id(511145))
 
 if __name__ == '__main__':
     main()

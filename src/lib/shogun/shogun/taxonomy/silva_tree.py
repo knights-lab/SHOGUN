@@ -60,10 +60,10 @@ class SilvaTree(PickleClass):
 
 
 def main():
-    silva_tree = SilvaTree()
-    silva_tree.save()
-    # silva_tree = SilvaTree.load()
-    # print(silva_tree.get_lineage('AJGD01000050'))
+    # silva_tree = SilvaTree()
+    # silva_tree.save()
+    silva_tree = SilvaTree.load()
+    print(silva_tree.get_lineage('AJGD01000050'))
 
 if __name__ == '__main__':
     main()
