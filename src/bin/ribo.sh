@@ -26,7 +26,7 @@ trimm_align () {
             SE -phred33 ${input_fastq_dir}/${in_file} \
             ${output_fastq_dir}/${out_file} \
             -threads 16 \
-            LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+            LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 > ${output_fastq_dir}/README.md
 #            ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
     done <${file_list}
 
@@ -40,7 +40,7 @@ trimm_align () {
         out_file=${filename%.fastq}.sam
         bowtie2 --no-unal --no-head -x ${bt2_indx} \
             -S ${output_sam_dir}/${out_file} --np 0 --mp "1,1" --rdg "0,1" --rfg "0,1" \
-            --score-min "L,0,-0.02" --norc -q ${in_file} -k 8 -p 48
+            --score-min "L,0,-0.02" --norc -q ${in_file} -k 8 -p 48 > ${output_sam_dir}/README.md
     done
 }
 
