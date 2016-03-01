@@ -40,7 +40,7 @@ trimm_align () {
         out_file=${filename%.fastq}.sam
         bowtie2 --no-unal --no-head -x ${bt2_indx} \
             -S ${output_sam_dir}/${out_file} --np 0 --mp "1,1" --rdg "0,1" --rfg "0,1" \
-            --score-min "L,0,-0.02" --norc -q ${in_file} -a -p 48
+            --score-min "L,0,-0.02" --norc -q ${in_file} -k 8 -p 48
     done
 }
 
