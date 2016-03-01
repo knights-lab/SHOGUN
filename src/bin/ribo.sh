@@ -13,7 +13,7 @@ FASTQ_DNA=/project/flatiron/ben/NINJA-Shogun/data/ribo/fasta_dna.txt
 
 while read file; do
   echo $file
-done <FASTQ_RNA
+done <$FASTQ_RNA
 
 # Run the full trial
 #bowtie2 --no-unal --no-hd -x /dev/shm/bowtie_indx/img.gene.bacteria.bowtie  --np 0 --mp "1,1" \
