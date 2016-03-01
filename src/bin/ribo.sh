@@ -26,8 +26,8 @@ trimm_align () {
             SE -phred33 ${input_fastq_dir}/${in_file} \
             ${output_fastq_dir}/${out_file} \
             -threads 16 \
-            ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
             LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+#            ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
     done <${file_list}
 
     # test for directory
