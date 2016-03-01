@@ -20,7 +20,7 @@ import os
 import networkx as nx
 import csv
 
-from shogun.utils.pickle_class import PickleClass
+from shogun.utilities.pickle_class import PickleClass
 from shogun import SETTINGS
 
 

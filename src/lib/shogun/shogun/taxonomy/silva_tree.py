@@ -3,8 +3,8 @@ import csv
 from glob import glob
 import os
 
-from shogun.utils.pickle_class import PickleClass
-from shogun.utils.collections import reverse_dict
+from shogun.utilities.pickle_class import PickleClass
+from shogun.utilities.collections import reverse_dict
 from shogun.taxonomy.ncbi_tree import NCBITree
 from shogun import SETTINGS
 

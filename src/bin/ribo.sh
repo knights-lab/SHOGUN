@@ -19,11 +19,11 @@ trimm_align () {
     test -d ${output_dir} | mkdir -p  ${output_dir}
     output_fastq_dir=${output_dir}/fastq
     test -d ${output_fastq_dir} | mkdir -p  ${output_fastq_dir}
-    while read IN_FILE; do
-      OUT_FILE=${IN_FILE%.fastq}.trimmed.fastq
+    while read in_file; do
+      out_file=${in_file%.fastq}.trimmed.fastq
       java -jar /project/flatiron/ben/bin/Trimmomatic-0.35/trimmomatic-0.35.jar \
-        SE -phred33 ${output_fastq_dir}/${IN_FILE} \
-        ${output_fastq_dir}/${OUT_FILE} \
+        SE -phred33 ${output_fastq_dir}/${in_file} \
+        ${output_fastq_dir}/${out_file} \
         -threads 16 \
         ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
         LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
@@ -33,11 +33,11 @@ trimm_align () {
     output_sam_dir=${output_dir}/sam
     test -d ${output_sam_dir} | mkdir -p  ${output_sam_dir}
     # Run bowtie2
-    for IN_FILE in ${output_fastq_dir}/*.fastq; do
-        OUT_FILE=${IN_FILE%.fastq}.sam
+    for in_file in ${output_fastq_dir}/*.fastq; do
+        out_file=${in_file%.fastq}.sam
         bowtie2 --no-unal --no-head -x ${bt2_indx} \
-            -S ${output_sam_dir}/${OUT_FILE} --np 0 --mp "1,1" --rdg "0,1" --rfg "0,1" \
-            --score-min "L,0,-0.02" --norc -q ${output_fastq_dir}/${IN_FILE} -a -p 48
+            -S ${output_sam_dir}/${out_file} --np 0 --mp "1,1" --rdg "0,1" --rfg "0,1" \
+            --score-min "L,0,-0.02" --norc -q ${output_fastq_dir}/${in_file} -a -p 48
     done
 }
 
