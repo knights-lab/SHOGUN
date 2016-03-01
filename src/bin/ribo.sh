@@ -4,7 +4,7 @@
 DATA_DIR=/project/flatiron/ben/data/ribo
 
 # Location of the sshfs from msi
-FASTQ_DIR=/export/scratch/ben/msi
+INPUT_FASTQ_DIR=/export/scratch/ben/msi
 
 #location of the fastq files
 DNA_FILE_LIST=${DATA_DIR}/fastq_dna.txt
@@ -12,7 +12,7 @@ RNA_FILE_LIST=${DATA_DIR}/fastq_rna.txt
 
 trimm_align () {
     output_dir=$1
-    fastq_dir=$2
+    input_fastq_dir=$2
     file_list=$3
     bt2_indx=$4
 
@@ -22,7 +22,7 @@ trimm_align () {
     while read in_file; do
       out_file=${in_file%.fastq}.trimmed.fastq
       java -jar /project/flatiron/ben/bin/Trimmomatic-0.35/trimmomatic-0.35.jar \
-        SE -phred33 ${output_fastq_dir}/${in_file} \
+        SE -phred33 ${input_fastq_dir}/${in_file} \
         ${output_fastq_dir}/${out_file} \
         -threads 16 \
         ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
@@ -45,7 +45,7 @@ trimm_align () {
 #mkdir /dev/shm/bt2_indx/
 #cp /project/flatiron/gabe/IMGENES.* /dev/shm/bt2_indx
 #DNA_BT2_INDX=/dev/shm/bt2_indx/IMGENES
-trimm_align ${DATA_DIR}/dna ${FASTQ_DIR} ${DNA_FILE_LIST} ${DNA_BT2_INDX}
+trimm_align ${DATA_DIR}/dna ${INPUT_FASTQ_DIR} ${DNA_FILE_LIST} ${DNA_BT2_INDX}
 # Clear the ramdisk
 #rm -r /dev/shm/bt2_indx
 
@@ -53,6 +53,6 @@ trimm_align ${DATA_DIR}/dna ${FASTQ_DIR} ${DNA_FILE_LIST} ${DNA_BT2_INDX}
 #mkdir /dev/shm/bt2_indx/
 #cp /project/flatiron/data/db/fasta/bt2/SILVA_119_SSU_LSU_combined.* /dev/shm/bt2_indx
 #RNA_BT2_INDX=/dev/shm/bt2_indx/SILVA_119_SSU_LSU_combined
-trimm_align ${DATA_DIR}/rna ${FASTQ_DIR} ${RNA_FILE_LIST} ${RNA_BT2_INDX}
+trimm_align ${DATA_DIR}/rna ${INPUT_FASTQ_DIR} ${RNA_FILE_LIST} ${RNA_BT2_INDX}
 # Clear the ramdisk
 #rm -r /dev/shm/bt2_indx
