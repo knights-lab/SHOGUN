@@ -5,15 +5,26 @@
 #cp /project/flatiron/tonya/img_bowtie_builds/*.bt2l /dev/shm/bowtie_indx
 
 # Set up the experiment parameters
-#TRIAL_HOME=/project/flatiron/ben/shallow-seq/results/SKTSL-downsampling-2015-12-31-15
-#IN_FILE=${TRIAL_HOME}/SKSTL0069.trimmed.hostRemoved_1.fasta
+TRIAL_HOME=/project/flatiron/ben/shallow-seq/results/SKTSL-downsampling-2015-12-31-15
+PROJECT_HOME=/project/flatiron/ben/NINJA-Shogun
+DATA_HOME=/project/flatiron/ben/data/ribo
 
-FASTQ_RNA=/project/flatiron/ben/NINJA-Shogun/data/ribo/fastq_rna.txt
-FASTQ_DNA=/project/flatiron/ben/NINJA-Shogun/data/ribo/fasta_dna.txt
+FASTQ_HOME=/export/scratch/ben/msi
+FASTQ_RNA=$PROJECT_HOME/data/ribo/fastq_rna.txt
+FASTQ_DNA=$PROJECT_HOME/data/ribo/fasta_dna.txt
 
-while read file; do
-  echo $file
+while read line; do
+  echo {$FASTQ_HOME}/{$line}
+  LINE_WITHOUT_EXTENSION=${${line}%.fastq}
+  time java -jar /project/flatiron/ben/bin/Trimmomatic-0.35/trimmomatic-0.35.jar \
+    SE -phred33 {$FASTQ_HOME}/{$line} \
+    {$DATA_HOME}\dna\{$LINE_WITHOUT_EXTENSION}.trimmed.fastq \
+    -threads 16 \
+    ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
+    LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 >> {$DATA_HOME}\dna\README.txt
 done <$FASTQ_RNA
+
+
 
 # Run the full trial
 #bowtie2 --no-unal --no-hd -x /dev/shm/bowtie_indx/img.gene.bacteria.bowtie  --np 0 --mp "1,1" \
