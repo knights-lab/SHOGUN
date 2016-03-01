@@ -10,18 +10,20 @@ PROJECT_HOME=/project/flatiron/ben/NINJA-Shogun
 DATA_HOME=/project/flatiron/ben/data/ribo
 
 FASTQ_HOME=/export/scratch/ben/msi
-FASTQ_RNA=$PROJECT_HOME/data/ribo/fastq_rna.txt
-FASTQ_DNA=$PROJECT_HOME/data/ribo/fasta_dna.txt
+FASTQ_RNA=${PROJECT_HOME}/data/ribo/fastq_rna.txt
+FASTQ_DNA=${PROJECT_HOME}/data/ribo/fasta_dna.txt
 
+# test for directory
+test -d ${DATA_HOME}/dna | mkdir -p  ${DATA_HOME}/dna
 while read line; do
-  echo {$FASTQ_HOME}/{$line}
+  echo ${FASTQ_HOME}/${line}
   LINE_WITHOUT_EXTENSION=${line%.fastq}
   time java -jar /project/flatiron/ben/bin/Trimmomatic-0.35/trimmomatic-0.35.jar \
-    SE -phred33 {$FASTQ_HOME}/{$line} \
-    {$DATA_HOME}\dna\{$LINE_WITHOUT_EXTENSION}.trimmed.fastq \
+    SE -phred33 ${FASTQ_HOME}/${line} \
+    ${DATA_HOME}/dna/${LINE_WITHOUT_EXTENSION}.trimmed.fastq \
     -threads 16 \
     ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq2-PE.fa:2:30:10 \
-    LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 >> {$DATA_HOME}\dna\README.txt
+    LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 >> ${DATA_HOME}/dna/README.txt
 done <$FASTQ_RNA
 
 
