@@ -45,14 +45,14 @@ trimm_align () {
 #mkdir /dev/shm/bt2_indx/
 #cp /project/flatiron/gabe/IMGENES.* /dev/shm/bt2_indx
 #DNA_BT2_INDX=/dev/shm/bt2_indx/IMGENES
-trimm_align ${DATA_DIR}/dna ${INPUT_FASTQ_DIR} ${DNA_FILE_LIST} ${DNA_BT2_INDX}
+#trimm_align ${DATA_DIR}/dna ${INPUT_FASTQ_DIR} ${DNA_FILE_LIST} ${DNA_BT2_INDX}
 # Clear the ramdisk
 #rm -r /dev/shm/bt2_indx
 
 #Copy the index into ramdisk
-#mkdir /dev/shm/bt2_indx/
-#cp /project/flatiron/data/db/fasta/bt2/SILVA_119_SSU_LSU_combined.* /dev/shm/bt2_indx
-#RNA_BT2_INDX=/dev/shm/bt2_indx/SILVA_119_SSU_LSU_combined
+mkdir /dev/shm/bt2_indx/
+cp /project/flatiron/data/db/fasta/bt2/SILVA_119_SSU_LSU_combined.* /dev/shm/bt2_indx
+RNA_BT2_INDX=/dev/shm/bt2_indx/SILVA_119_SSU_LSU_combined
 trimm_align ${DATA_DIR}/rna ${INPUT_FASTQ_DIR} ${RNA_FILE_LIST} ${RNA_BT2_INDX}
 # Clear the ramdisk
-#rm -r /dev/shm/bt2_indx
+rm -r /dev/shm/bt2_indx
