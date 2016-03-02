@@ -6,7 +6,7 @@ bh_trimmomatic () {
     file_list=$3
 
     test -d ${output_dir} | mkdir -p  ${output_dir}
-    output_fastq_dir=${output_dir}/fastq
+    output_fastq_dir=${output_dir}/trimmed_fastq
     test -d ${output_fastq_dir} | mkdir -p  ${output_fastq_dir}
     while read in_file; do
         filename=$(basename ${in_file})
@@ -31,7 +31,7 @@ bh_alignomatic () {
     bt2_indx_ramdisk=/dev/shm/btt2_indx/$(basename $(bt2_indx))
 
     # Grab the fastq dir
-    output_fastq_dir=${output_dir}/fastq
+    output_fastq_dir=${output_dir}/trimmed_fastq
 
     # test for directory
     output_sam_dir=${output_dir}/sam
