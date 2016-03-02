@@ -66,8 +66,8 @@ class NCBITree(PickleClass):
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
         path = [taxon_id]
         current_node = taxon_id
-        if current_node not in self.tree.nodes():
-            return []
+        # if current_node not in self.tree.nodes():
+        #     return []
         while len(self.tree.successors(current_node)) > 0:
             path.append(self.tree.successors(current_node)[0])
             current_node = self.tree.successors(current_node)[0]
