@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from networkx.exception import NetworkXError
+
 from shogun.taxonomy.ncbi_tree import NCBITree
 
 

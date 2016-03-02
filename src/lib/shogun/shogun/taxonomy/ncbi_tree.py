@@ -64,14 +64,15 @@ class NCBITree(PickleClass):
         nx.set_node_attributes(self.tree, 'rank', nodes)
 
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
-        path = [taxon_id]
-        current_node = taxon_id
-        # if current_node not in self.tree.nodes():
-        #     return []
-        while len(self.tree.successors(current_node)) > 0:
-            path.append(self.tree.successors(current_node)[0])
-            current_node = self.tree.successors(current_node)[0]
-        return path
+        try:
+            path = [taxon_id]
+            current_node = taxon_id
+            while len(self.tree.successors(current_node)) > 0:
+                path.append(self.tree.successors(current_node)[0])
+                current_node = self.tree.successors(current_node)[0]
+            return path
+        except nx.exception.NetworkXError:
+            return []
 
     def get_taxon_id_lineage_with_name(self, name):
         if name not in self.name2taxon_id:
@@ -121,7 +122,6 @@ class NCBITree(PickleClass):
                 name = ''
             if rank in ranks:
                 name_lineage.append((name, x, rank))
-        return name_lineage[::-1]
 
 def main():
     ncbi_tree = NCBITree()

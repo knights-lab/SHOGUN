@@ -16,7 +16,7 @@ bh_trimmomatic () {
             ${output_fastq_dir}/${out_file} \
             -threads 16 \
             LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 \
-            ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/TruSeq3-PE.fa:2:30:10
+            ILLUMINACLIP:/project/flatiron/ben/bin/Trimmomatic-0.35/adapters/NexteraPE-PE.fa:2:30:10
     done <${file_list}
 }
 
@@ -28,7 +28,7 @@ bh_alignomatic () {
     mkdir /dev/shm/bt2_indx/
     cp ${bt2_indx}.* /dev/shm/bt2_indx
 
-    bt2_indx_ramdisk=/dev/shm/btt2_indx/$(basename $(bt2_indx))
+    bt2_indx_ramdisk=/dev/shm/bt2_indx/$(basename $(bt2_indx))
 
     # Grab the fastq dir
     output_fastq_dir=${output_dir}/trimmed_fastq
