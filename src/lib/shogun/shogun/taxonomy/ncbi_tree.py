@@ -124,10 +124,10 @@ class NCBITree(PickleClass):
         return name_lineage[::-1]
 
 def main():
-    # ncbi_tree = NCBITree()
-    # ncbi_tree.save()
-    ncbi_tree = NCBITree.load()
-    print(ncbi_tree.get_taxon_id_lineage_with_taxon_id(511145))
+    ncbi_tree = NCBITree()
+    ncbi_tree.save()
+    # ncbi_tree = NCBITree.load()
+    # print(ncbi_tree.get_taxon_id_lineage_with_taxon_id(640701851))
 
 if __name__ == '__main__':
     main()

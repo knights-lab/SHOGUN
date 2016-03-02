@@ -4,7 +4,7 @@ from shogun.taxonomy.ncbi_tree import NCBITree
 
 
 class LCA:
-    def __init__(self, tree=NCBITree.load()):
+    def __init__(self, tree):
         """
 
         :param tree: NCBITree
@@ -13,7 +13,7 @@ class LCA:
         self.tree_obj = tree
 
     def __call__(self, taxon_id_a, taxon_id_b):
-        self.apply(taxon_id_a, taxon_id_b)
+        return self.apply(taxon_id_a, taxon_id_b)
 
     def apply(self, taxon_id_a, taxon_id_b):
         # assumes that all nodes in the tree have a common root
@@ -25,13 +25,13 @@ class LCA:
                 if taxon_ids[0] != taxon_ids[1]:
                         break
                 i += 1
-            return taxonomy_a[-i:]
+            return taxonomy_a[-i]
         else:
-            return []
+            return None
 
 
 def main():
-    LCA().apply(1292, 106)
+    print(LCA(NCBITree.load()).apply(1292, 106))
 
 if __name__ == '__main__':
     main()
