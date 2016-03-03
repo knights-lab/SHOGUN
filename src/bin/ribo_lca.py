@@ -63,7 +63,7 @@ def write_taxon_counts(taxon_counts, tree, outf,
 
     def map_counts(ncbi_taxon_id):
         taxa = tree.get_lineage(ncbi_taxon_id, ranks=ranks_set)
-        return [cols[0] for cols in taxa] + list(repeat(None, len(ranks) - len(taxa))) + [taxon_counts[ncbi_taxon_id]]
+        return list(reversed([cols[0] for cols in taxa])) + list(repeat(None, len(ranks) - len(taxa))) + [taxon_counts[ncbi_taxon_id]]
 
     wr = csv.writer(outf, quoting=csv.QUOTE_ALL)
     wr.writerow(ranks + ['count'])

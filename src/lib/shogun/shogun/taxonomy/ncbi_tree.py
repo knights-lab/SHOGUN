@@ -122,6 +122,7 @@ class NCBITree(PickleClass):
                 name = ''
             if rank in ranks:
                 name_lineage.append((name, x, rank))
+        return name_lineage
 
 def main():
     ncbi_tree = NCBITree()

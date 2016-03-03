@@ -31,7 +31,7 @@ bh_alignomatic () {
     bt2_indx_ramdisk=/dev/shm/bt2_indx/$(basename $(bt2_indx))
 
     # Grab the fastq dir
-    output_fastq_dir=${output_dir}/trimmed_fastq
+    output_fastq_dir=${output_dir}/trimmed_seqs
 
     # test for directory
     output_sam_dir=${output_dir}/sam
@@ -43,7 +43,7 @@ bh_alignomatic () {
         out_file=${filename%.fastq}.sam
         bowtie2 --no-unal --no-head -x ${bt2_indx_ramdisk} \
             -S ${output_sam_dir}/${out_file} --np 0 --mp "1,1" --rdg "0,1" --rfg "0,1" \
-            --score-min "L,0,-0.02" --norc -q ${in_file} -k 8 -p 48 --very-sensitive
+            --score-min "L,0,-0.02" --norc -q ${in_file} -k 8 -p 36 --very-sensitive
     done
 
     # Clear the ramdisk
@@ -51,24 +51,24 @@ bh_alignomatic () {
 }
 
 # Set up the experiment parameters
-DATA_DIR=/project/flatiron/ben/data/ribo
+# DATA_DIR=/project/flatiron/ben/data/ribo
 
 # Location of the sshfs from msi
-INPUT_FASTQ_DIR=/export/scratch/ben/msi
+# INPUT_FASTQ_DIR=/export/scratch/ben/msi
 
 #location of the fastq files
-DNA_FILE_LIST=${DATA_DIR}/fastq_dna.txt
-RNA_FILE_LIST=${DATA_DIR}/fastq_rna.txt
+# DNA_FILE_LIST=${DATA_DIR}/fastq_dna.txt
+# RNA_FILE_LIST=${DATA_DIR}/fastq_rna.txt
 
 # trim the reads
-bh_trimmomatic ${DATA_DIR}/dna ${INPUT_FASTQ_DIR} ${DNA_FILE_LIST}
+# bh_trimmomatic ${DATA_DIR}/dna ${INPUT_FASTQ_DIR} ${DNA_FILE_LIST}
 
-#DNA_BT2_INDX=/project/flatiron/gabe/IMGENES
-#bh_alignomatic ${DATA_DIR}/dna ${DNA_BT2_INDX}
+# DNA_BT2_INDX=/project/flatiron/gabe/IMGENES
+# bh_alignomatic ${DATA_DIR}/img ${DNA_BT2_INDX}
 
 
 # trim the reads
-bh_trimmomatic ${DATA_DIR}/rna ${INPUT_FASTQ_DIR} ${RNA_FILE_LIST}
+# bh_trimmomatic ${DATA_DIR}/rna ${INPUT_FASTQ_DIR} ${RNA_FILE_LIST}
 
-#RNA_BT2_INDX=/project/flatiron/data/db/fasta/bt2/SILVA_119_SSU_LSU_combined
-#bh_alignomatic ${DATA_DIR}/rna ${RNA_BT2_INDX}
+# RNA_BT2_INDX=/project/flatiron/data/db/fasta/bt2/SILVA_119_SSU_LSU_combined
+# bh_alignomatic ${DATA_DIR}/silva ${RNA_BT2_INDX}
