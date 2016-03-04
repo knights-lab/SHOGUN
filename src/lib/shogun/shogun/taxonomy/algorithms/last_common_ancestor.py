@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from networkx.exception import NetworkXError
-
 from shogun.taxonomy.ncbi_tree import NCBITree
 
 
@@ -31,6 +29,23 @@ class LCA:
             return None
         else:
             return taxonomy_a[-i]
+
+    def lca_mp(self, taxon_id, mp_taxonomy):
+        taxonomy_1 = self.tree_obj.lca_mp(taxon_id)
+        return lca_mp(taxonomy_1, mp_taxonomy)
+
+
+def lca_mp(taxonomy_a, taxonomy_b):
+    taxonomy_1 = taxonomy_a.split(';')
+    taxonomy_2 = taxonomy_b.split(';')
+    lca = []
+    for i in zip(taxonomy_1, taxonomy_2):
+        if i[0] == i[1]:
+            lca.append(i[0])
+        else:
+            break
+    if lca:
+        return ';'.join(lca)
 
 
 def main():

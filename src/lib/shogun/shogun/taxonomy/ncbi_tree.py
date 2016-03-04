@@ -124,6 +124,25 @@ class NCBITree(PickleClass):
                 name_lineage.append((name, x, rank))
         return name_lineage
 
+    def mp_lineage(self, taxon_id, ranks={'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}
+                   , nodes=('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__')):
+        taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
+        name_lineage = []
+        for x in taxon_id_lineage:
+            rank = self.tree.node[x]['rank']
+            try:
+                name = self.taxon_id2name[x]
+            except KeyError:
+                name = ''
+            if rank in ranks:
+                name_lineage.append(name)
+        return mp_format(reversed(name_lineage), nodes=nodes)
+
+
+def mp_format(taxa_array, nodes=('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__')):
+    return ';'.join([i + j.replace(' ', '_') for i, j in zip(nodes, taxa_array)])
+
+
 def main():
     ncbi_tree = NCBITree()
     ncbi_tree.save()

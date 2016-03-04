@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 from __future__ import print_function, division
+
 import argparse
+import csv
 import sys
 from collections import Counter
-import csv
-from itertools import repeat, zip_shortest
+import os
+import pandas as pd
 
 from shogun import SETTINGS
-from shogun.taxonomy.algorithms.last_common_ancestor import LCA
+from shogun.taxonomy.algorithms.last_common_ancestor import lca_mp
 from shogun.taxonomy.ncbi_maps.img_map import IMGMap
 from shogun.taxonomy.ncbi_maps.silva_map import SilvaMap
 from shogun.taxonomy.ncbi_tree import NCBITree
@@ -19,6 +21,7 @@ def make_arg_parser():
     parser.add_argument('-p', '--parser', help='Options are between silva and img', default='img', type=str)
     parser.add_argument('-o', '--output', help='If nothing is given, then STDOUT, else write to file')
     parser.add_argument('-t', '--threads', help='The number of threads to use.', default=SETTINGS.N_jobs, type=int)
+    parser.add_argument('-d', '--depth', help='The depth of the search (7=species default)', default=7, type=int)
     parser.add_argument('-v', '--verbose', help='Print extra statistics', action='store_true', default=False)
     return parser
 
@@ -42,66 +45,70 @@ def rname_img_parser(rname, img_map):
     return ncbi_taxon_id
 
 
-def build_lca_map(align_gen, lca, rname_parse_func):
+def build_lca_map(align_gen, lca, rname_parse_func, tree, depth):
     lca_map = {}
     for qname, rname in align_gen:
         if qname in lca_map:
-            new_taxon = rname_parse_func(rname)
+            new_taxon = tree.mp_lineage(rname_parse_func(rname))
             current_rname = lca_map[qname]
             if current_rname and new_taxon:
                 if current_rname != new_taxon:
                     lca_map[qname] = lca(current_rname, new_taxon)
         else:
-            lca_map[qname] = rname_parse_func(rname)
+            lca_map[qname] = tree.mp_lineage(rname_parse_func(rname))
     # taxon count here
-    for 
-    taxon_counts = Counter(lca_map.values())
+    lca_map = collapse(lca_map, depth)
+    taxon_counts = Counter(filter(None, lca_map.values()))
     #  normalize here
     return taxon_counts
 
 
-def write_taxon_counts(taxon_counts, tree, outf,
-                       ranks=['superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']):
-    ranks_set = set(ranks)
+def collapse(lca_map, depth):
+    for name in lca_map:
+        taxonomy = lca_map[name]
+        if taxonomy:
+            taxonomy = taxonomy.split(';')
+            if len(taxonomy) < depth:
+                lca_map[name] = None
+            elif len(taxonomy) > depth:
+                lca_map[name] = ';'.join(taxonomy[:depth])
+    return lca_map
 
-    def map_counts(ncbi_taxon_id):
-        taxa = tree.get_lineage(ncbi_taxon_id, ranks=ranks_set)
-        return list(reversed([cols[0] for cols in taxa])) + list(repeat(None, len(ranks) - len(taxa))) + [taxon_counts[ncbi_taxon_id]]
 
+def write_taxon_counts(taxon_counts, outf):
     wr = csv.writer(outf, quoting=csv.QUOTE_ALL)
-    wr.writerow(ranks + ['count'])
+    for taxon in [taxon for taxon in taxon_counts if taxon_counts[taxon] > 0 and taxon]:
+        wr.writerow((taxon, taxon_counts[taxon]))
 
-    for row in [map_counts(taxon) for taxon in taxon_counts if taxon_counts[taxon] > 0 and taxon]:
-        wr.writerow(row)
-
-
-def mp_format_taxonomy(taxa_array):
-    codes = ['k__', 'g__', 'c__', 'o__', 'f__', 'g__', 's__']
-    return ';'.join([i + j for i, j in zip(codes, taxa_array)])
 
 def main():
     parser = make_arg_parser()
     args = parser.parse_args()
 
-    with open(args.input, 'r') if args.input != '-' else sys.stdin as inf:
-        align_gen = yield_alignments_from_sam_inf(inf)
-        if args.parser == 'silva':
-            silva_map = SilvaMap.load()
+    sam_files = [os.path.join(args.input, filename) for filename in os.listdir(args.input) if filename.endswith('.sam')]
+    if args.parser == 'silva':
+        silva_map = SilvaMap.load()
 
-            def rname_parse_func(x):
-                return rname_silva_parser(x, silva_map)
-        else:
+        def rname_parse_func(x):
+            return rname_silva_parser(x, silva_map)
 
-            img_map = IMGMap.load()
+    else:
+        img_map = IMGMap.load()
 
-            def rname_parse_func(x):
-                return rname_img_parser(x, img_map)
-        ncbi_tree = NCBITree.load()
-        lca = LCA(ncbi_tree)
-        taxon_counts = build_lca_map(align_gen, lca, rname_parse_func)
-        with open(args.output, 'w') if args.output else sys.stdout as outf:
-            write_taxon_counts(taxon_counts, ncbi_tree, outf)
+        def rname_parse_func(x):
+            return rname_img_parser(x, img_map)
 
+    ncbi_tree = NCBITree.load()
+
+    counts = []
+    for file in sam_files:
+        with open(file) as inf:
+            counts.append(build_lca_map(yield_alignments_from_sam_inf(inf), lca_mp, rname_parse_func, ncbi_tree,
+                                        args.depth))
+
+    df = pd.DataFrame(counts, index=['#' + os.path.basename(sample).split('.')[0] for sample in sam_files])
+    with open(args.output, 'w') if args.output else sys.stdout as outf:
+        df.T.to_csv(outf)
 
 if __name__ == '__main__':
     main()
