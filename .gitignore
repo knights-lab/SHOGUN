@@ -185,3 +185,4 @@ data
 results
 docs
 SETTINGS.json
+!src/lib
