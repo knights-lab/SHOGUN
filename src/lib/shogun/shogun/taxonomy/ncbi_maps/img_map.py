@@ -50,7 +50,7 @@ class IMGMap(PickleClass):
             return None
 
     def __call__(self, img_id):
-        self.get(img_id)
+        return self.get(img_id)
 
     def __getstate__(self):
         d = dict(self.__dict__)

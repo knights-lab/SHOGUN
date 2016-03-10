@@ -124,6 +124,16 @@ class NCBITree(PickleClass):
                 name_lineage.append((name, x, rank))
         return name_lineage
 
+    def get_lineage_depth(self, taxon_id, depth, ranks=['superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']):
+        taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
+        ranks = set(ranks[depth:])
+        lineage = []
+        for x in taxon_id_lineage:
+            rank = self.tree.node[x]['rank']
+            if rank in ranks:
+                lineage.append(x)
+        return lineage
+
     def mp_lineage(self, taxon_id, ranks={'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}
                    , nodes=('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__')):
         taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
