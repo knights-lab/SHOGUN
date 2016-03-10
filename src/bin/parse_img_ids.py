@@ -94,7 +94,7 @@ def main():
                 lca_map = build_lca_map(yield_alignments_from_sam_inf(inf), lca, img_map)
                 for key in lca_map:
                     img_ids, ncbi_tid = lca_map[key]
-                    csv_outf.write([file[:-4], key, ncbi_tid, ','.join(img_ids)])
+                    csv_outf.writerow([os.path.basename(file).split('.')[0],  key, ncbi_tid, ','.join(img_ids)])
 
 if __name__ == '__main__':
     main()
