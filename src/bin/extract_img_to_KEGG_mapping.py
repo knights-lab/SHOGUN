@@ -3,11 +3,9 @@
 # python extract_IMG_to_KEGG_mapping.py -i IMGDIR -o outputfile.txt
 from __future__ import print_function
 import argparse
-import re
 import csv
-from collections import defaultdict
 import sys
-
+import os
 
 def make_arg_parser():
     parser = argparse.ArgumentParser(description='')
@@ -23,7 +21,7 @@ def read_img_ko_table(f, IMG_ID=None):
     for line in f:
         words = line.strip().split('\t')
         gene_id = words[0]
-        ko_id = words[10]
+        ko_id = words[9]
         if IMG_ID is not None:
             gene_id = IMG_ID + '_' + gene_id
         yield(gene_id, ko_id)
@@ -43,17 +41,20 @@ def main():
     parser = make_arg_parser()
     args = parser.parse_args()
 
-    img_dirs = [f in os.listdir() if os.isdir(f)]
-
-    with open(args., 'rb') as inf:
-        database_gen = read_fasta(inf)
-        for title, line in database_gen:
-            taxon_oid = re.search(find, title).group(0)
-            lengths[taxa_map.get(taxon_oid)] += len(line)
+    # list all IMG strain directories
+    img_dirs = [f for f in os.listdir(args.IMG_dir) if os.path.isdir(os.path.join(args.IMG_dir, f))]
 
     with open(args.output, 'wb') if args.output else sys.stdout as outf:
-        write_gene_length_counts(outf, lengths)
-
+        for i, imgID in enumerate(img_dirs):
+            if (i + 1) % 1000 == 0:
+                sys.stderr.write('Parsing folder ' + str(i) + ' of ' + str(len(img_dirs)) + '\n')
+                sys.stderr.flush()                
+            ko_fp = os.path.join(args.IMG_dir, imgID, imgID + ".ko.tab.txt")
+            if os.path.exists(ko_fp):
+                with open(ko_fp, 'rb') as inf:
+                    database_gen = read_img_ko_table(inf, imgID)
+                    for gene_id, ko in database_gen:
+                        outf.write(gene_id + '\t' + ko + '\n')
 
 if __name__ == '__main__':
     main()
