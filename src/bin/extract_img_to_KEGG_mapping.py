@@ -42,12 +42,17 @@ def main():
     args = parser.parse_args()
 
     # list all IMG strain directories
+    sys.stderr.write('Listing all IMG directories...\n')
+    sys.stderr.flush()
     img_dirs = [f for f in os.listdir(args.IMG_dir) if os.path.isdir(os.path.join(args.IMG_dir, f))]
+
+    sys.stderr.write('Parsing %d directories...\n' %(len(img_dirs)))
+    sys.stderr.flush()
 
     with open(args.output, 'wb') if args.output else sys.stdout as outf:
         for i, imgID in enumerate(img_dirs):
-            if (i + 1) % 1000 == 0:
-                sys.stderr.write('Parsing folder ' + str(i) + ' of ' + str(len(img_dirs)) + '\n')
+            if (i + 1) % 100 == 0:
+                sys.stderr.write('Parsing folder ' + str(i+1) + ' of ' + str(len(img_dirs)) + '\n')
                 sys.stderr.flush()                
             ko_fp = os.path.join(args.IMG_dir, imgID, imgID + ".ko.tab.txt")
             if os.path.exists(ko_fp):
