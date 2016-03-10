@@ -68,7 +68,7 @@ class NCBITree(PickleClass):
             path = [taxon_id]
             current_node = taxon_id
             for node in self.tree.successors_iter(current_node):
-                path.append(node[0])
+                path.append(node)
             return path
         except nx.exception.NetworkXError:
             return []
