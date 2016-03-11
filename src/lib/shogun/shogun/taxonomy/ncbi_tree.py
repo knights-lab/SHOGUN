@@ -19,6 +19,7 @@ path = t_tree.get_name_path_with_taxon_id(taxon_id)
 import os
 import networkx as nx
 import csv
+from itertools import chain
 
 from shogun.utilities.pickle_class import PickleClass
 from shogun import SETTINGS
@@ -67,22 +68,19 @@ class NCBITree(PickleClass):
         try:
             path = [taxon_id]
             current_node = taxon_id
-            for node in self.tree.successors_iter(current_node):
-                path.append(node)
-            return path
+            return chain(path, self.tree.successors_iter(current_node))
         except nx.exception.NetworkXError:
             return []
 
     def get_taxon_id_lineage_with_name(self, name):
         if name not in self.name2taxon_id:
             return []
-        path = self.get_taxon_id_lineage_with_taxon_id(self.name2taxon_id[name])
-        return path
+        return self.get_taxon_id_lineage_with_taxon_id(self.name2taxon_id[name])
 
     def get_name_lineage_with_taxon_id(self, taxon_id):
-        taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
+        tid_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
         name_lineage = []
-        for x in taxon_id_lineage:
+        for x in tid_lineage:
             rank = self.tree.node[x]['rank']
             try:
                 name = self.taxon_id2name[x]
