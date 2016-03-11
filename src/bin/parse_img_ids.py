@@ -2,11 +2,9 @@
 from __future__ import print_function, division
 
 import argparse
-import csv
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 import os
-import pandas as pd
 import csv
 
 from shogun import SETTINGS
@@ -26,8 +24,8 @@ def make_arg_parser():
 
 
 def yield_alignments_from_sam_inf(inf):
-    for i in inf:
-        line = i.split('\t')
+    csv_inf = csv.reader(inf, delimiter='\t')
+    for line in csv_inf:
         # this function yields qname, rname
         yield line[0], line[2]
 
@@ -52,26 +50,8 @@ def build_lca_map(align_gen, lca, img_map):
             lca_map[qname][1] = img_map(img_id)
         lca_map[qname][0].add(rname)
     # taxon count here
-    #  normalize here
+    # normalize here
     return lca_map
-
-
-def collapse(lca_map, depth):
-    for name in lca_map:
-        taxonomy = lca_map[name]
-        if taxonomy:
-            taxonomy = taxonomy.split(';')
-            if len(taxonomy) < depth:
-                lca_map[name] = None
-            elif len(taxonomy) > depth:
-                lca_map[name] = ';'.join(taxonomy[:depth])
-    return lca_map
-
-
-def write_taxon_counts(taxon_counts, outf):
-    wr = csv.writer(outf, quoting=csv.QUOTE_ALL)
-    for taxon in [taxon for taxon in taxon_counts if taxon_counts[taxon] > 0 and taxon]:
-        wr.writerow((taxon, taxon_counts[taxon]))
 
 
 def main():
@@ -85,10 +65,9 @@ def main():
     ncbi_tree = NCBITree.load()
     lca = LCA(ncbi_tree, args.depth)
 
-    counts = []
-
     with open(args.output, 'w') if args.output else sys.stdout as outf:
         csv_outf = csv.writer(outf, quoting=csv.QUOTE_ALL)
+        csv_outf.writerow(['sample_id', 'sequence_id', 'ncbi_tid', 'img_id'])
         for file in sam_files:
             with open(file) as inf:
                 lca_map = build_lca_map(yield_alignments_from_sam_inf(inf), lca, img_map)
