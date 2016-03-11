@@ -66,7 +66,7 @@ def main():
     lca = LCA(ncbi_tree, args.depth)
 
     with open(args.output, 'w') if args.output else sys.stdout as outf:
-        csv_outf = csv.writer(outf, quoting=csv.QUOTE_ALL)
+        csv_outf = csv.writer(outf, quoting=csv.QUOTE_ALL, lineterminator='\n')
         csv_outf.writerow(['sample_id', 'sequence_id', 'ncbi_tid', 'img_id'])
         for file in sam_files:
             with open(file) as inf:
