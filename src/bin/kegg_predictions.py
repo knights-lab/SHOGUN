@@ -14,7 +14,7 @@ def make_arg_parser():
     parser.add_argument('-m', '--mapping', help='The img to KEGG mapping file.', required=True)
     parser.add_argument('-o', '--output', help='If nothing is given, then stdout, else write to file')
     parser.add_argument('-a', '--algorithm', help='If nothing is given, then intersection, else stdout.',
-                        choices=['intersection'], default='intersection')
+                        choices=['intersection', 'consensus'], default='intersection')
     return parser
 
 
@@ -60,8 +60,33 @@ def get_img_oid2kegg(mapping_path):
     return img_oid2kegg
 
 
-def get_img2kegg(mapping_file):
-    pass
+def get_img2kegg(mapping_path):
+    with open(mapping_path) as inf:
+        csv_inf = csv.reader(inf, delimiter='\t')
+        img2kegg = defaultdict(str, csv_inf)
+    return img2kegg
+
+
+def consensus(csv_img_ids_inf, img2kegg):
+    counts = defaultdict(lambda: defaultdict(int))
+
+    # 'sample_id', 'sequence_id', 'ncbi_tid', 'img_id'
+    for line in csv_img_ids_inf:
+        img_ids = line[-1].split(',')
+        sample_dict = counts[line[0]]
+        if img_ids:
+            if len(img_ids) > 1:
+                first = img_ids.pop()
+                kegg = img2kegg[first]
+                for img_id in img_ids:
+                    if kegg != img2kegg[img_id]:
+                        kegg = None
+                        break
+            else:
+                kegg = img2kegg[img_ids[0]]
+            if kegg:
+                sample_dict[kegg] += 1
+    return counts
 
 
 def main():
@@ -77,9 +102,11 @@ def main():
             if args.algorithm == 'intersection':
                 counts = intersection(csv_inf, img_oid2kegg)
         else:
-            counts = defaultdict(lambda: defaultdict(int))
+            img2kegg = get_img2kegg(args.mapping)
+            if args.algorithm == 'consensus':
+                counts = consensus(csv_inf, img2kegg)
 
-    with open(args.output, 'wb') if args.output else sys.stdout as outf:
+    with open(args.output, 'w') if args.output else sys.stdout as outf:
         count_df = pd.DataFrame(counts)
         outf.write(count_df.T.to_csv())
 
