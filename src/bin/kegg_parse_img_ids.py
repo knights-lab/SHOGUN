@@ -49,8 +49,6 @@ def build_lca_map(align_gen, lca, img_map):
         else:
             lca_map[qname][1] = img_map(img_id)
         lca_map[qname][0].add(rname)
-    # taxon count here
-    # normalize here
     return lca_map
 
 

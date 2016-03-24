@@ -13,6 +13,8 @@ def make_arg_parser():
     parser.add_argument('-i', '--input', help='The input file.', required=True)
     parser.add_argument('-m', '--mapping', help='The img to KEGG mapping file.', required=True)
     parser.add_argument('-o', '--output', help='If nothing is given, then stdout, else write to file')
+    parser.add_argument('-a', '--algorithm', help='If nothing is given, then intersection, else stdout.',
+                        choices=['intersection'], default='intersection')
     return parser
 
 
@@ -21,7 +23,44 @@ def split_iter(string, sep=''):
     return (x.group(0) for x in re.finditer(r, string))
 
 
-def intersection():
+def intersection(csv_imgs_ids_inf, img_oid2kegg):
+    """
+    Returns the intersection of kegg_ids for each sequence for each sample in the study
+
+    :param csv_imgs_ids_inf: the file iter from the kegg_parse_img_ids script
+    :param img_oid2kegg: the img2kegg mapping dictionary
+    :return:
+    """
+
+    counts = defaultdict(lambda: defaultdict(int))
+    # 'sample_id', 'sequence_id', 'ncbi_tid', 'img_id'
+    for line in csv_imgs_ids_inf:
+        img_ids = line[-1].split(',')
+        sample_dict = counts[line[0]]
+        if img_ids:
+            if len(img_ids) > 1:
+                first = img_ids.pop()
+                kegg_intersection = img_oid2kegg[first[:first.find('_')]]
+                for img_id in img_ids:
+                    kegg_ids = img_oid2kegg[img_id[:img_id.find('_')]]
+                    kegg_intersection = kegg_ids.intersection(kegg_intersection)
+            else:
+                kegg_intersection = img_oid2kegg[img_ids[0][:img_ids[0].find('_')]]
+            for key in kegg_intersection:
+                sample_dict[key] += 1
+    return counts
+
+
+def get_img_oid2kegg(mapping_path):
+    img_oid2kegg = defaultdict(set)
+    with open(mapping_path) as inf:
+        csv_inf = csv.reader(inf, delimiter='\t')
+        for row in csv_inf:
+            img_oid2kegg[row[0][:row[0].find('_')]].add(row[1])
+    return img_oid2kegg
+
+
+def get_img2kegg(mapping_file):
     pass
 
 
@@ -29,42 +68,20 @@ def main():
     parser = make_arg_parser()
     args = parser.parse_args()
 
-    img2kegg = defaultdict(set)
-    with open(args.mapping) as inf:
-        csv_inf = csv.reader(inf, delimiter='\t')
-        for row in csv_inf:
-            img2kegg[row[0][:row[0].find('_')]].add(row[1])
-
-    # img_df = pd.read_csv(args.mapping, delimiter='\t', header=None, index_col=0, names=['img_id', 'kegg_id'])
-    # img_df['img_species_id'] = [i[:i.find('_')] for i in img_df.index.values]
-    # for index, row in img_df.iterrows():
-    #     img2kegg[row['img_species_id']].add(row['kegg_id'])
-
-    counts = defaultdict(lambda: defaultdict(int))
-
     with open(args.input) as inf:
         csv_inf = csv.reader(inf)
         header = next(csv_inf)
         # 'sample_id', 'sequence_id', 'ncbi_tid', 'img_id'
-        for line in csv_inf:
-            img_ids = line[-1].split(',')
-            sample_dict = counts[line[0]]
-            if img_ids:
-                if len(img_ids) > 1:
-                    first = img_ids.pop()
-                    kegg_intersection = img2kegg[first[:first.find('_')]]
-                    for img_id in img_ids:
-                        kegg_ids = img2kegg[img_id[:img_id.find('_')]]
-                        kegg_intersection = kegg_ids.intersection(kegg_intersection)
-                else:
-                    kegg_intersection = img2kegg[img_ids[0][:img_ids[0].find('_')]]
-                for key in kegg_intersection:
-                    sample_dict[key] += 1
+        if args.algorithm in ['intersection']:
+            img_oid2kegg = get_img_oid2kegg(args.mapping)
+            if args.algorithm == 'intersection':
+                counts = intersection(csv_inf, img_oid2kegg)
+        else:
+            counts = defaultdict(lambda: defaultdict(int))
 
     with open(args.output, 'wb') if args.output else sys.stdout as outf:
         count_df = pd.DataFrame(counts)
         outf.write(count_df.T.to_csv())
-
 
 
 if __name__ == '__main__':
