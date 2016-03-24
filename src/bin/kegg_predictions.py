@@ -6,7 +6,9 @@ import csv
 from collections import defaultdict
 import sys
 import pandas as pd
-
+# from multiprocessing import Pool
+# Could parallelize with async
+# http://stackoverflow.com/questions/1239035/asynchronous-method-call-in-python
 
 def make_arg_parser():
     parser = argparse.ArgumentParser(description='')
