@@ -91,6 +91,16 @@ def consensus(csv_img_ids_inf, img2kegg):
     return counts
 
 
+# Compare different voting methods to see which one is best
+# We used Spearman correlation so does PiCrust
+# We are still not using coverage estimation
+# 10 strains
+# PiCrust as well .88
+def weighted_voting():
+    # 1/n times all genes for all n hits
+    pass
+
+
 def main():
     parser = make_arg_parser()
     args = parser.parse_args()
