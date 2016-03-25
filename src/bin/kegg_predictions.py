@@ -10,6 +10,7 @@ import pandas as pd
 # Could parallelize with async
 # http://stackoverflow.com/questions/1239035/asynchronous-method-call-in-python
 
+
 def make_arg_parser():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-i', '--input', help='The input file.', required=True)

@@ -3,45 +3,44 @@ import csv
 from glob import glob
 import os
 
-from shogun.utilities.pickle_class import PickleClass
+from shogun.utilities.pickleable import Pickleable
 from shogun.utilities.collections import reverse_dict
+from shogun.utilities.scroll import Scroll, scrolling
 from shogun import SETTINGS
 
 
-class IMGMap(PickleClass):
-    def __init__(self, _img_taxdmp_dir=SETTINGS.img_taxdmp_dir):
+class IMGMap(Pickleable):
+    def __init__(self, _scroll=Scroll(os.path.join(SETTINGS.img_taxdmp_dir, '00.taxon.tab.txt'))):
         """
 
         :param img_taxdmp_dir:
         """
+        self._scroll = _scroll
         super().__init__()
 
-        self._img_taxdmp_dir = _img_taxdmp_dir
+    @scrolling
+    def _parse(self):
+        # init variables
+        self.img2taxon_id = {}
 
-        self.img2taxon_id, self.taxon_id2img = self._parse_silva_taxonomy_file()
+        with open(self._scroll.path, 'r') as inf:
+            csv_file = csv.reader(inf, delimiter='\t')
+            # columns = ['taxon_oid', 'ncbi_taxon_id', 'domain', 'genus', 'species']
+            row_1 = next(csv_file)
 
-    def _parse_silva_taxonomy_file(self):
-        img2taxon_id = {}
-        files = glob(os.path.join(self._img_taxdmp_dir, "*.txt"))
-        for file in files:
-            with open(file, 'r') as inf:
-                csv_file = csv.reader(inf, delimiter='\t')
-                # columns = ['taxon_oid', 'ncbi_taxon_id', 'domain', 'genus', 'species']
-                row_1 = next(csv_file)
+            # Checking for a header file
+            if row_1[-1] == 'Finished':
+                ncbi_taxon_id = int(row_1[1])
+                self.img2taxon_id[int(row_1[0])] = ncbi_taxon_id
 
-                # Checking for a header file
-                if row_1[-1] == 'Finished':
-                    ncbi_taxon_id = int(row_1[1])
-                    img2taxon_id[int(row_1[0])] = ncbi_taxon_id
+            for row in csv_file:
+                try:
+                    ncbi_taxon_id = int(row[1])
+                    self.img2taxon_id[int(row[0])] = ncbi_taxon_id
+                except ValueError as e:
+                    continue
 
-                for row in csv_file:
-                    try:
-                        ncbi_taxon_id = int(row[1])
-                        img2taxon_id[int(row[0])] = ncbi_taxon_id
-                    except ValueError as e:
-                        continue
-
-        return img2taxon_id, reverse_dict(img2taxon_id)
+        self.taxon_id2img = reverse_dict(self.img2taxon_id)
 
     def get(self, img_id):
         if img_id in self.img2taxon_id:
@@ -65,9 +64,7 @@ class IMGMap(PickleClass):
 
 def main():
     img_map = IMGMap()
-    img_map.save()
-    # img_map = IMGMap.load()
-    # print(img_map.get_lineage(637000263))
+    print(img_map.get(637000263))
 
 if __name__ == '__main__':
     main()

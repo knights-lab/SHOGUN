@@ -5,9 +5,19 @@ import pickle
 from shogun import SETTINGS, LOGGER
 
 
-class PickleClass:
+class Pickleable:
     def __init__(self, _pickle_dir=SETTINGS.pickle_dir):
         self._pickle_dir = _pickle_dir
+        self.dump = os.path.join(self._pickle_dir, "%s.pkl" % self.__class__.__name__)
+        saved = os.path.isfile(self.dump)
+        if not saved:
+            self._parse()
+            self.save()
+        else:
+            self.load()
+
+    def _parse(self):
+        pass
 
     def save(self):
         self_dump = os.path.join(self._pickle_dir, "%s.pkl" % self.__class__.__name__)

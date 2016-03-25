@@ -9,11 +9,10 @@ ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz
 
 basically you can init an taxonomy tree obj by:
 
-t_tree = ncbi.NCBITree(path)   # tree being the tax dump db unzip dir
+t_tree = ncbi.NCBITree(path)   # tree being the tax dump db unzip path
 then you can basically get the taxonomy ranks using:
 
 path = t_tree.get_name_path_with_taxon_id(taxon_id)
-
 """
 
 import os
@@ -21,25 +20,26 @@ import networkx as nx
 import csv
 from itertools import chain
 
-from shogun.utilities.pickle_class import PickleClass
-from shogun import SETTINGS
+from shogun.utilities.pickleable import Pickleable
+from shogun.utilities.downloadable import download
+from shogun.downloaders.download_ncbi_taxonomy import NCBITaxdmp
 
 
-class NCBITree(PickleClass):
-    def __init__(self, _ncbi_taxdmp_dir=SETTINGS.ncbi_taxdmp_dir):
+class NCBITree(Pickleable):
+    def __init__(self, _downloader=NCBITaxdmp()):
+        # Private variables (should be set in settings)
+        self._downloader = _downloader
         super().__init__()
+
+    @download
+    def _parse(self):
+        # Initialize variables
         self.tree = nx.DiGraph()
-        # construct name -> taxon_id mapping
         self.name2taxon_id = {}
         self.taxon_id2name = {}
+        ncbi_taxdmp_dir = self._downloader.path
 
-        # Private variables (should be set in settings)
-        self._ncbi_taxdmp_dir = _ncbi_taxdmp_dir
-
-        self._parse_ncbi_taxonomy()
-
-    def _parse_ncbi_taxonomy(self):
-        with open(os.path.join(self._ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
+        with open(os.path.join(ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
                 taxon_id = int(cols[0])
@@ -51,7 +51,7 @@ class NCBITree(PickleClass):
         # construct node tree
         edges = []
         nodes = {}
-        with open(os.path.join(self._ncbi_taxdmp_dir, 'nodes.dmp'), 'r') as handle:
+        with open(os.path.join(ncbi_taxdmp_dir, 'nodes.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
             for cols in csv_handle:
                 parent_node = int(cols[2])
@@ -152,9 +152,7 @@ def mp_format(taxa_array, nodes=('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__'
 
 def main():
     ncbi_tree = NCBITree()
-    ncbi_tree.save()
-    # ncbi_tree = NCBITree.load()
-    # print(ncbi_tree.get_taxon_id_lineage_with_taxon_id(640701851))
+    print(ncbi_tree.get_taxon_id_lineage_with_taxon_id(640701851))
 
 if __name__ == '__main__':
     main()

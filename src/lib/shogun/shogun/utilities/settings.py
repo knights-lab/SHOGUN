@@ -44,7 +44,7 @@ def initialize_settings(config_dir=os.path.abspath(os.path.join(os.path.dirname(
         default_values = make_default_values(config_dir)
         settings_dict = dict(zip(default_keys, default_values))
 
-    for outdir in [item for item in default_keys if 'dir' in item]:
+    for outdir in [item for item in default_keys if 'path' in item]:
         verify_make_dir(settings_dict[outdir])
 
     return Settings(**settings_dict)
