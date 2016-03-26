@@ -58,9 +58,9 @@ def main():
 
     sam_files = [os.path.join(args.input, filename) for filename in os.listdir(args.input) if filename.endswith('.sam')]
 
-    img_map = IMGMap.load()
+    img_map = IMGMap()
 
-    ncbi_tree = NCBITree.load()
+    ncbi_tree = NCBITree()
     lca = LCA(ncbi_tree, args.depth)
 
     with open(args.output, 'w') if args.output else sys.stdout as outf:
