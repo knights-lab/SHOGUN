@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import csv
-from glob import glob
 import os
 
 from shogun.utilities.pickleable import Pickleable

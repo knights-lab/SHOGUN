@@ -14,7 +14,7 @@ class Pickleable:
             self._parse()
             self.save()
         else:
-            self.load()
+            self.__dict__.update(self.load().__dict__)
 
     def _parse(self):
         pass
