@@ -59,6 +59,7 @@ def build_lca_map(align_gen, lca, rname_parse_func, tree, depth):
     # taxon count here
     lca_map = collapse(lca_map, depth)
     taxon_counts = Counter(filter(None, lca_map.values()))
+    print(len(list(taxon_counts.keys())))
     #  normalize here
     return taxon_counts
 
@@ -73,12 +74,6 @@ def collapse(lca_map, depth):
             elif len(taxonomy) > depth:
                 lca_map[name] = ';'.join(taxonomy[:depth])
     return lca_map
-
-
-def write_taxon_counts(taxon_counts, outf):
-    wr = csv.writer(outf, quoting=csv.QUOTE_ALL)
-    for taxon in [taxon for taxon in taxon_counts if taxon_counts[taxon] > 0 and taxon]:
-        wr.writerow((taxon, taxon_counts[taxon]))
 
 
 def main():
