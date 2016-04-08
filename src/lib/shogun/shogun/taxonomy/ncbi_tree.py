@@ -7,7 +7,7 @@ This library works with the taxonomy db download from NCBI FTP:
 
 ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz
 
-basically you can init an taxonomy tree obj by:
+Init an taxonomy tree obj by:
 
 t_tree = ncbi.NCBITree(path)   # tree being the tax dump db unzip path
 then you can basically get the taxonomy ranks using:
@@ -18,6 +18,7 @@ path = t_tree.get_name_path_with_taxon_id(taxon_id)
 import os
 import networkx as nx
 import csv
+import sys
 from functools import lru_cache
 from collections import defaultdict
 
@@ -44,6 +45,7 @@ class NCBITree(Pickleable):
         self.name2taxon_id = defaultdict(int)
         self.taxon_id2name = defaultdict(str)
         ncbi_taxdmp_dir = self._downloader.path
+        csv.field_size_limit(sys.maxsize)
 
         with open(os.path.join(ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
             csv_handle = csv.reader(handle, delimiter="\t")
