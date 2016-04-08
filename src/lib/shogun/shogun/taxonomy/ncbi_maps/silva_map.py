@@ -36,7 +36,7 @@ class SilvaMap(Pickleable):
             return None
 
     def __call__(self, silva_acc):
-        self.get(silva_acc)
+        return self.get(silva_acc)
 
     def __getstate__(self):
         d = dict(self.__dict__)

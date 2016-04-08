@@ -10,6 +10,7 @@ import shutil
 from scipy.stats import powerlaw
 import numpy as np
 
+
 # The arg parser for this wrapper
 def make_arg_parser():
     parser = argparse.ArgumentParser(description='Simulate a metagenomic community from DWGSIM according to a powerlaw.')
