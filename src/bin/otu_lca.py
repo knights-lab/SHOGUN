@@ -21,7 +21,7 @@ def make_arg_parser():
     parser.add_argument('-p', '--parser', help='Options are between silva and img', default='img', type=str)
     parser.add_argument('-o', '--output', help='If nothing is given, then STDOUT, else write to file')
     parser.add_argument('-t', '--threads', help='The number of threads to use.', default=SETTINGS.N_jobs, type=int)
-    parser.add_argument('-d', '--depth', help='The depth of the search (7=species default)', default=7, type=int)
+    parser.add_argument('-d', '--depth', help='The depth of the search (7=species default, 0=No Collapse)', default=7, type=int)
     parser.add_argument('-v', '--verbose', help='Print extra statistics', action='store_true', default=False)
     return parser
 
@@ -59,21 +59,23 @@ def build_lca_map(align_gen, lca, rname_parse_func, tree, depth):
     # taxon count here
     lca_map = collapse(lca_map, depth)
     taxon_counts = Counter(filter(None, lca_map.values()))
-    print(len(list(taxon_counts.keys())))
     #  normalize here
     return taxon_counts
 
 
 def collapse(lca_map, depth):
-    for name in lca_map:
-        taxonomy = lca_map[name]
-        if taxonomy:
-            taxonomy = taxonomy.split(';')
-            if len(taxonomy) < depth:
-                lca_map[name] = None
-            elif len(taxonomy) > depth:
-                lca_map[name] = ';'.join(taxonomy[:depth])
-    return lca_map
+    if depth > 0:
+        for name in lca_map:
+            taxonomy = lca_map[name]
+            if taxonomy:
+                taxonomy = taxonomy.split(';')
+                if len(taxonomy) < depth:
+                    lca_map[name] = None
+                elif len(taxonomy) > depth:
+                    lca_map[name] = ';'.join(taxonomy[:depth])
+        return lca_map
+    else:
+        return lca_map
 
 
 def main():
@@ -82,18 +84,18 @@ def main():
 
     sam_files = [os.path.join(args.input, filename) for filename in os.listdir(args.input) if filename.endswith('.sam')]
     if args.parser == 'silva':
-        silva_map = SilvaMap.load()
+        silva_map = SilvaMap()
 
         def rname_parse_func(x):
             return rname_silva_parser(x, silva_map)
 
     else:
-        img_map = IMGMap.load()
+        img_map = IMGMap()
 
         def rname_parse_func(x):
             return rname_img_parser(x, img_map)
 
-    ncbi_tree = NCBITree.load()
+    ncbi_tree = NCBITree()
 
     counts = []
     for file in sam_files:
