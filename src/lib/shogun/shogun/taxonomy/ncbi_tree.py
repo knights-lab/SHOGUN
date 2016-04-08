@@ -18,7 +18,8 @@ path = t_tree.get_name_path_with_taxon_id(taxon_id)
 import os
 import networkx as nx
 import csv
-from itertools import chain
+from functools import lru_cache
+from collections import defaultdict
 
 from shogun.utilities.pickleable import Pickleable
 from shogun.utilities.downloadable import download
@@ -26,17 +27,22 @@ from shogun.downloaders.download_ncbi_taxonomy import NCBITaxdmp
 
 
 class NCBITree(Pickleable):
-    def __init__(self, _downloader=NCBITaxdmp()):
+    def __init__(self, mp_ranks=None, _downloader=NCBITaxdmp()):
         # Private variables (should be set in settings)
         self._downloader = _downloader
+        if mp_ranks is None:
+            self.mp_ranks = dict(zip(('superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'),
+                     ('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__')))
+        else:
+            self.mp_ranks = mp_ranks
         super().__init__()
 
     @download
     def _parse(self):
         # Initialize variables
         self.tree = nx.DiGraph()
-        self.name2taxon_id = {}
-        self.taxon_id2name = {}
+        self.name2taxon_id = defaultdict(int)
+        self.taxon_id2name = defaultdict(str)
         ncbi_taxdmp_dir = self._downloader.path
 
         with open(os.path.join(ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
@@ -65,12 +71,9 @@ class NCBITree(Pickleable):
         nx.set_node_attributes(self.tree, 'rank', nodes)
 
     def get_taxon_id_lineage_with_taxon_id(self, taxon_id):
-        try:
-            path = [taxon_id]
-            current_node = taxon_id
-            return chain(path, self.tree.successors_iter(current_node))
-        except nx.exception.NetworkXError:
-            return []
+        if taxon_id in self.tree:
+            for i in nx.dfs_preorder_nodes(self.tree, taxon_id):
+                yield i
 
     def get_taxon_id_lineage_with_name(self, name):
         if name not in self.name2taxon_id:
@@ -82,10 +85,7 @@ class NCBITree(Pickleable):
         name_lineage = []
         for x in tid_lineage:
             rank = self.tree.node[x]['rank']
-            try:
-                name = self.taxon_id2name[x]
-            except KeyError:
-                name = ''
+            name = self.taxon_id2name[x]
             name_lineage.append((name, rank))
         return name_lineage
 
@@ -113,15 +113,13 @@ class NCBITree(Pickleable):
         name_lineage = []
         for x in taxon_id_lineage:
             rank = self.tree.node[x]['rank']
-            try:
-                name = self.taxon_id2name[x]
-            except KeyError:
-                name = ''
+            name = self.taxon_id2name[x]
             if rank in ranks:
                 name_lineage.append((name, x, rank))
         return name_lineage
 
-    def get_lineage_depth(self, taxon_id, depth, ranks=['superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']):
+    def get_lineage_depth(self, taxon_id, depth, ranks=('superkingdom', 'phylum', 'class', 'order', 'family', 'genus',
+                                                        'species')):
         taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
         ranks = set(ranks[depth:])
         lineage = []
@@ -131,23 +129,18 @@ class NCBITree(Pickleable):
                 lineage.append(x)
         return lineage
 
-    def mp_lineage(self, taxon_id, ranks={'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}
-                   , nodes=('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__')):
+    # Note that this will create a global cache for all instances of NCBITree.
+    # Will be fine unless if you want to compare trees.
+    @lru_cache(maxsize=128)
+    def mp_lineage(self, taxon_id):
         taxon_id_lineage = self.get_taxon_id_lineage_with_taxon_id(taxon_id)
         name_lineage = []
         for x in taxon_id_lineage:
             rank = self.tree.node[x]['rank']
-            try:
-                name = self.taxon_id2name[x]
-            except KeyError:
-                name = ''
-            if rank in ranks:
-                name_lineage.append(name)
-        return mp_format(reversed(name_lineage), nodes=nodes)
-
-
-def mp_format(taxa_array, nodes=('k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__')):
-    return ';'.join([i + j.replace(' ', '_') for i, j in zip(nodes, taxa_array)])
+            name = self.taxon_id2name[x]
+            if rank in self.mp_ranks:
+                name_lineage.append(self.mp_ranks[rank] + name.replace(' ', '_'))
+        return ';'.join(reversed(name_lineage))
 
 
 def main():
