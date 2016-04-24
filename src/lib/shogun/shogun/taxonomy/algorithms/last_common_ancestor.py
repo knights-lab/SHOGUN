@@ -50,7 +50,12 @@ def lca_mp(taxonomy_a, taxonomy_b):
 
 
 def main():
-    print(LCA(NCBITree.load()).apply(1292, 106))
+    tree = NCBITree()
+    print(tree.mp_lineage(1292))
+    print(tree.mp_lineage(106))
+    print(LCA(tree, 4).apply(1292, 106))
+    print(tree.mp_lineage(LCA(tree, 0).apply(1293, 106)))
+
 
 if __name__ == '__main__':
     main()

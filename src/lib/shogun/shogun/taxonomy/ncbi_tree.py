@@ -9,8 +9,8 @@ ftp://ftp.ncbi.nih.gov:/pub/taxonomy/taxdump.tar.gz
 
 Init an taxonomy tree obj by:
 
-t_tree = ncbi.NCBITree(path)   # tree being the tax dump db unzip path
-then you can basically get the taxonomy ranks using:
+t_tree = ncbi.NCBITree()
+then you can get the taxonomy ranks by using:
 
 path = t_tree.get_name_path_with_taxon_id(taxon_id)
 """

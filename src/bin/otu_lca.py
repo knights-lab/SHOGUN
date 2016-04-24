@@ -2,7 +2,6 @@
 from __future__ import print_function, division
 
 import argparse
-import csv
 import sys
 from collections import Counter
 import os
@@ -103,7 +102,7 @@ def main():
             counts.append(build_lca_map(yield_alignments_from_sam_inf(inf), lca_mp, rname_parse_func, ncbi_tree,
                                         args.depth))
 
-    df = pd.DataFrame(counts, index=['#' + os.path.basename(sample).split('.')[0] for sample in sam_files])
+    df = pd.DataFrame(counts, index=['#' + os.path.basename(sample)[:-3] for sample in sam_files])
     with open(args.output, 'w') if args.output else sys.stdout as outf:
         df.T.to_csv(outf)
 
