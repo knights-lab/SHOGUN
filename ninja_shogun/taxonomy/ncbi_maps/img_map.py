@@ -2,10 +2,10 @@
 import csv
 import os
 
-from shogun.utilities.pickleable import Pickleable
-from shogun.utilities.collections import reverse_dict
-from shogun.utilities.scroll import Scroll, scrolling
-from shogun import SETTINGS
+from ninja_shogun.utilities.pickleable import Pickleable
+from ninja_shogun.utilities.collections import reverse_dict
+from ninja_shogun.utilities.scroll import Scroll, scrolling
+from ninja_shogun import SETTINGS
 
 
 class IMGMap(Pickleable):

@@ -3,7 +3,7 @@ import json
 import os.path
 import time
 
-from shogun.utilities.scroll import Scroll
+from ninja_shogun.utilities.scroll import Scroll
 
 
 class Downloadable(Scroll):

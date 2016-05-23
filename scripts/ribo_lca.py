@@ -6,10 +6,10 @@ from collections import Counter
 import csv
 from itertools import repeat
 
-from shogun.taxonomy.algorithms.last_common_ancestor import LCA
-from shogun.taxonomy.ncbi_maps.img_map import IMGMap
-from shogun.taxonomy.ncbi_maps.silva_map import SilvaMap
-from shogun.taxonomy.ncbi_tree import NCBITree
+from ninja_shogun.taxonomy.algorithms.last_common_ancestor import LCA
+from ninja_shogun.taxonomy.ncbi_maps.img_map import IMGMap
+from ninja_shogun.taxonomy.ncbi_maps.silva_map import SilvaMap
+from ninja_shogun.taxonomy.ncbi_tree import NCBITree
 
 
 def make_arg_parser():

@@ -22,9 +22,9 @@ import sys
 from functools import lru_cache
 from collections import defaultdict
 
-from shogun.utilities.pickleable import Pickleable
-from shogun.utilities.downloadable import download
-from shogun.downloaders.download_ncbi_taxonomy import NCBITaxdmp
+from ninja_shogun.utilities.pickleable import Pickleable
+from ninja_shogun.utilities.downloadable import download
+from ninja_shogun.downloaders.download_ncbi_taxonomy import NCBITaxdmp
 
 
 class NCBITree(Pickleable):

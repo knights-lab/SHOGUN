@@ -3,10 +3,10 @@ import csv
 from glob import glob
 import os
 
-from shogun.utilities.pickleable import Pickleable
-from shogun.utilities.collections import reverse_dict
-from shogun.utilities.downloadable import download
-from shogun.downloaders.download_silva2ncbi_taxonomy import SilvaMapping
+from ninja_shogun.utilities.pickleable import Pickleable
+from ninja_shogun.utilities.collections import reverse_dict
+from ninja_shogun.utilities.downloadable import download
+from ninja_shogun.downloaders.download_silva2ncbi_taxonomy import SilvaMapping
 
 
 class SilvaMap(Pickleable):

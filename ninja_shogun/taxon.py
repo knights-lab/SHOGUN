@@ -1,6 +1,7 @@
 from __future__ import print_function
 from collections import defaultdict
 
+
 def load_taxon_map(path, verbose=False):
     if verbose:
         # load the taxon map

@@ -2,7 +2,7 @@
 import os
 import pickle
 
-from shogun import SETTINGS, LOGGER
+from ninja_shogun import SETTINGS, LOGGER
 
 
 class Pickleable:

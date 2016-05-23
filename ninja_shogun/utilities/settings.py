@@ -4,7 +4,7 @@ import multiprocessing
 import os
 import json
 
-from shogun.utilities.path import verify_make_dir
+from ninja_shogun.utilities.path import verify_make_dir
 
 Settings = namedtuple('Settings', ('default_dir', 'docs_dir', 'data_dir', 'results_dir', 'pickle_dir',
                                    'ncbi_taxdmp_url', 'ncbi_taxdmp_dir', 'silva_taxdmp_urls', 'silva_taxdmp_dir',

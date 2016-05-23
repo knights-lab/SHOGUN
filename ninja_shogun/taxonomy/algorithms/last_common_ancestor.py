@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from shogun.taxonomy.ncbi_tree import NCBITree
+from ninja_shogun.taxonomy.ncbi_tree import NCBITree
 
 
 class LCA:

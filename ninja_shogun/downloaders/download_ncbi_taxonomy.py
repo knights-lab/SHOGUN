@@ -2,8 +2,8 @@
 import urllib.request
 import tarfile
 
-from shogun import SETTINGS
-from shogun.utilities.downloadable import Downloadable
+from ninja_shogun import SETTINGS
+from ninja_shogun.utilities.downloadable import Downloadable
 
 
 class NCBITaxdmp(Downloadable):

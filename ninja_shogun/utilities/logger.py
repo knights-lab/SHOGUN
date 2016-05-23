@@ -2,7 +2,7 @@
 import os
 import sys
 
-from shogun.utilities.path import verify_make_dir
+from ninja_shogun.utilities.path import verify_make_dir
 
 
 class Logger(object):

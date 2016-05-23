@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import os
 
-from shogun.utilities.downloadable import Downloadable
-from shogun.downloaders.utilities.stream_url import download_txt_url
-from shogun import SETTINGS
+from ninja_shogun.utilities.downloadable import Downloadable
+from ninja_shogun.downloaders.utilities.stream_url import download_txt_url
+from ninja_shogun import SETTINGS
 
 
 class SilvaMapping(Downloadable):
