@@ -13,7 +13,7 @@ __version__ = "0.0.1-dev"
 long_description = ''
 
 setup(
-    name='shogun',
+    name='ninja_shogun',
     version=__version__,
     packages=['ninja_shogun'],
     url='',
