@@ -2,7 +2,7 @@
 from collections import namedtuple
 import multiprocessing
 import os
-import json
+import yaml
 
 from ninja_shogun.utilities.path import verify_make_dir
 
@@ -11,8 +11,7 @@ Settings = namedtuple('Settings', ('default_dir', 'docs_dir', 'data_dir', 'resul
                                    'N_jobs', 'img_taxdmp_dir'))
 
 
-def initialize_settings(config_dir=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                                                '..', '..', '..', '..', '..'))):
+def initialize_settings(config_dir=os.path.join(os.path.expanduser('~'), 'ninja_shogun')):
     # I wish I could synchronize these with the Settings namedtuple but I can't
     default_keys = (
         'default_dir',
@@ -28,9 +27,11 @@ def initialize_settings(config_dir=os.path.abspath(os.path.join(os.path.dirname(
         'img_taxdmp_dir'
     )
 
-    if os.path.exists(os.path.join(config_dir, 'SETTINGS.json')):
-        with open(os.path.join(config_dir, 'SETTINGS.json')) as inf_handle:
-            j = json.load(inf_handle)
+    verify_make_dir(config_dir)
+
+    if os.path.exists(os.path.join(config_dir, 'SETTINGS.yaml')):
+        with open(os.path.join(config_dir, 'SETTINGS.yaml')) as inf_handle:
+            j = yaml.load(inf_handle)
             # result the settings dict if user changed default_dir
             if 'default_dir' in j:
                 default_values = make_default_values(j['default_dir'])
@@ -43,8 +44,10 @@ def initialize_settings(config_dir=os.path.abspath(os.path.join(os.path.dirname(
     else:
         default_values = make_default_values(config_dir)
         settings_dict = dict(zip(default_keys, default_values))
+        with open(os.path.join(config_dir, 'SETTINGS.yaml'), 'w') as settings_handle:
+            yaml.dump(settings_dict, settings_handle)
 
-    for outdir in [item for item in default_keys if 'path' in item]:
+    for outdir in [item for item in default_keys if 'dir' in item]:
         verify_make_dir(settings_dict[outdir])
 
     return Settings(**settings_dict)

@@ -45,11 +45,12 @@ class NCBITree(Pickleable):
         self.name2taxon_id = defaultdict(int)
         self.taxon_id2name = defaultdict(str)
         ncbi_taxdmp_dir = self._downloader.path
-        csv.field_size_limit(sys.maxsize)
+        # csv.field_size_limit(sys.maxsize)
 
         with open(os.path.join(ncbi_taxdmp_dir, 'names.dmp'), 'r') as handle:
-            csv_handle = csv.reader(handle, delimiter="\t")
-            for cols in csv_handle:
+            # csv_handle = csv.reader(handle, delimiter="\t")
+            for cols in handle:
+                cols = cols.split('\t')
                 taxon_id = int(cols[0])
                 name = cols[2]
                 self.name2taxon_id[name] = taxon_id

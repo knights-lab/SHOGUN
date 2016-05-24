@@ -4,7 +4,7 @@ from glob import glob
 import os
 
 from ninja_shogun.utilities.pickleable import Pickleable
-from ninja_shogun.utilities.collections import reverse_dict
+from ninja_shogun.utilities.utils import reverse_dict
 from ninja_shogun.utilities.downloadable import download
 from ninja_shogun.downloaders.download_silva2ncbi_taxonomy import SilvaMapping
 

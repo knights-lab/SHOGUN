@@ -3,7 +3,7 @@ import csv
 import os
 
 from ninja_shogun.utilities.pickleable import Pickleable
-from ninja_shogun.utilities.collections import reverse_dict
+from ninja_shogun.utilities.utils import reverse_dict
 from ninja_shogun.utilities.scroll import Scroll, scrolling
 from ninja_shogun import SETTINGS
 

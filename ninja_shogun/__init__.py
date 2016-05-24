@@ -1,7 +1,7 @@
 import os
 
-fromninja_shogun.utilities.logger import Logger
-fromninja_shogun.utilities.settings import initialize_settings
+from ninja_shogun.utilities.logger import Logger
+from ninja_shogun.utilities.settings import initialize_settings
 
 SETTINGS = initialize_settings()
 # Opens logger to write to log and/or stdout
