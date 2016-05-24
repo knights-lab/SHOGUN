@@ -6,6 +6,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
+
 def make_arg_parser():
     parser = argparse.ArgumentParser(description='Fragment a FASTA file into a database.')
     parser.add_argument('input', help='If nothing is given then stdin, else basename of the file for the'
@@ -15,9 +16,11 @@ def make_arg_parser():
     parser.add_argument('-s', '--step', help='The step size for sliding the window.', default=1)
     return parser
 
+
 def chunks(l, step=1, window=100):
-    for i in xrange(0, len(l)-window, step):
+    for i in range(0, len(l)-window, step):
         yield l[i:i+window], i, i+window
+
 
 def main():
     parser = make_arg_parser()

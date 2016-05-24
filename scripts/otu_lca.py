@@ -9,9 +9,9 @@ import pandas as pd
 
 from ninja_shogun import SETTINGS
 from ninja_shogun.taxonomy.algorithms.last_common_ancestor import lca_mp
-from ninja_shogun.taxonomy.ncbi_maps.img_map import IMGMap
-from ninja_shogun.taxonomy.ncbi_maps.silva_map import SilvaMap
-from ninja_shogun.taxonomy.ncbi_tree import NCBITree
+from ninja_shogun.taxonomy.ncbi.maps.img_map import IMGMap
+from ninja_shogun.taxonomy.ncbi.maps.silva_map import SilvaMap
+from ninja_shogun.taxonomy.ncbi.ncbi_tree import NCBITree
 
 
 def make_arg_parser():
