@@ -27,6 +27,7 @@ def return_taxa_map(path):
         m[species_id] = tuple(df[df['species_id'] == species_id][['domain', 'genus', 'species']].values[0])
     return m
 
+
 def main():
     pass
 

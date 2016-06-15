@@ -5,12 +5,14 @@ import sys
 import csv
 from collections import Counter
 
+
 # The arg parser for this wrapper
 def make_arg_parser():
     parser = argparse.ArgumentParser(description='Aggregate NBCI taxon id counts for a Kraken run.')
     parser.add_argument('-i', '--input', type=str, help='The species name file. One species name per line.', required=True)
     parser.add_argument('-o', '--output', type=str, help='The output file.')
     return parser
+
 
 def main(args):
     with sys.stdin if args.input == '-' else open(args.input, 'r') as inf:

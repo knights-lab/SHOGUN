@@ -6,7 +6,6 @@ from ninja_shogun.taxonomy.ncbi_tree import NCBITree
 class LCA:
     def __init__(self, tree, depth):
         """
-
         :param tree: NCBITree
         :return:
         """

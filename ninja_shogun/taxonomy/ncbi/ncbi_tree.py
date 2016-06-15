@@ -148,7 +148,7 @@ class NCBITree(Pickleable):
 
 def main():
     ncbi_tree = NCBITree()
-    print(ncbi_tree.get_taxon_id_lineage_with_taxon_id(640701851))
+    print(ncbi_tree.mp_lineage(9606))
 
 if __name__ == '__main__':
     main()

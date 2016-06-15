@@ -6,7 +6,8 @@ from ninja_shogun.utilities.path import verify_make_dir
 
 
 class Logger(object):
-    """ A convenient logging object
+    """
+        A convenient logging object
         Prints output to a given log file and/or stdout
     """
     def __init__(self, logfp=None, use_std_out=True):
@@ -16,7 +17,6 @@ class Logger(object):
             outdir = os.path.abspath(os.path.dirname(os.path.realpath(logfp)))
 
             # Checks for output directory. Makes it if necessary.
-
             verify_make_dir(outdir)
 
         self.logfp = logfp
