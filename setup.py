@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from glob import glob
 import os
 
@@ -15,14 +15,14 @@ long_description = ''
 setup(
     name='ninja_shogun',
     version=__version__,
-    packages=['ninja_shogun'],
+    packages=find_packages(),
     url='',
     license=__license__,
     author=__author__,
     author_email=__email__,
     description='',
     long_description=long_description,
-    scripts=glob(os.path.join('scripts', '*py')),
+    scripts=glob(os.path.join('ninja_shogun', 'scripts', '*py')),
     keywords='',
     install_requires=['click', 'scipy', 'numpy', 'pandas']
 )
