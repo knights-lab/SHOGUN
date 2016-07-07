@@ -22,7 +22,12 @@ setup(
     author_email=__email__,
     description='',
     long_description=long_description,
-    scripts=glob(os.path.join('ninja_shogun', 'scripts', '*py')),
+    # scripts=glob(os.path.join('ninja_shogun', 'scripts', '*py')),
     keywords='',
-    install_requires=['click', 'scipy', 'numpy', 'pandas']
+    install_requires=['click', 'scipy', 'numpy', 'pandas'],
+    entry_points={
+        'console_scripts': [
+            'shogalign = ninja_shogun.scripts.wrapper_bowtie:bowtie2_wrapper',
+        ]
+    },
 )
