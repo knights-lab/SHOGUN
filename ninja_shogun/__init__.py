@@ -8,3 +8,9 @@ SETTINGS = initialize_settings()
 # First stores original console location as a variable for error handling
 shogun_log_path = os.path.join(SETTINGS.data_dir, "shogun_log.txt")
 LOGGER = Logger(shogun_log_path, use_std_out=False)
+
+__all__ = ['aligners',
+           'downloaders',
+           'parsers',
+           'scripts',
+           'utilities']
