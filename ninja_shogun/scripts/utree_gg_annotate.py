@@ -36,7 +36,7 @@ def utree_gg_annotate(input, output, extract_refseq_id, prefixes):
             ncbi_tid = db.get_ncbi_tid_from_refseq_accession_version(refseq_accession_version)
             if ncbi_tid:
                 gg = tree.gg_lineage(ncbi_tid[0])
-                title = '>ncbi_tid|%d|%s\t' % (ncbi_tid[0], title[1:], gg)
+                title = '>ncbi_tid|%d|%s\t%s' % (ncbi_tid[0], title[1:], gg)
                 output.write('%s\n%s\n' % (title, seq))
 
 
