@@ -27,7 +27,8 @@ setup(
     install_requires=['click', 'scipy', 'numpy', 'pandas'],
     entry_points={
         'console_scripts': [
-            'shogalign = ninja_shogun.scripts.wrapper_bowtie:bowtie2_wrapper',
+            'shogun_align = ninja_shogun.scripts.wrapper_bowtie:bowtie2_wrapper',
+            'shogun_db_annotate = ninja_shogun.scripts.utree_gg_annotate:utree_gg_annotate',
         ]
     },
 )
