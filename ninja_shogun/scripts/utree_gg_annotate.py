@@ -31,7 +31,11 @@ def utree_gg_annotate(input, output, extract_refseq_id, prefixes):
     else:
         prefix_set = set([_ for _ in prefixes])
 
-    output_fn = '.'.join(str(os.path.basename(input)).split('.')[:-1])
+    if input == '-':
+        output_fn = 'stdin'
+    else:
+        output_fn = '.'.join(str(os.path.basename(input)).split('.')[:-1])
+    
     with open(input, 'r') if input != '-' else sys.stdin as inf:
         with open(os.path.join(output, output_fn + '.annotated.fna'), 'w') as output_fna:
             with open(os.path.join(output, output_fn + '.annotated.map'), 'w') as output_map:
