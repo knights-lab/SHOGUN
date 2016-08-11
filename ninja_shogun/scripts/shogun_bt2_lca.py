@@ -88,6 +88,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
                     if current_rname != new_taxon:
                         lca_map[qname] = lca_gg(current_rname, new_taxon)
             else:
+                print(tree.gg_lineage(ncbi_tid))
                 lca_map[qname] = tree.gg_lineage(ncbi_tid)
 
         lca_map = collapse(lca_map, depth)
