@@ -62,8 +62,9 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
 
     for fna_file in fna_files:
-        sam_outf = os.path.join(output, '.'.join(str(os.path.basename(input)).split('.')[:-1]) + '.sam')
+        sam_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.sam')
         print(sam_outf)
+        print(fna_file)
         print(bowtie2(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
