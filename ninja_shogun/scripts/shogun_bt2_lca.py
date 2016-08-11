@@ -78,8 +78,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
     for sam_file in sam_files:
         lca_map = {}
         for qname, rname in yield_alignments_from_sam_inf(sam_file):
-            ncbi_tid = find_between(rname, begin, end)
-            print(ncbi_tid)
+            ncbi_tid = int(find_between(rname, begin, end))
             if qname in lca_map:
                 new_taxon = tree.gg_lineage(ncbi_tid)
                 current_rname = lca_map[qname]
@@ -87,7 +86,6 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
                     if current_rname != new_taxon:
                         lca_map[qname] = lca_gg(current_rname, new_taxon)
             else:
-                print(tree.gg_lineage(741158))
                 lca_map[qname] = tree.gg_lineage(ncbi_tid)
 
         lca_map = collapse(lca_map, depth)
