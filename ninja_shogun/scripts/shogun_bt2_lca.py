@@ -18,7 +18,10 @@ def yield_alignments_from_sam_inf(inf):
     for i in inf:
         line = i.split('\t')
         # this function yields qname, rname
-        yield line[0], line[2]
+        try:
+            yield line[0], line[2]
+        except IndexError:
+            print('Incorrect SAM input')
 
 
 def lca_gg(taxonomy_a, taxonomy_b):
@@ -63,8 +66,6 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
 
     for fna_file in fna_files:
         sam_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.sam')
-        print(sam_outf)
-        print(fna_file)
         print(bowtie2(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
