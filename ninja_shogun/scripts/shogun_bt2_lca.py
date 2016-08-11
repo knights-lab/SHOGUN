@@ -54,9 +54,8 @@ def collapse(lca_map, depth):
 @click.option('-o', '--output', type=click.Path(), default=os.getcwd())
 @click.option('-b', '--bt2_indx')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|')
-@click.option('-d', '--depth', type=click.INT(), default=7,
-              help='The depth of the search (7=species default, 0=No Collapse)')
-@click.option('-p', '--threads', type=click.INT(), default=1)
+@click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
+@click.option('-p', '--threads', type=click.INT, default=1)
 def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
