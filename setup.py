@@ -30,6 +30,8 @@ setup(
             'shogun_align = ninja_shogun.scripts.wrapper_bowtie:bowtie2_wrapper',
             'shogun_db_annotate = ninja_shogun.scripts.utree_gg_annotate:utree_gg_annotate',
             'shogun_lca = ninja_shogun.scripts.lca:lca',
+            'shogun_bt2_db = ninja_shogun.scripts.shogun_bt2_db:shogun_bt2_db',
+            # 'shogun_bt2_lca = ninja_shogun.scripts',
         ]
     },
 )

@@ -20,3 +20,8 @@ def bowtie2(infile, outfile, database, num_threads=SETTINGS.N_jobs, shell=False)
            '-p', '24',
            '--no-hd']
     return run_command(cmd, shell=shell)
+
+
+def bowtie2_build(infile, outfile, offrate=3, shell=False):
+    cmd = ['bowtie2', '-f', '-o', offrate, infile, outfile]
+    return run_command(cmd, shell=shell)
