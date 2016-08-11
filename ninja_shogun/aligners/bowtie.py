@@ -19,6 +19,7 @@ def bowtie2(infile, outfile, database, alignments_to_report=32, num_threads=SETT
            '-k', str(alignments_to_report),
            '-p', str(num_threads),
            '--no-hd']
+    print(cmd)
     return run_command(cmd, shell=shell)
 
 
