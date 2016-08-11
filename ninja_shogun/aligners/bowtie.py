@@ -23,5 +23,5 @@ def bowtie2(infile, outfile, database, alignments_to_report=32, num_threads=SETT
 
 
 def bowtie2_build(infile, outfile, offrate=3, shell=False):
-    cmd = ['bowtie2', '-f', '-o', str(offrate), infile, outfile]
+    cmd = ['bowtie2-build', '-f', '-o', str(offrate), infile, outfile]
     return run_command(cmd, shell=shell)
