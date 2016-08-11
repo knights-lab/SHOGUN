@@ -3,7 +3,7 @@ from ninja_utils.utils import run_command
 from .. import SETTINGS
 
 
-def bowtie2(infile, outfile, database, num_threads=SETTINGS.N_jobs, shell=False):
+def bowtie2(infile, outfile, database, alignments_to_report=32, num_threads=SETTINGS.N_jobs, shell=False):
     cmd = ['bowtie2',
            '--no-unal',
            '-x', database,
@@ -16,12 +16,12 @@ def bowtie2(infile, outfile, database, num_threads=SETTINGS.N_jobs, shell=False)
            '--norc',
            '-f', outfile,
            '--very-sensitive',
-           '-k', num_threads,
-           '-p', '24',
+           '-k', str(alignments_to_report),
+           '-p', str(num_threads),
            '--no-hd']
     return run_command(cmd, shell=shell)
 
 
 def bowtie2_build(infile, outfile, offrate=3, shell=False):
-    cmd = ['bowtie2', '-f', '-o', offrate, infile, outfile]
+    cmd = ['bowtie2', '-f', '-o', str(offrate), infile, outfile]
     return run_command(cmd, shell=shell)
