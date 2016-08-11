@@ -11,7 +11,7 @@ def bowtie2(infile, outfile, database, alignments_to_report=32, num_threads=SETT
            '--np', '0',
            '--mp', '"1,1"',
            '--rdg', '"0,1"',
-           '--rfg', '"0,1',
+           '--rfg', '"0,1"',
            '--score-min', '"L,0,-0.02"',
            '--norc',
            '-f', infile,
