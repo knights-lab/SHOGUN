@@ -49,7 +49,21 @@ wget https://www.dropbox.com/s/b5w4xe08x7snm93/shogun_test_files.zip?dl=1
 Extract the folder using your favorite extraction utility.
 
 ```
-7z x ./shogun_test_files.zip
+7z x <downloaded file>
 ```
 
+Next you create the database.
+
+```
+shogun_bt2_db -i ./test.hmp_species.fna -x '>, '
+```
+
+This will take some time, the DOJO software is lazy loading the NCBI Taxonomy.
+
+```
+cd mock_communities
+shogun_bt2_lca -i ./ -b ../annotated/bt2/test.hmp_species
+```
+
+The results of the taxonomy counts will be in the taxon_counts.csv ♠🐱‍👤
 

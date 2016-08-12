@@ -92,7 +92,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
         taxon_counts = Counter(filter(None, lca_map.values()))
         counts.append(taxon_counts)
 
-    df = pd.DataFrame(counts, index=['#' + os.path.basename(sample)[:-3] for sample in sam_files])
+    df = pd.DataFrame(counts, index=['#' + '.'.join(os.path.basename(sample).split('.')[:-1]) for sample in sam_files])
     df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
 
 
