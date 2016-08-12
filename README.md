@@ -65,5 +65,5 @@ cd mock_communities
 shogun_bt2_lca -i ./ -b ../annotated/bt2/test.hmp_species
 ```
 
-The results of the taxonomy counts will be in the taxon_counts.csv ♠🐱‍👤
+The results of the taxonomy counts will be in the taxon_counts.csv 🐱‍👤
 
