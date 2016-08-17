@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 import click
 import os
-from cytoolz import valmap, map
+from cytoolz import valmap
+import csv
 
 from ninja_utils.utils import find_between,verify_make_dir
 
 from ninja_dojo.taxonomy import NCBITree
+
+from ninja_utils.parsers import FASTA
+from ninja_utils.utils import verify_make_dir
 
 from ninja_shogun.aligners.bowtie import bowtie2
 
@@ -19,6 +23,7 @@ def yield_alignments_from_sam_inf(inf):
                 yield line[0], line[2]
             except IndexError:
                 print('Incorrect SAM input %s' % (inf))
+
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd())
@@ -55,7 +60,23 @@ def shogun_capitalist(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
 
             lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
             # filter out null values
-            [taxon_out.write('%s\t%s\n' % (k, '; '.join(v.split(';')))) for k, v in lca_map.items() if v]
+            [taxon_out.write('%s\t%s\n' % (k.split()[1], '; '.join(v.split(';')))) for k, v in lca_map.items() if v]
+
+    read_map = {}
+    with open(os.path.join(output, 'taxon_map.tsv')) as inf:
+        tsv_in = csv.reader(inf, delimiter='\t')
+        for line in tsv_in:
+            read_map[line[0]] = '.'.join(line[1].split('; '))
+
+    # Prepare for capitalist
+    verify_make_dir(os.path.join(output, 'queries'))
+    for fna_file in fna_files:
+        fna_iter = FASTA(fna_file)
+        for header, seq in fna_iter.read():
+            title = header.split()[1]
+            if title in read_map:
+                with open(os.path.join(output, 'queries', read_map[title] + '.fna'), 'a+') as output_fna:
+                    output_fna.write('>%s\n%s\n' % (header, seq))
 
 
 if __name__ == '__main__':
