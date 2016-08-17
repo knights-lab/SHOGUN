@@ -60,7 +60,7 @@ def shogun_capitalist(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
 
             lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
             # filter out null values
-            [taxon_out.write('%s\t%s\n' % (k.split()[1], '; '.join(v.split(';')))) for k, v in lca_map.items() if v]
+            [taxon_out.write('%s\t%s\n' % (k.split()[0], '; '.join(v.split(';')))) for k, v in lca_map.items() if v]
 
     read_map = {}
     with open(os.path.join(output, 'taxon_map.tsv')) as inf:
