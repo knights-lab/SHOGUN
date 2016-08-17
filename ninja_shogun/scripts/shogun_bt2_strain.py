@@ -42,7 +42,6 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
     tree = NCBITree()
     begin, end = extract_ncbi_tid.split(',')
 
-    counts = []
     sam_files = [os.path.join(output, filename) for filename in os.listdir(output) if filename.endswith('.sam')]
 
     for sam_file in sam_files:
@@ -59,12 +58,7 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
 
         lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
         # filter out null values
-        map(lambda k, v: output.write('%s\t%s\n' % (k,v)), lca_map.items())
-
-
-
-    df = pd.DataFrame(counts, index=['#' + '.'.join(os.path.basename(sample).split('.')[:-1]) for sample in sam_files])
-    df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
+        map(lambda k, v: output.write('%s\t%s\n' % (k, v)), lca_map.items())
 
 
 if __name__ == '__main__':
