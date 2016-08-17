@@ -55,7 +55,7 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
 
             lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
             # filter out null values
-            map(lambda x: taxon_out.write('%s\t%s\n' % (x[0], '; '.join(x[1].split(';')))), lca_map.items())
+            [taxon_out.write('%s\t%s\n' % (k, '; '.join(v.split(';')))) for k, v in lca_map.items()]
 
 
 if __name__ == '__main__':
