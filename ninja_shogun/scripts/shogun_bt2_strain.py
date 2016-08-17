@@ -40,7 +40,7 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
     begin, end = extract_ncbi_tid.split(',')
 
     sam_files = [os.path.join(output, filename) for filename in os.listdir(output) if filename.endswith('.sam')]
-    with open(os.path.join(output, 'taxon_map.csv'), 'w') as taxon_out:
+    with open(os.path.join(output, 'taxon_map.tsv'), 'w') as taxon_out:
         for sam_file in sam_files:
             lca_map = {}
             for qname, rname in yield_alignments_from_sam_inf(sam_file):
@@ -53,9 +53,10 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
                 else:
                     lca_map[qname] = ncbi_tid
 
-        lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
-        # filter out null values
-        map(lambda k, v: taxon_out.write('%s\t%s\n' % (k, v)), lca_map.items())
+            lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
+            print(lca_map.items())
+            # filter out null values
+            map(lambda k, v: taxon_out.write('%s\t%s\n' % (k, v)), lca_map.items())
 
 
 if __name__ == '__main__':
