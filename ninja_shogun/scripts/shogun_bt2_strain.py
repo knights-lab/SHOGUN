@@ -55,7 +55,7 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
                     if current_ncbi_tid != ncbi_tid:
                         lca_map[qname] = tree.lowest_common_ancestor(ncbi_tid, current_ncbi_tid)
             else:
-                lca_map[qname] = tree.gg_lineage(ncbi_tid)
+                lca_map[qname] = ncbi_tid
 
         lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
         taxon_counts = Counter(filter(None, lca_map.values()))
