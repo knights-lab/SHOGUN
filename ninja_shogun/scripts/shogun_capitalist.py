@@ -71,12 +71,13 @@ def shogun_capitalist(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
     # Prepare for capitalist
     verify_make_dir(os.path.join(output, 'queries'))
     for fna_file in fna_files:
-        fna_iter = FASTA(fna_file)
-        for header, seq in fna_iter.read():
-            title = header.split()[1]
-            if title in read_map:
-                with open(os.path.join(output, 'queries', read_map[title] + '.fna'), 'a+') as output_fna:
-                    output_fna.write('>%s\n%s\n' % (header, seq))
+        with open(fna_file) as fna_fh:
+            fna_iter = FASTA(fna_fh)
+            for header, seq in fna_iter.read():
+                title = header.split()[1]
+                if title in read_map:
+                    with open(os.path.join(output, 'queries', read_map[title] + '.fna'), 'a+') as output_fna:
+                        output_fna.write('>%s\n%s\n' % (header, seq))
 
 
 if __name__ == '__main__':
