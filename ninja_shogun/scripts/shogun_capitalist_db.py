@@ -22,13 +22,11 @@ def shogun_capitalist_db(input, output, extract_ncbi_tid):
     inf_fasta = FASTA(input)
     for title, seq in inf_fasta.read():
         title = '>' + title
-        title.replace('\t', '|')
         ncbi_tid = int(find_between(title, begin, end))
         if ncbi_tid:
             gg = tree.gg_lineage(ncbi_tid).replace(';', '.')
             with open(os.path.join(output, gg + '.fna'), 'a+') as output_fna:
-                header = 'ncbi_tid|%d|%s' % (ncbi_tid, title[1:])
-                output_fna.write('>%s\n%s\n' % (header, seq))
+                output_fna.write('%s\n%s\n' % (title, seq))
 
 
 if __name__ == '__main__':
