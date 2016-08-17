@@ -30,7 +30,7 @@ def yield_alignments_from_sam_inf(inf):
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1)
-def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
+def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -66,4 +66,4 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
 
 
 if __name__ == '__main__':
-    shogun_bt2_lca()
+    shogun_bt2_strain()
