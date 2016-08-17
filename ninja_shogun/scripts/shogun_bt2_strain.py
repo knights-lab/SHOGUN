@@ -25,7 +25,7 @@ def yield_alignments_from_sam_inf(inf):
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd())
-@click.option('-o', '--output', type=click.File(), default=os.path.join(os.getcwd(), 'taxon_map.csv'))
+@click.option('-o', '--output', type=click.File('w'), default=os.path.join(os.getcwd(), 'taxon_map.csv'))
 @click.option('-b', '--bt2_indx')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
