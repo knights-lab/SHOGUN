@@ -3,7 +3,7 @@ import click
 from collections import Counter
 import os
 import pandas as pd
-from cytoolz import valmap
+from cytoolz import valmap, map
 
 from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
@@ -25,7 +25,7 @@ def yield_alignments_from_sam_inf(inf):
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd())
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd())
+@click.option('-o', '--output', type=click.File(), default=os.path.join(os.getcwd(), 'taxon_map.csv'))
 @click.option('-b', '--bt2_indx')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
@@ -58,8 +58,10 @@ def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads)
                 lca_map[qname] = ncbi_tid
 
         lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
-        taxon_counts = Counter(filter(None, lca_map.values()))
-        counts.append(taxon_counts)
+        # filter out null values
+        map(lambda k, v: output.write('%s\t%s\n' % (k,v)), lca_map.items())
+
+
 
     df = pd.DataFrame(counts, index=['#' + '.'.join(os.path.basename(sample).split('.')[:-1]) for sample in sam_files])
     df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))

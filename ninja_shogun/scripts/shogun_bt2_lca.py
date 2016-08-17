@@ -3,6 +3,7 @@ import click
 from collections import Counter
 import os
 import pandas as pd
+from cytoolz import valmap
 
 from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
@@ -21,35 +22,6 @@ def yield_alignments_from_sam_inf(inf):
                 yield line[0], line[2]
             except IndexError:
                 print('Incorrect SAM input %s' % (inf))
-
-
-def lca_gg(taxonomy_a, taxonomy_b):
-    taxonomy_1 = taxonomy_a.split(';')
-    taxonomy_2 = taxonomy_b.split(';')
-    lca = []
-    for i in zip(taxonomy_1, taxonomy_2):
-        if i[0] == i[1]:
-            lca.append(i[0])
-        else:
-            break
-    if lca:
-        return ';'.join(lca)
-
-
-def collapse(lca_map, depth):
-    if depth > 0:
-        for name in lca_map:
-            taxonomy = lca_map[name]
-            if taxonomy:
-                taxonomy = taxonomy.split(';')
-                if len(taxonomy) < depth:
-                    lca_map[name] = None
-                elif len(taxonomy) > depth:
-                    lca_map[name] = ';'.join(taxonomy[:depth])
-        return lca_map
-    else:
-        return lca_map
-
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd())
@@ -78,15 +50,14 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
         for qname, rname in yield_alignments_from_sam_inf(sam_file):
             ncbi_tid = int(find_between(rname, begin, end))
             if qname in lca_map:
-                new_taxon = tree.gg_lineage(ncbi_tid)
-                current_rname = lca_map[qname]
-                if current_rname and new_taxon:
-                    if current_rname != new_taxon:
-                        lca_map[qname] = lca_gg(current_rname, new_taxon)
+                current_ncbi_tid = lca_map[qname]
+                if current_ncbi_tid:
+                    if current_ncbi_tid != ncbi_tid:
+                        lca_map[qname] = tree.lowest_common_ancestor(ncbi_tid, current_ncbi_tid)
             else:
-                lca_map[qname] = tree.gg_lineage(ncbi_tid)
+                lca_map[qname] = ncbi_tid
 
-        lca_map = collapse(lca_map, depth)
+        lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
         taxon_counts = Counter(filter(None, lca_map.values()))
         counts.append(taxon_counts)
 
