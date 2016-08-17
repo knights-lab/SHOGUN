@@ -27,7 +27,7 @@ def shogun_capitalist_db(input, output, extract_ncbi_tid):
         title.replace('\t', '|')
         ncbi_tid = int(find_between(title, begin, end))
         if ncbi_tid:
-            gg = tree.gg_lineage(ncbi_tid[0])
+            gg = tree.gg_lineage(ncbi_tid)
             with open(os.path.join(output, 'capitalist', gg + '.fna'), 'a+') as output_fna:
                 header = 'ncbi_tid|%d|%s' % (ncbi_tid, title[1:])
                 output_fna.write('>%s\n%s\n' % (header, seq))
