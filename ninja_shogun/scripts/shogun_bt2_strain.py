@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 import click
-from collections import Counter
 import os
-import pandas as pd
 from cytoolz import valmap, map
 
 from ninja_utils.utils import find_between
-from ninja_utils.utils import verify_make_dir
 
 from ninja_dojo.taxonomy import NCBITree
 
@@ -31,8 +28,6 @@ def yield_alignments_from_sam_inf(inf):
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1)
 def shogun_bt2_strain(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
-    verify_make_dir(output)
-
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
 
     for fna_file in fna_files:
