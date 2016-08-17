@@ -32,6 +32,7 @@ setup(
             'shogun_lca = ninja_shogun.scripts.lca:lca',
             'shogun_bt2_db = ninja_shogun.scripts.shogun_bt2_db:shogun_bt2_db',
             'shogun_bt2_lca = ninja_shogun.scripts.shogun_bt2_lca:shogun_bt2_lca',
+            'shogun_bt2_strain = ninja_shogun.scripts.shogun_bt2_strain:shogun_bt2_strain',
         ]
     },
 )
