@@ -70,10 +70,15 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     lca_map_2 = defaultdict(list)
     for basename in lca_maps.keys():
         for key, val in lca_maps[basename].items():
-            lca_map_2[key].append(val)
+            if key:
+                lca_map_2[key].append(val)
 
     for key in lca_map_2.keys():
         print(key)
+
+    fna_faidx = {}
+    for fna_file in fna_files:
+        fna_faidx[fna_file[:-4]] = pyfaidx.Fasta()
 
     reference_map = {}
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
@@ -82,7 +87,15 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             reference_map[line[0]] = line[1]
 
     # reverse the dict to feed into embalmer
-    # rf_faidx = pyfaidx.Fasta(reference_fasta)
+    rf_faidx = pyfaidx.Fasta(reference_fasta)
+
+    for key in lca_map_2.keys():
+        for i in reference_map[key]:
+            print(rf_faidx[i])
+
+        for basename, header in lca_map_2[key]:
+            print(fna_faidx[basename][header])
+
 
     # Prepare for capitalist
     # verify_make_dir(os.path.join(output, 'queries'))
