@@ -94,7 +94,8 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
 
         for basename, headers in lca_map_2[key]:
             for header in headers:
-                print(fna_faidx[basename][header][:])
+                record = fna_faidx[basename][header]
+                print('>%s\n%s\n' % (record.long_name, record.seq))
 
 
     # Prepare for capitalist
