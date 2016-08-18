@@ -4,6 +4,7 @@ import os
 import pyfaidx
 from cytoolz import valmap
 import csv
+from collections import defaultdict
 
 from ninja_utils.utils import find_between, reverse_collision_dict
 
@@ -66,7 +67,13 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     for basename in lca_maps.keys():
         lca_maps[basename] = valmap(lambda val: (basename, val), lca_maps[basename])
 
-    print(list(lca_maps['test1'].values())[0])
+    lca_map_2 = defaultdict(list)
+    for basename in lca_maps.keys():
+        for key, val in lca_maps[basename].items():
+            lca_map_2[key].append(val)
+
+    for key in lca_map_2.keys():
+        print(key)
 
     reference_map = {}
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
