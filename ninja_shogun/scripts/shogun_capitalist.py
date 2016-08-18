@@ -76,6 +76,7 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     fna_faidx = {}
     for fna_file in fna_files:
         fna_faidx[fna_file[:-4]] = pyfaidx.Fasta(fna_file)
+    print(list(fna_faidx.keys()))
 
     reference_map = defaultdict(list)
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
