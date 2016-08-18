@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import click
 import os
+import pyfaidx
 
 from ninja_utils.parsers import FASTA
 from ninja_utils.utils import find_between
