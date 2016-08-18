@@ -81,7 +81,7 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
         tsv_in = csv.reader(inf, delimiter='\t')
         for line in tsv_in:
-            reference_map[';'.join(line[1].split('; '))].join(line[0])
+            reference_map[';'.join(line[1].split('; '))].append(line[0])
 
     # reverse the dict to feed into embalmer
     rf_faidx = pyfaidx.Fasta(reference_fasta)
