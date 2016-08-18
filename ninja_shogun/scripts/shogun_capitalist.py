@@ -63,7 +63,8 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
         # filter out null values
         lca_maps['.'.join(os.path.basename(sam_file).split('.')[:-1])] = reverse_collision_dict(lca_map)
 
-    [valmap(lambda val: (basename, val), lca_maps[basename]) for basename in lca_maps.keys()]
+    for basename in lca_maps.keys():
+        lca_maps[basename] = valmap(lambda val: (basename, val), lca_maps[basename])
 
     print(list(lca_maps['test1'].values())[0:2])
 
