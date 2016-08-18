@@ -66,7 +66,7 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     for basename in lca_maps.keys():
         lca_maps[basename] = valmap(lambda val: (basename, val), lca_maps[basename])
 
-    print(list(lca_maps['test1'].values())[0:2])
+    print(list(lca_maps['test1'].values())[0])
 
     reference_map = {}
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
