@@ -68,7 +68,7 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     print(lca_maps['test1'])
 
     reference_map = {}
-    with open(os.path.join(os.path.basename(reference_fasta).split('.')[:-1], '.map')) as inf:
+    with open(os.path.basename(reference_fasta).split('.')[:-1] + '.map') as inf:
         tsv_in = csv.reader(inf, delimiter='\t')
         for line in tsv_in:
             reference_map[line[0]] = line[1]
