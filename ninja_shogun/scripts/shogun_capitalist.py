@@ -77,11 +77,11 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     for fna_file in fna_files:
         fna_faidx[fna_file[:-4]] = pyfaidx.Fasta(fna_file)
 
-    reference_map = {}
+    reference_map = defaultdict(list)
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
         tsv_in = csv.reader(inf, delimiter='\t')
         for line in tsv_in:
-            reference_map[line[1]] = ';'.join(line[0].split('; '))
+            reference_map[';'.join(line[1].split('; '))].join(line[0])
 
     # reverse the dict to feed into embalmer
     rf_faidx = pyfaidx.Fasta(reference_fasta)
