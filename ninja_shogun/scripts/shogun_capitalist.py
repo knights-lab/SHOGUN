@@ -73,12 +73,9 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             if key:
                 lca_map_2[key].append(val)
 
-    for key in lca_map_2.keys():
-        print(key)
-
     fna_faidx = {}
     for fna_file in fna_files:
-        fna_faidx[fna_file[:-4]] = pyfaidx.Fasta()
+        fna_faidx[fna_file[:-4]] = pyfaidx.Fasta(fna_file)
 
     reference_map = {}
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
