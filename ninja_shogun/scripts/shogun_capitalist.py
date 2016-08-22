@@ -88,6 +88,7 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     references_faidx = pyfaidx.Fasta(reference_fasta)
 
     tmpdir = tempfile.mkdtemp()
+    print(tmpdir)
 
     with open(os.path.join(output, 'embalmer_out.txt'), 'w') as embalmer_cat:
         for key in lca_map_2.keys():
@@ -125,25 +126,6 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             break
 
     os.rmdir(tmpdir)
-
-
-
-
-
-
-
-
-    # Prepare for capitalist
-    # verify_make_dir(os.path.join(output, 'queries'))
-    # for fna_file in fna_files:
-    #     with open(fna_file) as fna_fh:
-    #         fna_iter = FASTA(fna_fh)
-    #         for header, seq in fna_iter.read():
-    #             title = header.split()[0]
-    #             if title in read_map:
-    #                 with open(os.path.join(output, 'queries', read_map[title] + '.fna'), 'a+') as output_fna:
-    #                     output_fna.write('>%s\n%s\n' % (header, seq))
-
 
 if __name__ == '__main__':
     shogun_capitalist()
