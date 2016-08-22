@@ -6,7 +6,6 @@ import os
 from ninja_utils.parsers import FASTA
 from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
-from ninja_utils.config
 
 from ninja_dojo.database import RefSeqDatabase
 from ninja_dojo.taxonomy import NCBITree
@@ -51,7 +50,7 @@ def shogun_bt2_db(input, output, extract_refseq_id, prefixes):
                     if refseq_accession_version[:2] in prefix_set:
                         ncbi_tid = db.get_ncbi_tid_from_refseq_accession_version(refseq_accession_version)
                         if ncbi_tid:
-                            gg = tree.gg_lineage(ncbi_tid[0])
+                            gg = tree.green_genes_lineage(ncbi_tid[0])
                             gg = '; '.join(gg.split(';'))
                             header = 'ncbi_tid|%d|%s' % (ncbi_tid[0], title[1:])
                             output_fna.write('>%s\n%s\n' % (header, seq))
