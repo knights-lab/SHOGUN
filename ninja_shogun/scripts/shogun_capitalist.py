@@ -97,46 +97,39 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             references_fna_filename = os.path.join(tmpdir, 'reference.fna')
             output_filename = os.path.join(tmpdir, 'output.txt')
 
-            try:
-                os.mkfifo(queries_fna_filename)
-                os.mkfifo(references_fna_filename)
-                os.mkfifo(output_filename)
-            except OSError as e:
-                print("Failed to create FIFO: %s" % e)
-            else:
-                print(key)
-                with open(queries_fna_filename, 'w') as queries_fna:
-                    for basename, headers in lca_map_2[key]:
-                        for header in headers:
-                            record = fna_faidx[basename][header][:]
-                            print(record.name)
-                            queries_fna.write('>%s\n%s\n' % (record.name, record.seq))
-                print('----------------------------------------------------------Done with queries---------------')
-                with open(references_fna_filename, 'w') as references_fna:
-                    for i in reference_map[key]:
-                            record = references_faidx[i][:]
-                            print(record.name)
-                            references_fna.write('>%s\n%s\n' % (record.name, record.seq))
+            print(key)
+            with open(queries_fna_filename, 'w') as queries_fna:
+                for basename, headers in lca_map_2[key]:
+                    for header in headers:
+                        record = fna_faidx[basename][header][:]
+                        print(record.name)
+                        queries_fna.write('>%s\n%s\n' % (record.name, record.seq))
+            print('--------------------Done with queries--------------------')
+            with open(references_fna_filename, 'w') as references_fna:
+                for i in reference_map[key]:
+                        record = references_faidx[i][:]
+                        print(record.name)
+                        references_fna.write('>%s\n%s\n' % (record.name, record.seq))
 
-                # embalmer_align(queries_fna_filename, references_fna_filename, output_filename)
+            # embalmer_align(queries_fna_filename, references_fna_filename, output_filename)
 
-                with open(output_filename) as embalmer_out:
+            with open(output_filename) as embalmer_out:
+                for line in embalmer_out:
+                    embalmer_cat.write(line)
+
+            with open(os.path.join(output, 'references.fna'), 'w') as queries_out:
+                with open(references_fna_filename) as embalmer_out:
                     for line in embalmer_out:
-                        embalmer_cat.write(line)
+                        queries_out.write(line)
 
-                with open(os.path.join(output, 'references.fna'), 'w') as queries_out:
-                    with open(references_fna_filename) as embalmer_out:
-                        for line in embalmer_out:
-                            queries_out.write(line)
+            with open(os.path.join(output, 'queries.fna'), 'w') as reference_out:
+                with open(queries_fna_filename) as embalmer_out:
+                    for line in embalmer_out:
+                        reference_out.write(line)
 
-                with open(os.path.join(output, 'queries.fna'), 'w') as reference_out:
-                    with open(queries_fna_filename) as embalmer_out:
-                        for line in embalmer_out:
-                            reference_out.write(line)
-
-                os.remove(queries_fna_filename)
-                os.remove(references_fna_filename)
-                os.remove(output_filename)
+            os.remove(queries_fna_filename)
+            os.remove(references_fna_filename)
+            os.remove(output_filename)
             break
 
     os.rmdir(tmpdir)
