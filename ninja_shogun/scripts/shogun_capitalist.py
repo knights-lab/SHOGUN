@@ -5,6 +5,7 @@ import pyfaidx
 from cytoolz import valmap
 import csv
 from collections import defaultdict
+import tempfile
 
 from ninja_utils.utils import find_between, reverse_collision_dict
 
@@ -13,7 +14,7 @@ from ninja_dojo.taxonomy import NCBITree
 from ninja_utils.parsers import FASTA
 from ninja_utils.utils import verify_make_dir
 
-from ninja_shogun.aligners.bowtie import bowtie2
+from ninja_shogun.aligners import bowtie2, embalmer_align
 
 
 def yield_alignments_from_sam_inf(inf):
@@ -76,7 +77,6 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     fna_faidx = {}
     for fna_file in fna_files:
         fna_faidx[os.path.basename(fna_file)[:-4]] = pyfaidx.Fasta(fna_file)
-    print(list(fna_faidx.keys()))
 
     reference_map = defaultdict(list)
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
@@ -85,17 +85,52 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             reference_map[';'.join(line[1].split('; '))].append(line[0])
 
     # reverse the dict to feed into embalmer
-    rf_faidx = pyfaidx.Fasta(reference_fasta)
+    references_faidx = pyfaidx.Fasta(reference_fasta)
 
-    for key in lca_map_2.keys():
-        for i in reference_map[key]:
-            # print(rf_faidx[i])
+    tmpdir = tempfile.mkdtemp()
+
+    with open(os.path.join(output, 'embalmer_out.txt'), 'w') as embalmer_cat:
+        for key in lca_map_2.keys():
+
+            queries_fna_filename = os.path.join(tmpdir, 'queries.fna')
+            references_fna_filename = os.path.join(tmpdir, 'reference.fna')
+            output_filename = os.path.join(tmpdir, 'output.txt')
+
+            try:
+                os.mkfifo(queries_fna_filename)
+                os.mkfifo(references_fna_filename)
+                os.mkfifo(output_filename)
+            except OSError as e:
+                print("Failed to create FIFO: %s" % e)
+            else:
+                with open(queries_fna_filename, 'w') as queries_fna:
+                    for basename, headers in lca_map_2[key]:
+                        for header in headers:
+                            record = fna_faidx[basename][header][:]
+                            queries_fna.write('>%s\n%s\n' % (record.name, record.seq))
+                with open(references_fna_filename, 'w') as references_fna:
+                    for i in reference_map[key]:
+                            record = references_faidx[i][:]
+                            references_fna.write('>%s\n%s\n' % (record.name, record.seq))
+
+                embalmer_align(queries_fna_filename, references_fna_filename, output_filename)
+
+                with open(output_filename) as embalmer_out:
+                    for line in embalmer_out:
+                        embalmer_cat.write(line)
+
+                os.remove(queries_fna_filename)
+                os.remove(references_fna_filename)
+                os.remove(output_filename)
             break
 
-        for basename, headers in lca_map_2[key]:
-            for header in headers:
-                record = fna_faidx[basename][header][:]
-                print('>%s\n%s\n' % (record.name, record.seq))
+    os.rmdir(tmpdir)
+
+
+
+
+
+
 
 
     # Prepare for capitalist

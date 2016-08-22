@@ -6,6 +6,7 @@ import os
 from ninja_utils.parsers import FASTA
 from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
+from ninja_utils.config
 
 from ninja_dojo.database import RefSeqDatabase
 from ninja_dojo.taxonomy import NCBITree
