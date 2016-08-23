@@ -8,11 +8,9 @@ from collections import defaultdict
 import tempfile
 
 from ninja_utils.utils import find_between, reverse_collision_dict
+from ninja_utils.utils import verify_make_dir
 
 from ninja_dojo.taxonomy import NCBITree
-
-from ninja_utils.parsers import FASTA
-from ninja_utils.utils import verify_make_dir
 
 from ninja_shogun.aligners import bowtie2, embalmer_align
 
@@ -27,14 +25,15 @@ def yield_alignments_from_sam_inf(inf):
             except IndexError:
                 print('Incorrect SAM input %s' % (inf))
 
+
 @click.command()
-@click.option('-i', '--input', type=click.Path(), default=os.getcwd())
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd())
-@click.option('-b', '--bt2_indx')
-@click.option('-r', '--reference_fasta')
-@click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|')
+@click.option('-i', '--input', type=click.Path(), default=os.getcwd(), required=False, help='Directoy containing the input FASTA files with .fna extension. (default=cwd)')
+@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), required=False, help='')
+@click.option('-b', '--bt2_indx', required=True, help='Path to the bowtie2 index')
+@click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with .fna extension.')
+@click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA. (default="ncbi_tid|,|"')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
-@click.option('-p', '--threads', type=click.INT, default=1)
+@click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use. (default=1)')
 def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
