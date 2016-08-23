@@ -1,16 +1,11 @@
-import os
+from ninja_utils.config import Settings
+from ninja_utils import Logger
+from .config.settings import ninja_shogun_settings
 
-from ninja_shogun.utilities.logger import Logger
-from ninja_shogun.utilities.settings import initialize_settings
+SETTINGS = Settings('shogun', ninja_shogun_settings)
+LOGGER = Logger(logfp=SETTINGS.settings['log'], log_persist=SETTINGS.settings['log_persists'])
 
-SETTINGS = initialize_settings()
-# Opens logger to write to log and/or stdout
-# First stores original console location as a variable for error handling
-shogun_log_path = os.path.join(SETTINGS.data_dir, "shogun_log.txt")
-LOGGER = Logger(shogun_log_path, use_std_out=False)
-
-__all__ = ['aligners',
-           'downloaders',
+__all__ = ['config',
            'parsers',
            'scripts',
-           'utilities']
+           'wrappers']
