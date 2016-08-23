@@ -11,17 +11,8 @@ from ninja_utils.utils import verify_make_dir
 from ninja_dojo.taxonomy import NCBITree
 
 from ninja_shogun.wrappers import bowtie2_align
+from ninja_shogun.parsers import yield_alignments_from_sam_inf
 
-
-def yield_alignments_from_sam_inf(inf):
-    with open(inf) as fh:
-        for i in fh:
-            line = i.split('\t')
-            # this function yields qname, rname
-            try:
-                yield line[0], line[2]
-            except IndexError:
-                print('Incorrect SAM input %s' % (inf))
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd(), help='Directory containing the input FASTA files with ".fna" extensions (default=cwd)')
