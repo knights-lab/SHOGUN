@@ -6,6 +6,7 @@ from cytoolz import valmap
 import csv
 from collections import defaultdict
 import tempfile
+import pandas as pd
 
 from ninja_utils.utils import find_between, reverse_collision_dict
 from ninja_utils.utils import verify_make_dir
@@ -96,18 +97,15 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             references_fna_filename = os.path.join(tmpdir, 'reference.fna')
             output_filename = os.path.join(tmpdir, 'output.txt')
 
-            print(key)
             with open(queries_fna_filename, 'w') as queries_fna:
                 for basename, headers in lca_map_2[key]:
                     for header in headers:
                         record = fna_faidx[basename][header][:]
-                        print(record.name)
                         queries_fna.write('>%s\n%s\n' % (record.name, record.seq))
-            print('--------------------Done with queries--------------------')
+
             with open(references_fna_filename, 'w') as references_fna:
                 for i in reference_map[key]:
                         record = references_faidx[i][:]
-                        print(record.name)
                         references_fna.write('>%s\n%s\n' % (record.name, record.seq))
 
             embalmer_align(queries_fna_filename, references_fna_filename, output_filename)
@@ -119,9 +117,23 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
             os.remove(queries_fna_filename)
             os.remove(references_fna_filename)
             os.remove(output_filename)
-            break
 
     os.rmdir(tmpdir)
+
+    sparse_ncbi_dict = defaultdict(dict)
+
+    # build query by NCBI_TID DataFrame
+    with open(os.path.join(output, 'embalmer_out.txt')) as embalmer_cat:
+        embalmer_csv = csv.reader(embalmer_cat, delimiter='\t')
+        for line in embalmer_csv:
+            # line[0] = qname, line[1] = rname, line[2] = %match
+            sparse_ncbi_dict[line[0]][line[1]] = line[2]
+
+    df = pd.DataFrame.from_dict(sparse_ncbi_dict)
+    df.to_csv(os.path.join(output, 'strain_alignments.csv'))
+
+
+
 
 if __name__ == '__main__':
     shogun_capitalist()
