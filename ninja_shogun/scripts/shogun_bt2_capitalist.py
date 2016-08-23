@@ -15,17 +15,7 @@ from ninja_utils.utils import verify_make_dir
 from ninja_dojo.taxonomy import NCBITree
 
 from ninja_shogun.wrappers import bowtie2_align, embalmer_align
-
-
-def yield_alignments_from_sam_inf(inf):
-    with open(inf) as fh:
-        for i in fh:
-            line = i.split('\t')
-            # this function yields qname, rname
-            try:
-                yield line[0], line[2]
-            except IndexError:
-                print('Incorrect SAM input %s' % (inf))
+from ninja_shogun.parsers import yield_alignments_from_sam_inf
 
 
 @click.command()
@@ -36,7 +26,7 @@ def yield_alignments_from_sam_inf(inf):
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
-def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid, depth, threads):
+def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -133,8 +123,5 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
     df = pd.DataFrame.from_dict(sparse_ncbi_dict)
     df.to_csv(os.path.join(output, 'strain_alignments.csv'))
 
-
-
-
 if __name__ == '__main__':
-    shogun_capitalist()
+    shogun_bt2_capitalist()
