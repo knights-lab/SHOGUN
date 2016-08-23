@@ -30,7 +30,7 @@ setup(
             'shogun_bt2_align = ninja_shogun.scripts.shogun_bt2_align:shogun_bt2_align',
             'shogun_bt2_db = ninja_shogun.scripts.shogun_bt2_db:shogun_bt2_db',
             'shogun_bt2_lca = ninja_shogun.scripts.shogun_bt2_lca:shogun_bt2_lca',
-            'shogun_bt2_capitalist = ninja_shogun.scripts.shogun_capitalist:shogun_capitalist',
+            'shogun_bt2_capitalist = ninja_shogun.scripts.shogun_bt2_capitalist:shogun_bt2_capitalist',
         ]
     },
 )
