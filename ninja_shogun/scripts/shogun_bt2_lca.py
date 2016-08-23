@@ -10,7 +10,7 @@ from ninja_utils.utils import verify_make_dir
 
 from ninja_dojo.taxonomy import NCBITree
 
-from ninja_shogun.aligners.bowtie import bowtie2
+from ninja_shogun.wrappers import bowtie2_align
 
 
 def yield_alignments_from_sam_inf(inf):
@@ -24,12 +24,12 @@ def yield_alignments_from_sam_inf(inf):
                 print('Incorrect SAM input %s' % (inf))
 
 @click.command()
-@click.option('-i', '--input', type=click.Path(), default=os.getcwd())
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd())
-@click.option('-b', '--bt2_indx')
-@click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|')
+@click.option('-i', '--input', type=click.Path(), default=os.getcwd(), help='Directory containing the input FASTA files with ".fna" extensions (default=cwd)')
+@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='Output directory for the results')
+@click.option('-b', '--bt2_indx', help='Path to the bowtie2 index')
+@click.option('-x', '--extract_ncbi_tid', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
-@click.option('-p', '--threads', type=click.INT, default=1)
+@click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
 def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
@@ -37,7 +37,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads):
 
     for fna_file in fna_files:
         sam_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.sam')
-        print(bowtie2(fna_file, sam_outf, bt2_indx, num_threads=threads))
+        print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
     begin, end = extract_ncbi_tid.split(',')

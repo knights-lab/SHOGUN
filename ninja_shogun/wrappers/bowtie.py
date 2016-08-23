@@ -3,7 +3,7 @@ from ninja_utils.utils import run_command
 from .. import SETTINGS
 
 
-def bowtie2(infile, outfile, database, alignments_to_report=32, num_threads=SETTINGS.N_jobs, shell=False):
+def bowtie2_align(infile, outfile, database, alignments_to_report=32, num_threads=SETTINGS.N_jobs, shell=False):
     """
     Search a bowtie2 index with multiple alignment.
     :param infile: the query FASTA file
