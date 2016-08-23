@@ -7,6 +7,7 @@ import csv
 from collections import defaultdict
 import tempfile
 import pandas as pd
+import numpy as np
 
 from ninja_utils.utils import find_between, reverse_collision_dict
 from ninja_utils.utils import verify_make_dir
@@ -127,7 +128,8 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
         embalmer_csv = csv.reader(embalmer_cat, delimiter='\t')
         for line in embalmer_csv:
             # line[0] = qname, line[1] = rname, line[2] = %match
-            sparse_ncbi_dict[line[0]][line[1]] = line[2]
+            ncbi_tid = np.int(find_between(line[1], begin, end))
+            sparse_ncbi_dict[line[0]][ncbi_tid] = np.float(line[2])
 
     df = pd.DataFrame.from_dict(sparse_ncbi_dict)
     df.to_csv(os.path.join(output, 'strain_alignments.csv'))
