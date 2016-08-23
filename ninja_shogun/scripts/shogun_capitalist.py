@@ -27,8 +27,8 @@ def yield_alignments_from_sam_inf(inf):
 
 
 @click.command()
-@click.option('-i', '--input', type=click.Path(), default=os.getcwd(), required=False, help='Directoy containing the input FASTA files with .fna extension. (default=cwd)')
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), required=False, help='')
+@click.option('-i', '--input', type=click.Path(), default=os.getcwd(), help='Directoy containing the input FASTA files with .fna extension. (default=cwd)')
+@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='')
 @click.option('-b', '--bt2_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with .fna extension.')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA. (default="ncbi_tid|,|"')
