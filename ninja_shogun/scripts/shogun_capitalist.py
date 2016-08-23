@@ -113,19 +113,9 @@ def shogun_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid
 
             embalmer_align(queries_fna_filename, references_fna_filename, output_filename)
 
-            # with open(output_filename) as embalmer_out:
-            #     for line in embalmer_out:
-            #         embalmer_cat.write(line)
-            #
-            # with open(os.path.join(output, 'references.fna'), 'w') as queries_out:
-            #     with open(references_fna_filename) as embalmer_out:
-            #         for line in embalmer_out:
-            #             queries_out.write(line)
-            #
-            # with open(os.path.join(output, 'queries.fna'), 'w') as reference_out:
-            #     with open(queries_fna_filename) as embalmer_out:
-            #         for line in embalmer_out:
-            #             reference_out.write(line)
+            with open(output_filename) as embalmer_out:
+                for line in embalmer_out:
+                    embalmer_cat.write(line)
 
             os.remove(queries_fna_filename)
             os.remove(references_fna_filename)

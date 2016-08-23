@@ -10,5 +10,6 @@ def embalmer_align(queries, references, outfile, mode='CAPITALIST', num_threads=
            '--output', outfile,
            '--threads', str(num_threads),
            '--mode', mode,
+           '--shear',
            ]
     return run_command(cmd, shell=shell)
