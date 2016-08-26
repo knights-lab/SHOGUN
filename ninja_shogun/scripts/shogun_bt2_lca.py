@@ -29,7 +29,10 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
 
     for fna_file in fna_files:
         sam_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.sam')
-        print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
+        if os.path.isfile(sam_outf):
+            print("Found the Samfile %s. Skipping the alignment phase" % sam_outf)
+        else:
+            print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
     rank_name = tree.mp_ranks.keys()[depth]
