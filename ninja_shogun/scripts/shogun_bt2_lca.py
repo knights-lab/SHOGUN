@@ -32,7 +32,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
         print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
-    rank_name = tree.mp_ranks()[depth]
+    rank_name = tree.mp_ranks[depth]
     if not rank_name:
         raise ValueError('Depth must be between 0 and 7, it was %d' % depth)        
 
