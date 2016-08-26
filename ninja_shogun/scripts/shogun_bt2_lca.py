@@ -30,7 +30,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
     for fna_file in fna_files:
         sam_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.sam')
         if os.path.isfile(sam_outf):
-            print("Found the samfile <%s>. Skipping the alignment phase." % sam_outf)
+            print("Found the samfile \"%s\". Skipping the alignment phase for this file." % sam_outf)
         else:
             print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
