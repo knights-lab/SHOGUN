@@ -78,8 +78,7 @@ def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi
     # reverse the dict to feed into embalmer
     references_faidx = pyfaidx.Fasta(reference_fasta)
 
-    tmpdir = tempfile.mkdtemp()
-
+    tmpdir = te                                                                                               
     with open(os.path.join(output, 'embalmer_out.txt'), 'w') as embalmer_cat:
         for key in lca_map_2.keys():
 
