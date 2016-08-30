@@ -23,25 +23,25 @@ from ninja_shogun.wrappers import utree_search, embalmer_align
 def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, threads):
     verify_make_dir(output)
 
-    fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
+    basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
 
-    for fna_file in fna_files:
-        tsv_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.utree.tsv')
+    for basename in basenames:
+        fna_file = os.path.join(input, basename + '.fna')
+        tsv_outf = os.path.join(output, basename + 'utree.tsv')
         print(utree_search(utree_indx, fna_file, tsv_outf))
 
-    utree_tsv_files = [os.path.join(output, filename) for filename in os.listdir(output) if filename.endswith('.utree.tsv')]
     lca_maps = defaultdict(lambda: defaultdict(list))
-    for tsv in utree_tsv_files:
-        basename = '.'.join(os.path.basename(tsv).split('.')[:-1])
-        with open(tsv) as inf:
+    for basename in basenames:
+        utree_tsv = os.path.join(output, basename + '.utree.tsv')
+        with open(utree_tsv) as inf:
             tsv_parser = csv.reader(inf, delimiter='\t')
             for line in tsv_parser:
                 if line[1]:
                     lca_maps[';'.join(line[1].split('; '))][basename].append(line[0])
 
     fna_faidx = {}
-    for fna_file in fna_files:
-        fna_faidx[os.path.basename(fna_file)[:-4]] = pyfaidx.Fasta(fna_file)
+    for basename in basenames:
+        fna_faidx[basename] = pyfaidx.Fasta(os.path.join(input, basename + '.fna'))
 
     reference_map = defaultdict(list)
     with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
