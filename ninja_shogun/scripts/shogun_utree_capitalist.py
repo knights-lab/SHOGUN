@@ -30,9 +30,8 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, threads)
         print(utree_search(utree_indx, fna_file, tsv_outf))
 
     tsv_files = [os.path.join(output, filename) for filename in os.listdir(output) if filename.endswith('.tsv')]
-    lca_maps = defaultdict(defaultdict(list))
+    lca_maps = defaultdict(lambda: defaultdict(list))
     for tsv in tsv_files:
-        lca_map = {}
         basename = '.'.join(os.path.basename(tsv).split('.')[:-1])
         with open(tsv) as inf:
             tsv_parser = csv.reader(inf, delimiter='\t')
