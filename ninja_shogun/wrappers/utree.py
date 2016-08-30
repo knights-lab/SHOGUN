@@ -12,6 +12,7 @@ def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threa
        output_uncompressed_tree,
        threads,
     ]
+    cmd = [str(i) for i in cmd]
     return run_command(cmd, shell=shell)
 
 
@@ -24,6 +25,7 @@ def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, th
         output_uncompressed_tree,
         threads,
     ]
+    cmd = [str(i) for i in cmd]
     return run_command(cmd, shell=shell)
 
 
@@ -34,6 +36,7 @@ def utree_compress(input_uncompressed_tree, output_compressed_tree, shell=False)
         input_uncompressed_tree,
         output_compressed_tree
     ]
+    cmd = [str(i) for i in cmd]
     return run_command(cmd, shell=shell)
 
 
@@ -45,6 +48,7 @@ def utree_search(input_compressed_tree, input_fasta_to_search, output, shell=Fal
         input_fasta_to_search,
         output
     ]
+    cmd = [str(i) for i in cmd]
     return run_command(cmd, shell=shell)
 
 
@@ -56,4 +60,5 @@ def utree_search_gg(input_compressed_tree, input_fasta_to_search, output, shell=
         input_fasta_to_search,
         output
     ]
+    cmd = [str(i) for i in cmd]
     return run_command(cmd, shell=shell)
