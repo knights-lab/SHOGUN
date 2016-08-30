@@ -33,7 +33,7 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_
 
     for fna_file in fna_files:
         tsv_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.tsv')
-        print(utree_search(fna_file, utree_indx, tsv_outf))
+        print(utree_search(utree_indx, fna_file, tsv_outf))
 
     # tree = NCBITree()
     # begin, end = extract_ncbi_tid.split(',')
