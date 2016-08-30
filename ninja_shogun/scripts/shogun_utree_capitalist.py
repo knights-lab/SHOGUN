@@ -19,8 +19,9 @@ from ninja_shogun.wrappers import utree_search, embalmer_align
 @click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='Output directory for the results')
 @click.option('-u', '--utree_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
+@click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
-def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, threads):
+def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_ncbi_tid, threads):
     verify_make_dir(output)
 
     basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -85,6 +86,7 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, threads)
 
     sparse_ncbi_dict = defaultdict(dict)
 
+    begin, end = extract_ncbi_tid.split(',')
     # build query by NCBI_TID DataFrame
     with open(os.path.join(output, 'embalmer_out.txt')) as embalmer_cat:
         embalmer_csv = csv.reader(embalmer_cat, delimiter='\t')
