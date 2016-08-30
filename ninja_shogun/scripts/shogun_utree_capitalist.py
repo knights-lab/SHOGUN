@@ -2,20 +2,16 @@
 import click
 import os
 import pyfaidx
-from cytoolz import valmap
 import csv
 from collections import defaultdict
 import tempfile
 import pandas as pd
 import numpy as np
 
-from ninja_utils.utils import find_between, reverse_collision_dict
+from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
 
-from ninja_dojo.taxonomy import NCBITree
-
 from ninja_shogun.wrappers import utree_search, embalmer_align
-from ninja_shogun.parsers import yield_alignments_from_sam_inf
 
 
 @click.command()
@@ -24,7 +20,7 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 @click.option('-u', '--utree_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
-def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_ncbi_tid, depth, threads):
+def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, threads):
     verify_make_dir(output)
 
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -32,9 +28,6 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_
     for fna_file in fna_files:
         tsv_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.tsv')
         print(utree_search(utree_indx, fna_file, tsv_outf))
-
-    tree = NCBITree()
-    begin, end = extract_ncbi_tid.split(',')
 
     tsv_files = [os.path.join(output, filename) for filename in os.listdir(output) if filename.endswith('.tsv')]
     lca_maps = defaultdict(defaultdict(list))
