@@ -31,6 +31,8 @@ setup(
             'shogun_bt2_db = ninja_shogun.scripts.shogun_bt2_db:shogun_bt2_db',
             'shogun_bt2_lca = ninja_shogun.scripts.shogun_bt2_lca:shogun_bt2_lca',
             'shogun_bt2_capitalist = ninja_shogun.scripts.shogun_bt2_capitalist:shogun_bt2_capitalist',
+            'shogun_utree_db = ninja_shogun.scripts.shogun_utree_db:shogun_utree_db',
+            'shogun_utree_capitalist = ninja_shogun.scripts.shogun_utree_capitalist:shogun_utree_capitalist',
         ]
     },
 )
