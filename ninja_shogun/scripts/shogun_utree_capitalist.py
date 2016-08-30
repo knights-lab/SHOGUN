@@ -26,7 +26,7 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
-def shogun_bt2_capitalist(input, output, utree_indx, reference_fasta, extract_ncbi_tid, depth, threads):
+def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -123,4 +123,4 @@ def shogun_bt2_capitalist(input, output, utree_indx, reference_fasta, extract_nc
     # df.to_csv(os.path.join(output, 'strain_alignments.csv'))
 
 if __name__ == '__main__':
-    shogun_bt2_capitalist()
+    shogun_utree_capitalist()
