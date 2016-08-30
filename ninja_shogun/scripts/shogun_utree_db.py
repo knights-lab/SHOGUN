@@ -21,7 +21,7 @@ from ninja_shogun import SETTINGS
 @click.option('-p', '--threads', type=click.INT, default=SETTINGS.N_jobs, help='The number of threads to use (default=MAX_THREADS)')
 @click.option('--prefixes', default='*', help="Supply a comma-seperated list where the options are choices"
                                               " in ('AC', 'NC', 'NG', 'NM', 'NT', 'NW', 'NZ') e.g. NC,AC default=all")
-def shogun_bt2_db(input, output, extract_refseq_id, threads, prefixes):
+def shogun_utree_db(input, output, extract_refseq_id, threads, prefixes):
     db = RefSeqDatabase()
 
     verify_make_dir(output)
@@ -76,4 +76,4 @@ def shogun_bt2_db(input, output, extract_refseq_id, threads, prefixes):
         os.remove(path_uncompressed_tree)
 
 if __name__ == '__main__':
-    shogun_bt2_db()
+    shogun_utree_db()
