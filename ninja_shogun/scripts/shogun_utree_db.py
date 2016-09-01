@@ -38,6 +38,8 @@ def shogun_utree_db(input, output, extract_refseq_id, threads, prefixes, depth, 
                 for lines_fna, lines_map in annotater:
                     output_fna.write(lines_fna)
                     output_map.write(lines_map)
+    else:
+        print("Found the output files \"%s\" and \"%s\". Skipping the annotation phase for this file." % (outf_fasta, outf_map))
 
     # Build the output CTR
     verify_make_dir(os.path.join(output, 'utree'))

@@ -37,7 +37,7 @@ def shogun_bt2_db(input, output, extract_refseq_id, prefixes, depth, depth_force
                     output_fna.write(lines_fna)
                     output_map.write(lines_map)
     else:
-        print("Found the output file \"%s\". Skipping the annotation phase for this file." % outf_fasta)
+        print("Found the output files \"%s\" and \"%s\". Skipping the annotation phase for this file." % (outf_fasta, outf_map))
 
     # Build the output BT2 database
     verify_make_dir(os.path.join(output, 'bt2'))
