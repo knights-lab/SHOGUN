@@ -23,10 +23,11 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 @click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='Output directory for the results')
 @click.option('-b', '--bt2_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
+@click.option('-m', '--dict_reference_map', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
-def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi_tid, depth, threads):
+def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, reference_map, extract_ncbi_tid, depth, threads):
     verify_make_dir(output)
 
     fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -69,11 +70,11 @@ def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi
     for fna_file in fna_files:
         fna_faidx[os.path.basename(fna_file)[:-4]] = pyfaidx.Fasta(fna_file)
 
-    reference_map = defaultdict(list)
-    with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
+    dict_reference_map = defaultdict(list)
+    with open(reference_map) as inf:
         tsv_in = csv.reader(inf, delimiter='\t')
         for line in tsv_in:
-            reference_map[';'.join(line[1].split('; '))].append(line[0])
+            dict_reference_map[';'.join(line[1].split('; '))].append(line[0])
 
     # reverse the dict to feed into embalmer
     references_faidx = pyfaidx.Fasta(reference_fasta)
@@ -93,7 +94,7 @@ def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi
                         queries_fna.write('>filename|%s|%s\n%s\n' % (basename, record.name, record.seq))
 
             with open(references_fna_filename, 'w') as references_fna:
-                for i in reference_map[key]:
+                for i in dict_reference_map[key]:
                         record = references_faidx[i][:]
                         references_fna.write('>%s\n%s\n' % (record.name, record.seq))
 
