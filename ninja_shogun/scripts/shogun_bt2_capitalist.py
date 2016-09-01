@@ -90,7 +90,7 @@ def shogun_bt2_capitalist(input, output, bt2_indx, reference_fasta, extract_ncbi
                 for basename, headers in lca_map_2[key]:
                     for header in headers:
                         record = fna_faidx[basename][header][:]
-                        queries_fna.write('>%s\n%s\n' % (record.name, record.seq))
+                        queries_fna.write('>filename|%s|%s\n%s\n' % (basename, record.name, record.seq))
 
             with open(references_fna_filename, 'w') as references_fna:
                 for i in reference_map[key]:
