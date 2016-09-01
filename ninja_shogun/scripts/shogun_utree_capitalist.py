@@ -19,9 +19,10 @@ from ninja_shogun.wrappers import utree_search, embalmer_align
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'shogun_utree_capitalist_out'), help='Output directory for the results')
 @click.option('-u', '--utree_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
+@click.option('-m', '--reference_map', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
-def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_ncbi_tid, threads):
+def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, reference_map, extract_ncbi_tid, threads):
     verify_make_dir(output)
 
     basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -51,11 +52,12 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_
         for basename in basenames:
             fna_faidx[basename] = pyfaidx.Fasta(os.path.join(input, basename + '.fna'))
 
-        reference_map = defaultdict(list)
-        with open('.'.join(os.path.basename(reference_fasta).split('.')[:-1]) + '.map') as inf:
+        dict_reference_map = defaultdict(list)
+
+        with open(reference_map) as inf:
             tsv_in = csv.reader(inf, delimiter='\t')
             for line in tsv_in:
-                reference_map[';'.join(line[1].split('; '))].append(line[0])
+                dict_reference_map[';'.join(line[1].split('; '))].append(line[0])
 
         # reverse the dict to feed into embalmer
         references_faidx = pyfaidx.Fasta(reference_fasta)
@@ -72,10 +74,10 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, extract_
                     for basename in lca_maps[species].keys():
                         for header in lca_maps[species][basename]:
                             record = fna_faidx[basename][header][:]
-                            queries_fna.write('>%s\n%s\n' % (record.name, record.seq))
+                            queries_fna.write('>filename|%s|%s\n%s\n' % (basename, record.name, record.seq))
 
                 with open(references_fna_filename, 'w') as references_fna:
-                    for i in reference_map[species]:
+                    for i in dict_reference_map[species]:
                             record = references_faidx[i][:]
                             references_fna.write('>%s\n%s\n' % (record.name, record.seq))
 
