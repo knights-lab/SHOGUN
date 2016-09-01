@@ -18,7 +18,9 @@ from ninja_shogun import SETTINGS
 @click.option('-p', '--threads', type=click.INT, default=SETTINGS.N_jobs, help='The number of threads to use (default=MAX_THREADS)')
 @click.option('--prefixes', default='*', help="Supply a comma-seperated list where the options are choices"
                                               " in ('AC', 'NC', 'NG', 'NM', 'NT', 'NW', 'NZ') e.g. NC,AC default=all")
-def shogun_utree_db(input, output, extract_refseq_id, threads, prefixes):
+@click.option('-d', '--depth', default=7, help="The depth to annotate the map")
+@click.option('-f', '--depth-force', default=True, help="Force the depth criterion if missing annotation")
+def shogun_utree_db(input, output, extract_refseq_id, threads, prefixes, depth, depth_force):
     verify_make_dir(output)
     # Verify the FASTA is annotated
     if input == '-':
