@@ -23,7 +23,7 @@ from ninja_shogun import SETTINGS
                                               " in ('AC', 'NC', 'NG', 'NM', 'NT', 'NW', 'NZ') e.g. NC,AC default=all")
 @click.option('-d', '--depth', default=7, help="The depth to annotate the map")
 @click.option('-f', '--depth-force', default=True, help="Force the depth criterion if missing annotation")
-def shogun_utree_db(input, output, extract_id, annotater, threads, prefixes, depth, depth_force):
+def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, depth, depth_force):
     verify_make_dir(output)
     # Verify the FASTA is annotated
     if input == '-':
