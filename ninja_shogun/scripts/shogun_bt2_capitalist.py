@@ -23,7 +23,7 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 @click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='Output directory for the results')
 @click.option('-b', '--bt2_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
-@click.option('-m', '--dict_reference_map', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
+@click.option('-m', '--reference_map', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
