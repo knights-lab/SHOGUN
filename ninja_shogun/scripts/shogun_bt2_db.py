@@ -34,7 +34,7 @@ def shogun_bt2_db(input, output, extract_refseq_id, prefixes, depth, depth_force
                 with open(input) as inf:
                     inf_fasta = FASTA(inf)
                     annotater = refseq_annotater(inf_fasta.read(), prefixes, extract_refseq_id, depth=depth, depth_force=depth_force)
-                    for lines_fna, lines_map in annotater:
+                    for lines_fna, lines_map in anno:
                         output_fna.write(lines_fna)
                         output_map.write(lines_map)
     else:
