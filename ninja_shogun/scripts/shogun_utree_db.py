@@ -31,17 +31,16 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
     else:
         output_fn = '.'.join(str(os.path.basename(input)).split('.')[:-1])
 
-    tree = NCBITree()
-    db = RefSeqDatabase()
-
-    if annotater == 'refseq':
-        annotater_class = RefSeqAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
-    else:
-        annotater_class = GIAnnotater(extract_id, db, tree, depth=depth, depth_force=depth_force)
-
     outf_fasta = os.path.join(output, output_fn + '.annotated.fna')
     outf_map = os.path.join(output, output_fn + '.annotated.map')
     if not os.path.isfile(outf_fasta) or not os.path.isfile(outf_map):
+        tree = NCBITree()
+        db = RefSeqDatabase()
+        if annotater == 'refseq':
+            annotater_class = RefSeqAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
+        else:
+            annotater_class = GIAnnotater(extract_id, db, tree, depth=depth, depth_force=depth_force)
+
         with open(outf_fasta, 'w') as output_fna:
             with open(outf_map, 'w') as output_map:
                 inf_fasta = FASTA(input)
