@@ -45,7 +45,7 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
         with open(outf_fasta, 'w') as output_fna:
             with open(outf_map, 'w') as output_map:
                 inf_fasta = FASTA(input)
-                gen_annotater = annotater_class(inf_fasta)
+                gen_annotater = annotater_class(inf_fasta.read())
                 for lines_fna, lines_map in gen_annotater:
                     output_fna.write(lines_fna)
                     output_map.write(lines_map)
