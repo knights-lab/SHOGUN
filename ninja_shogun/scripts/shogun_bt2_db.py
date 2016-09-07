@@ -31,11 +31,12 @@ def shogun_bt2_db(input, output, extract_refseq_id, prefixes, depth, depth_force
     if not os.path.isfile(outf_fasta) or not os.path.isfile(outf_map):
         with open(outf_fasta, 'w') as output_fna:
             with open(outf_map, 'w') as output_map:
-                inf_fasta = FASTA(outf_fasta)
-                annotater = refseq_annotater(inf_fasta.read(), prefixes, extract_refseq_id, depth=depth, depth_force=depth_force)
-                for lines_fna, lines_map in annotater:
-                    output_fna.write(lines_fna)
-                    output_map.write(lines_map)
+                with open(input) as inf:
+                    inf_fasta = FASTA(inf)
+                    annotater = refseq_annotater(inf_fasta.read(), prefixes, extract_refseq_id, depth=depth, depth_force=depth_force)
+                    for lines_fna, lines_map in annotater:
+                        output_fna.write(lines_fna)
+                        output_map.write(lines_map)
     else:
         print("Found the output files \"%s\" and \"%s\". Skipping the annotation phase for this file." % (outf_fasta, outf_map))
 
