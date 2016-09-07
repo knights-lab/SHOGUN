@@ -35,7 +35,7 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
     db = RefSeqDatabase()
 
     if annotater == 'refseq':
-        annotater_class = RefSeqAnnotater(prefixes, extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
+        annotater_class = RefSeqAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
     else:
         annotater_class = GIAnnotater(extract_id, db, tree, depth=depth, depth_force=depth_force)
 
