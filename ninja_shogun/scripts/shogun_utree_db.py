@@ -43,14 +43,12 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
 
         with open(outf_fasta, 'w') as output_fna:
             with open(outf_map, 'w') as output_map:
-                inf_fasta = FASTA(input)
-                for title, seq in inf_fasta.read():
-                    print(title)
-                    print(seq)
-                gen_annotater = annotater_class(inf_fasta.read())
-                for lines_fna, lines_map in gen_annotater:
-                    output_fna.write(lines_fna)
-                    output_map.write(lines_map)
+                with open(input) as inf:
+                    inf_fasta = FASTA(inf)
+                    gen_annotater = annotater_class(inf_fasta.read())
+                    for lines_fna, lines_map in gen_annotater:
+                        output_fna.write(lines_fna)
+                        output_map.write(lines_map)
     else:
         print("Found the output files \"%s\" and \"%s\". Skipping the annotation phase for this file." % (outf_fasta, outf_map))
 
