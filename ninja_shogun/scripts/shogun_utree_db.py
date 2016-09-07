@@ -44,7 +44,7 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
     if not os.path.isfile(outf_fasta) or not os.path.isfile(outf_map):
         with open(outf_fasta, 'w') as output_fna:
             with open(outf_map, 'w') as output_map:
-                inf_fasta = FASTA(outf_fasta)
+                inf_fasta = FASTA(input)
                 gen_annotater = annotater_class(inf_fasta)
                 for lines_fna, lines_map in gen_annotater:
                     output_fna.write(lines_fna)
