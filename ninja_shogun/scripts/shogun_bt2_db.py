@@ -20,7 +20,7 @@ from ninja_shogun.wrappers import bowtie2_build
                                               " in ('AC', 'NC', 'NG', 'NM', 'NT', 'NW', 'NZ') e.g. NC,AC default=all")
 @click.option('-d', '--depth', default=7, help="The depth to annotate the map")
 @click.option('-f', '--depth-force', default=True, help="Force the depth criterion if missing annotation")
-def shogun_bt2_db(input, output, extract_id, prefixes, depth, depth_force):
+def shogun_bt2_db(input, output, annotater, extract_id, prefixes, depth, depth_force):
     verify_make_dir(output)
     # Verify the FASTA is annotated
     if input == '-':
