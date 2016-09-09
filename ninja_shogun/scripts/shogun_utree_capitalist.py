@@ -63,6 +63,7 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, referenc
         references_faidx = pyfaidx.Fasta(reference_fasta)
 
         tmpdir = tempfile.mkdtemp()
+        print(tmpdir)
         with open(embalmer_outf, 'w') as embalmer_cat:
             for species in lca_maps.keys():
 
