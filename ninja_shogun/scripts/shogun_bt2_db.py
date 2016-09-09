@@ -5,6 +5,8 @@ import os
 from ninja_utils.utils import verify_make_dir
 from ninja_utils.parsers import FASTA
 
+from ninja_dojo.database import RefSeqDatabase
+from ninja_dojo.taxonomy import NCBITree
 from ninja_dojo.annotaters import GIAnnotater, RefSeqAnnotater
 
 from ninja_shogun.wrappers import bowtie2_build
