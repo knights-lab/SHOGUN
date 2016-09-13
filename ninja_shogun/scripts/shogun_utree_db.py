@@ -24,7 +24,6 @@ from ninja_shogun import SETTINGS
 @click.option('-p', '--threads', type=click.INT, default=SETTINGS.N_jobs, help='The number of threads to use',
               show_default=True)
 @click.option('--prefixes', default='*',
-              help="Supply -seperated list where the options are choice in ('AC', 'NC', 'NG', 'NM', 'NT', 'NW', 'NZ') e.g. NC,AC",
               show_default=True)
 @click.option('-d', '--depth', default=7, help="The depth to annotate the map")
 @click.option('-f', '--depth-force', default=True, help="Force the depth criterion if missing annotation",

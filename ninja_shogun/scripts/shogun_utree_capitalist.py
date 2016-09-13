@@ -82,7 +82,7 @@ def shogun_utree_capitalist(input, output, utree_indx, reference_fasta, referenc
                             record = references_faidx[i][:]
                             references_fna.write('>%s\n%s\n' % (record.name, record.seq))
 
-                embalmer_align(queries_fna_filename, references_fna_filename, output_filename)
+                print(embalmer_align(queries_fna_filename, references_fna_filename, output_filename))
 
                 with open(output_filename) as embalmer_out:
                     for line in embalmer_out:
