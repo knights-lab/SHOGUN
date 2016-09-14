@@ -20,7 +20,7 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd(), help='Directory containing the input FASTA files with ".fna" extensions (default=cwd)')
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='Output directory for the results')
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'shogun_bt2_capitalist_out'), help='Output directory for the results')
 @click.option('-b', '--bt2_indx', required=True, help='Path to the bowtie2 index')
 @click.option('-r', '--reference_fasta', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')
 @click.option('-m', '--reference_map', required=True, help='Path to the annotated Reference FASTA file with ".fna" extension')

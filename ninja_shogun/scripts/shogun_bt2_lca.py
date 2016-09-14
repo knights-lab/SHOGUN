@@ -16,7 +16,7 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default=os.getcwd(), help='Directory containing the input FASTA files with ".fna" extensions (default=cwd)')
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='Output directory for the results')
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'shogun_bt2_lca_out'), help='Output directory for the results')
 @click.option('-b', '--bt2_indx', help='Path to the bowtie2 index')
 @click.option('-x', '--extract_ncbi_tid', default='ncbi_tid|,|', help='Characters that sandwich the NCBI TID in the reference FASTA (default="ncbi_tid|,|")')
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
@@ -35,9 +35,9 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
             print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
-    rank_name = list(tree.mp_ranks.keys())[depth-1]
+    rank_name = list(tree.lineage_ranks.keys())[depth-1]
     if not rank_name:
-        raise ValueError('Depth must be between 0 and 7, it was %d' % depth)        
+        raise ValueError('Depth must be between 0 and 7, it was %d' % depth)
 
     begin, end = extract_ncbi_tid.split(',')
 
