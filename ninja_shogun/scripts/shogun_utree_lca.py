@@ -39,7 +39,7 @@ def shogun_utree_lca(input, output, utree_indx, threads):
                 tsv_parser = csv.reader(inf, delimiter='\t')
                 for line in tsv_parser:
                     if line[1]:
-                        lcas.append([';'.join(line[1].split('; '))])
+                        lcas.append(';'.join(line[1].split('; ')))
             counts.append(Counter(filter(None, lcas)))
 
     df = pd.DataFrame(counts, index=['#' + basename for basename in basenames])
