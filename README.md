@@ -61,9 +61,19 @@ shogun_bt2_db -i ./test.hmp_species.fna -x '>, '
 This will take some time, the DOJO software is lazy loading the NCBI Taxonomy.
 
 ```
-cd mock_communities
-shogun_bt2_lca -i ./ -b ../annotated/bt2/test.hmp_species
+shogun_bt2_lca -i ./mock_communities -b ./annotated/bt2/test.hmp_species
 ```
 
 The results of the taxonomy counts will be in the taxon_counts.csv 🐱‍👤
 
+To run it with UTree
+
+```
+shogun_utree_db -i ./test.hmp_species.fna -x '>, '
+```
+
+
+The run LCA:
+```
+shogun_utree_db -i ./mock_communities -u ./annotated/utree/test.hmp_species.ctr
+```
