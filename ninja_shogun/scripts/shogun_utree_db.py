@@ -7,7 +7,7 @@ from ninja_utils.parsers import FASTA
 
 from ninja_dojo.database import RefSeqDatabase
 from ninja_dojo.taxonomy import NCBITree
-from ninja_dojo.annotaters import GIAnnotater, RefSeqAnnotater
+from ninja_dojo.annotaters import GIAnnotater, RefSeqAnnotater, NTAnnotater
 
 from ninja_shogun.wrappers import utree_build, utree_compress
 from ninja_shogun import SETTINGS
@@ -17,7 +17,7 @@ from ninja_shogun import SETTINGS
 @click.option('-i', '--input', type=click.Path(), help='The input FASTA file for annotating with NCBI TID')
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'annotated'),
               help='The directory to output the formatted DB and UTree db', show_default=True)
-@click.option('-a', '-annotater', type=click.Choice(['gi', 'refseq']), default='refseq', help='The annotater to use.',
+@click.option('-a', '-annotater', type=click.Choice(['gi', 'refseq', 'nt']), default='refseq', help='The annotater to use.',
               show_default=True)
 @click.option('-x', '--extract_id', default='ref|,|',
               help='Characters that sandwich the RefSeq Accession Version in the reference FASTA', show_default=True)
@@ -41,8 +41,11 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
     if not os.path.isfile(outf_fasta) or not os.path.isfile(outf_map):
         tree = NCBITree()
         db = RefSeqDatabase()
+
         if annotater == 'refseq':
             annotater_class = RefSeqAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
+        elif annotater == 'nt':
+            annotater_class = NTAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
         else:
             annotater_class = GIAnnotater(extract_id, db, tree, depth=depth, depth_force=depth_force)
 
