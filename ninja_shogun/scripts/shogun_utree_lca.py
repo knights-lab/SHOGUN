@@ -42,7 +42,7 @@ def shogun_utree_lca(input, output, utree_indx, threads):
                         lcas.append(';'.join(line[1].split('; ')))
             counts.append(Counter(filter(None, lcas)))
 
-    df = pd.DataFrame(counts, index=['#' + basename for basename in basenames])
+    df = pd.DataFrame(counts, index=basenames)
     df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
 
 if __name__ == '__main__':
