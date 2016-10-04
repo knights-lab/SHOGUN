@@ -25,7 +25,7 @@ from ninja_shogun import SETTINGS
               show_default=True)
 @click.option('--prefixes', default='*',
               show_default=True)
-@click.option('-d', '--depth', default=7, help="The depth to annotate the map")
+@click.option('-d', '--depth', default=7, help="The depth to annotate the map, max of 8 with strain.")
 @click.option('-f', '--depth-force', default=True, help="Force the depth criterion if missing annotation",
               show_default=True)
 def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, depth, depth_force):
