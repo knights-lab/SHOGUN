@@ -25,14 +25,15 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, annotate_lineage):
     verify_make_dir(output)
 
-    fna_files = [os.path.join(input, filename) for filename in os.listdir(input) if filename.endswith('.fna')]
+    basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
 
-    for fna_file in fna_files:
-        sam_outf = os.path.join(output, '.'.join(str(os.path.basename(fna_file)).split('.')[:-1]) + '.sam')
+    for basename in basenames:
+        fna_inf = os.path.join(input, basename + '.fna')
+        sam_outf = os.path.join(output, basename + '.sam')
         if os.path.isfile(sam_outf):
             print("Found the samfile \"%s\". Skipping the alignment phase for this file." % sam_outf)
         else:
-            print(bowtie2_align(fna_file, sam_outf, bt2_indx, num_threads=threads))
+            print(bowtie2_align(fna_inf, sam_outf, bt2_indx, num_threads=threads))
 
     tree = NCBITree()
     rank_name = list(tree.lineage_ranks.keys())[depth-1]
@@ -42,9 +43,8 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
     begin, end = extract_ncbi_tid.split(',')
 
     counts = []
-    sam_files = [os.path.join(output, filename) for filename in os.listdir(output) if filename.endswith('.sam')]
-
-    for sam_file in sam_files:
+    for basename in basenames:
+        sam_file = os.path.join(output, basename + '.sam')
         lca_map = {}
         for qname, rname in yield_alignments_from_sam_inf(sam_file):
             ncbi_tid = int(find_between(rname, begin, end))
@@ -64,7 +64,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
             taxon_counts = Counter(filter(None, lca_map.values()))
         counts.append(taxon_counts)
 
-    df = pd.DataFrame(counts, index=['#' + '.'.join(os.path.basename(sample).split('.')[:-1]) for sample in sam_files])
+    df = pd.DataFrame(counts, index=basenames)
     df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
 
 
