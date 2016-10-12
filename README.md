@@ -75,5 +75,5 @@ shogun_utree_db -i ./test.hmp_species.fna -x '>, '
 
 The run LCA:
 ```
-shogun_utree_db -i ./mock_communities -u ./annotated/utree/test.hmp_species.ctr
+shogun_utree_lca -i ./mock_communities -u ./annotated/utree/test.hmp_species.ctr
 ```
