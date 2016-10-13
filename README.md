@@ -28,10 +28,10 @@ conda install -c bioconda bowtie2
 pip install git+https://github.com/knights-lab/NINJA-utils.git --no-cache-dir --upgrade
 
 # NINJA-DOJO
-pip install git+https://github.com/knights-lab/NINJA-DOJO.git --no-cache-dir --upgrade
+pip install git+https://github.com/knights-lab/NINJA-DOJO.git --no-cache-dir --upgrade scipy=1.8.0
 
 # NINJA-SHOGUN
-pip install git+https://github.com/knights-lab/NINJA-SHOGUN.git --no-cache-dir --upgrade
+pip install git+https://github.com/knights-lab/NINJA-SHOGUN.git --no-cache-dir --upgrade scipy=1.8.0
 ```
 
 All dependencies should now be installed for NINJA-SHOGUN. If anything fails, try to directly conda install the failed package as the conda package manager is more robust to errors than pip. For example, if scipy failed.
