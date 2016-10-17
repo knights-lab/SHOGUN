@@ -34,13 +34,14 @@ pip install git+https://github.com/knights-lab/NINJA-DOJO.git --no-cache-dir --u
 pip install git+https://github.com/knights-lab/NINJA-SHOGUN.git --no-cache-dir --upgrade scipy=1.8.0
 ```
 
-All dependencies should now be installed for NINJA-SHOGUN. If anything fails, try to directly conda install the failed package as the conda package manager is more robust to errors than pip. For example, if scipy failed.
 
-```
-conda install scipy
-```
+With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened.
 
-With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened. Next, to test the installation, download the test data.
+If you are installing SHOGUN for BugBase, you are done. The database is provided for you.
+
+## Building a Database
+
+Next, to test the installation, download the test data.
 
 ```
 wget https://www.dropbox.com/s/b5w4xe08x7snm93/shogun_test_files.zip?dl=1
