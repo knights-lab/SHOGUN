@@ -24,7 +24,7 @@ setup(
     long_description=long_description,
     # scripts=glob(os.path.join('ninja_shogun', 'scripts', '*py')),
     keywords='',
-    install_requires=['click', 'scipy==0.18.0', 'numpy', 'pandas', 'cytoolz'],
+    install_requires=['click', 'numpy', 'pandas', 'cytoolz', 'pyfaidx'],
     entry_points={
         'console_scripts': [
             'shogun_bt2_align = ninja_shogun.scripts.shogun_bt2_align:shogun_bt2_align',
