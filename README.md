@@ -28,10 +28,10 @@ conda install -c bioconda bowtie2
 pip install git+https://github.com/knights-lab/NINJA-utils.git --no-cache-dir --upgrade
 
 # NINJA-DOJO
-pip install git+https://github.com/knights-lab/NINJA-DOJO.git --no-cache-dir --upgrade scipy=1.8.0
+pip install git+https://github.com/knights-lab/NINJA-DOJO.git --no-cache-dir --upgrade
 
 # NINJA-SHOGUN
-pip install git+https://github.com/knights-lab/NINJA-SHOGUN.git --no-cache-dir --upgrade scipy=1.8.0
+pip install git+https://github.com/knights-lab/NINJA-SHOGUN.git --no-cache-dir --upgrade
 ```
 
 
