@@ -21,8 +21,11 @@ source activate shogun
 With the shogun environment activated, install the developmental SHOGUN toolchain.
 
 ```
-# bowtie2
+# If you want to use bowtie2
 conda install -c bioconda bowtie2
+
+# Put condas and pip setuptools in sync
+pip install -I --upgrade setuptools
 
 # NINJA-utils
 pip install git+https://github.com/knights-lab/NINJA-utils.git --no-cache-dir --upgrade
