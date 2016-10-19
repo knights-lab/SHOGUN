@@ -27,7 +27,7 @@ def shogun_bugbase(input, output, img_database_folder):
     verify_make_dir(output)
 
     utree_indx = os.path.join(img_database_folder, 'img.genes.ctr')
-    with open(os.path.join(img_database_folder, 'img.genes.ctr'), 'rb') as inf:
+    with open(os.path.join(img_database_folder, 'img_map.pkl'), 'rb') as inf:
         gg2img_oid = pickle.load(inf)
 
     basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
