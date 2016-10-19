@@ -4,14 +4,12 @@ from collections import defaultdict
 import os
 
 from ninja_utils.parsers import FASTA
-from ninja_utils.utils import verify_make_dir
 
 @click.command()
 @click.option('-i', '--input', type=click.File(), default='-', help='The input annotated FASTA file')
 @click.option('-m', '--map', type=click.File(), default='-', help='The input FASTA mapping file for UTree taxonomy')
 @click.option('-o', '--output', type=click.File('w'), default=os.path.join(os.getcwd(), 'annotated'), help='The directory to output the formatted DB and BT2 db (default=annotated)')
 def extract_genome_lengths(input, map, output):
-    verify_make_dir(output)
     d = defaultdict(int)
     inf_fasta = FASTA(input)
     for header, seq in inf_fasta.read():
