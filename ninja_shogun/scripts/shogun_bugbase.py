@@ -57,10 +57,8 @@ def shogun_bugbase(input, output, img_database_folder):
                             lcas.append(gg2img_oid[taxon])
             counts.append(Counter(filter(None, lcas)))
 
-        df = pd.DataFrame(counts, index=basenames).fillna(0).astype(int)
-        columns = df.columns
-        columns[0] = '#OTU ID'
-        df.columns = columns
+        df = pd.DataFrame(counts, index=basenames).fillna(0).astype(int).T
+        df.columns.values[0] = '#OTU ID'
         df.T.to_csv(utree_outf, sep='\t')
     else:
         print("Found the output file \"%s\". Skipping all steps." % utree_outf)
