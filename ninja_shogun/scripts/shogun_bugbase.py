@@ -25,7 +25,7 @@ def build_img_map(infile: str):
 @click.option('-u', '--img_database_folder', type=click.Path(), help='Location of the BugBase Database folder.')
 def shogun_bugbase(input, output, img_database_folder):
     verify_make_dir(output)
-    utree_outf = os.path.join(output, 'taxon_counts.txt')
+    utree_outf = os.path.join(output, 'taxa_counts.txt')
     # Indexing for emblalmer
     if not os.path.isfile(utree_outf):
 
@@ -58,7 +58,7 @@ def shogun_bugbase(input, output, img_database_folder):
             counts.append(Counter(filter(None, lcas)))
 
         df = pd.DataFrame(counts, index=basenames).fillna(0).astype(int)
-        df.T.to_csv(os.path.join(output, 'taxa_counts.txt'), sep='\t')
+        df.T.to_csv(utree_outf, sep='\t')
     else:
         print("Found the output file \"%s\". Skipping all steps.")
 
