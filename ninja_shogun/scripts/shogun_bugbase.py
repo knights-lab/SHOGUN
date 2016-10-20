@@ -60,7 +60,7 @@ def shogun_bugbase(input, output, img_database_folder):
         df = pd.DataFrame(counts, index=basenames).fillna(0).astype(int)
         df.T.to_csv(utree_outf, sep='\t')
     else:
-        print("Found the output file \"%s\". Skipping all steps.")
+        print("Found the output file \"%s\". Skipping all steps." % utree_outf)
 
 
 if __name__ == '__main__':
