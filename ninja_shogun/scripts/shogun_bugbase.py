@@ -52,12 +52,11 @@ def shogun_bugbase(input, output, img_database_folder):
                 for line in tsv_parser:
                     if line[1]:
                         taxon = line[1].replace('; ', ';')
-                        print(taxon)
                         if taxon in gg2img_oid:
                             lcas.append(gg2img_oid[taxon])
             counts.append(Counter(filter(None, lcas)))
 
-    df = pd.DataFrame(counts, index=basenames)
+    df = pd.DataFrame(counts, index=basenames).astype(int)
     df.T.to_csv(os.path.join(output, 'taxa_counts.txt'), sep='\t')
 
 
