@@ -50,12 +50,14 @@ def shogun_bugbase(input, output, img_database_folder):
             with open(utree_tsv) as inf:
                 tsv_parser = csv.reader(inf, delimiter='\t')
                 for line in tsv_parser:
-                    if line[1] and line[1] in gg2img_oid:
-                        lcas.append(gg2img_oid[line[1]])
+                    if line[1]:
+                        taxon = line[1].replace('; ', ';')
+                        if taxon in gg2img_oid:
+                            lcas.append(gg2img_oid[taxon])
             counts.append(Counter(filter(None, lcas)))
 
     df = pd.DataFrame(counts, index=basenames)
-    df.T.to_csv(os.path.join(output, 'taxon_counts.txt'), sep='\t')
+    df.T.to_csv(os.path.join(output, 'taxa_counts.txt'), sep='\t')
 
 
 if __name__ == '__main__':
