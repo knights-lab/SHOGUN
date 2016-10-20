@@ -58,8 +58,7 @@ def shogun_bugbase(input, output, img_database_folder):
             counts.append(Counter(filter(None, lcas)))
 
         df = pd.DataFrame(counts, index=basenames).fillna(0).astype(int).T
-        df.columns.values[0] = '#OTU ID'
-        df.T.to_csv(utree_outf, sep='\t')
+        df.to_csv(utree_outf, sep='\t', index_label='#OTU ID')
     else:
         print("Found the output file \"%s\". Skipping all steps." % utree_outf)
 
