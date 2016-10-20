@@ -25,25 +25,26 @@ def build_img_map(infile: str):
 @click.option('-u', '--img_database_folder', type=click.Path(), help='Location of the BugBase Database folder.')
 def shogun_bugbase(input, output, img_database_folder):
     verify_make_dir(output)
-
-    utree_indx = os.path.join(img_database_folder, 'img.genes.ctr')
-    with open(os.path.join(img_database_folder, 'img_map.pkl'), 'rb') as inf:
-        gg2img_oid = pickle.load(inf)
-
-    basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
-
-    for basename in basenames:
-        fna_file = os.path.join(input, basename + '.fna')
-        tsv_outf = os.path.join(output, basename + '.utree.tsv')
-        if not os.path.isfile(tsv_outf):
-            print(utree_search(utree_indx, fna_file, tsv_outf))
-        else:
-            print("Found the output file \"%s\". Skipping the alignment phase for this file." % tsv_outf)
-
-    counts = []
     utree_outf = os.path.join(output, 'taxon_counts.txt')
     # Indexing for emblalmer
     if not os.path.isfile(utree_outf):
+
+        utree_indx = os.path.join(img_database_folder, 'img.genes.ctr')
+        with open(os.path.join(img_database_folder, 'img_map.pkl'), 'rb') as inf:
+            gg2img_oid = pickle.load(inf)
+
+        basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
+
+        for basename in basenames:
+            fna_file = os.path.join(input, basename + '.fna')
+            tsv_outf = os.path.join(output, basename + '.utree.tsv')
+            if not os.path.isfile(tsv_outf):
+                print(utree_search(utree_indx, fna_file, tsv_outf))
+            else:
+                print("Found the output file \"%s\". Skipping the alignment phase for this file." % tsv_outf)
+
+        counts = []
+
         for basename in basenames:
             lcas = []
             utree_tsv = os.path.join(output, basename + '.utree.tsv')
@@ -56,8 +57,10 @@ def shogun_bugbase(input, output, img_database_folder):
                             lcas.append(gg2img_oid[taxon])
             counts.append(Counter(filter(None, lcas)))
 
-    df = pd.DataFrame(counts, index=basenames).astype(int)
-    df.T.to_csv(os.path.join(output, 'taxa_counts.txt'), sep='\t')
+        df = pd.DataFrame(counts, index=basenames).astype(int)
+        df.T.to_csv(os.path.join(output, 'taxa_counts.txt'), sep='\t')
+    else:
+        print("Found the output file \"%s\". Skipping all steps.")
 
 
 if __name__ == '__main__':
