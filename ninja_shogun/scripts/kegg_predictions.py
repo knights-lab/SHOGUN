@@ -6,6 +6,10 @@ import csv
 from collections import defaultdict
 import sys
 import pandas as pd
+import os
+from ninja_shogun.wrappers import bowtie2_align
+
+from ninja_shogun import SETTINGS
 # from multiprocessing import Pool
 # Could parallelize with async
 # http://stackoverflow.com/questions/1239035/asynchronous-method-call-in-python
@@ -15,9 +19,11 @@ def make_arg_parser():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-i', '--input', help='The input file.', required=True)
     parser.add_argument('-m', '--mapping', help='The img to KEGG mapping file.', required=True)
-    parser.add_argument('-o', '--output', help='If nothing is given, then stdout, else write to file')
+    parser.add_argument('-o', '--output', help='Outfile', required=True)
     parser.add_argument('-a', '--algorithm', help='If nothing is given, then intersection, else stdout.',
                         choices=['intersection', 'consensus'], default='intersection')
+    parser.add_argument('-b', '--bt2_index', help='Path to the bowtie2 index', required=True)
+    parser.add_argument('-t', '--threads', help='The number of threads to use.', default=SETTINGS.N_jobs, type=int)
     return parser
 
 
@@ -106,20 +112,32 @@ def main():
     parser = make_arg_parser()
     args = parser.parse_args()
 
-    with open(args.input) as inf:
+    fna_inf = args.input
+
+    inf_path, inf_basename = os.path.split(fna_inf)
+    outf_path, outf_basename = os.path.split(args.output)
+
+    inf_name = os.path.splitext(inf_basename)[0]
+    sam_outf = os.path.join(outf_path, inf_name + '.sam')
+
+    if os.path.isfile(sam_outf):
+        print("Found the samfile \"%s\". Skipping the alignment phase for this file." % sam_outf)
+    else:
+        print(bowtie2_align(fna_inf, sam_outf, args.bt2_indx, num_threads=args.threads))
+
+    with open(sam_outf) as inf:
         csv_inf = csv.reader(inf)
         header = next(csv_inf)
+
         # 'sample_id', 'sequence_id', 'ncbi_tid', 'img_id'
-        if args.algorithm in ['intersection']:
+        if args.algorithm == 'intersection':
             img_oid2kegg = get_img_oid2kegg(args.mapping)
-            if args.algorithm == 'intersection':
-                counts = intersection(csv_inf, img_oid2kegg)
+            counts = intersection(csv_inf, img_oid2kegg)
         else:
             img2kegg = get_img2kegg(args.mapping)
-            if args.algorithm == 'consensus':
-                counts = consensus(csv_inf, img2kegg)
+            counts = consensus(csv_inf, img2kegg)
 
-    with open(args.output, 'w') if args.output else sys.stdout as outf:
+    with open(args.output, 'w') as outf:
         count_df = pd.DataFrame(counts)
         outf.write(count_df.T.to_csv())
 

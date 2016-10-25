@@ -35,7 +35,9 @@ setup(
             'shogun_utree_lca = ninja_shogun.scripts.shogun_utree_lca:shogun_utree_lca',
             'shogun_utree_capitalist = ninja_shogun.scripts.shogun_utree_capitalist:shogun_utree_capitalist',
             'shogun_bugbase = ninja_shogun.scripts.shogun_bugbase:shogun_bugbase',
-            'extract_genome_lengths = ninja_shogun.scripts.extract_genome_lengths:extract_genome_lengths'
+            'extract_genome_lengths = ninja_shogun.scripts.extract_genome_lengths:extract_genome_lengths',
+            'kegg_predictions = ninja_shogun.scripts.kegg_predictions:main',
+            'kegg_mapping_extract_img_id = ninja_shogun.scripts.kegg_mapping_extract_img_id:main',
         ]
     },
 )
