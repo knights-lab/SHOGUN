@@ -22,7 +22,8 @@ from ninja_shogun.parsers import yield_alignments_from_sam_inf
 @click.option('-d', '--depth', type=click.INT, default=7, help='The depth of the search (7=species default, 0=No Collapse)')
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
 @click.option('-a', '--annotate_lineage', type=click.BOOL, default=True, help='Annotate the NCBI Taxonomy ID with lineage (default=True)')
-def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, annotate_lineage):
+@click.option('-l', '--run_lca', type=click.BOOL, default=True, help='Run LCA at all, or just align (default=True)')
+def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, annotate_lineage, run_lca):
     verify_make_dir(output)
 
     basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -34,38 +35,39 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
             print("Found the samfile \"%s\". Skipping the alignment phase for this file." % sam_outf)
         else:
             print(bowtie2_align(fna_inf, sam_outf, bt2_indx, num_threads=threads))
+    
+    if run_lca:
+        tree = NCBITree()
+        rank_name = list(tree.lineage_ranks.keys())[depth-1]
+        if not rank_name:
+            raise ValueError('Depth must be between 0 and 7, it was %d' % depth)
 
-    tree = NCBITree()
-    rank_name = list(tree.lineage_ranks.keys())[depth-1]
-    if not rank_name:
-        raise ValueError('Depth must be between 0 and 7, it was %d' % depth)
+        begin, end = extract_ncbi_tid.split(',')
 
-    begin, end = extract_ncbi_tid.split(',')
+        counts = []
+        for basename in basenames:
+            sam_file = os.path.join(output, basename + '.sam')
+            lca_map = {}
+            for qname, rname in yield_alignments_from_sam_inf(sam_file):
+                ncbi_tid = int(find_between(rname, begin, end))
+                if qname in lca_map:
+                    current_ncbi_tid = lca_map[qname]
+                    if current_ncbi_tid:
+                        if current_ncbi_tid != ncbi_tid:
+                            lca_map[qname] = tree.lowest_common_ancestor(ncbi_tid, current_ncbi_tid)
+                else:
+                    lca_map[qname] = ncbi_tid
 
-    counts = []
-    for basename in basenames:
-        sam_file = os.path.join(output, basename + '.sam')
-        lca_map = {}
-        for qname, rname in yield_alignments_from_sam_inf(sam_file):
-            ncbi_tid = int(find_between(rname, begin, end))
-            if qname in lca_map:
-                current_ncbi_tid = lca_map[qname]
-                if current_ncbi_tid:
-                    if current_ncbi_tid != ncbi_tid:
-                        lca_map[qname] = tree.lowest_common_ancestor(ncbi_tid, current_ncbi_tid)
+            if annotate_lineage:
+                lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
+                taxon_counts = Counter(filter(None, lca_map.values()))
             else:
-                lca_map[qname] = ncbi_tid
+                lca_map = valfilter(lambda x: tree.get_rank_from_taxon_id(x) == rank_name, lca_map)
+                taxon_counts = Counter(filter(None, lca_map.values()))
+            counts.append(taxon_counts)
 
-        if annotate_lineage:
-            lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
-            taxon_counts = Counter(filter(None, lca_map.values()))
-        else:
-            lca_map = valfilter(lambda x: tree.get_rank_from_taxon_id(x) == rank_name, lca_map)
-            taxon_counts = Counter(filter(None, lca_map.values()))
-        counts.append(taxon_counts)
-
-    df = pd.DataFrame(counts, index=basenames)
-    df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
+        df = pd.DataFrame(counts, index=basenames)
+        df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
 
 
 if __name__ == '__main__':
