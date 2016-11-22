@@ -8,7 +8,7 @@ import pickle
 
 from ninja_utils.utils import verify_make_dir
 
-from ninja_shogun.wrappers import utree_search
+from shogun.wrappers import utree_search
 
 
 def build_img_map(infile: str):

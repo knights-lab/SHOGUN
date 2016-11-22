@@ -10,7 +10,7 @@ import numpy as np
 from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
 
-from ninja_shogun.wrappers import utree_search, embalmer_align
+from shogun.wrappers import utree_search, embalmer_align
 
 
 @click.command()

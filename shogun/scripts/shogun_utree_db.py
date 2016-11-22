@@ -9,8 +9,8 @@ from ninja_dojo.database import RefSeqDatabase
 from ninja_dojo.taxonomy import NCBITree
 from ninja_dojo.annotaters import GIAnnotater, RefSeqAnnotater, NTAnnotater
 
-from ninja_shogun.wrappers import utree_build, utree_compress
-from ninja_shogun import SETTINGS
+from shogun.wrappers import utree_build, utree_compress
+from shogun import SETTINGS
 
 
 @click.command()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import click
 
-from ninja_shogun.wrappers import bowtie2_align
+from shogun.wrappers import bowtie2_align
 
 
 @click.command()

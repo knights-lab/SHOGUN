@@ -14,8 +14,8 @@ from ninja_utils.utils import verify_make_dir
 
 from ninja_dojo.taxonomy import NCBITree
 
-from ninja_shogun.wrappers import bowtie2_align, embalmer_align
-from ninja_shogun.parsers import yield_alignments_from_sam_inf
+from shogun.wrappers import bowtie2_align, embalmer_align
+from shogun.parsers import yield_alignments_from_sam_inf
 
 
 @click.command()

@@ -7,10 +7,10 @@ from collections import defaultdict
 import os
 import csv
 
-from ninja_shogun import SETTINGS
-from ninja_shogun.taxonomy.algorithms.last_common_ancestor import LCA
-from ninja_shogun.taxonomy.ncbi.maps.img_map import IMGMap
-from ninja_shogun.taxonomy.ncbi.ncbi_tree import NCBITree
+from shogun import SETTINGS
+from shogun.taxonomy.algorithms.last_common_ancestor import LCA
+from shogun.taxonomy.ncbi.maps.img_map import IMGMap
+from shogun.taxonomy.ncbi.ncbi_tree import NCBITree
 
 
 def make_arg_parser():
