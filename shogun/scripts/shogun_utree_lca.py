@@ -7,7 +7,7 @@ import pandas as pd
 
 from ninja_utils.utils import verify_make_dir
 
-from ninja_shogun.wrappers import utree_search
+from shogun.wrappers import utree_search
 
 
 @click.command()

@@ -9,7 +9,7 @@ from ninja_dojo.database import RefSeqDatabase
 from ninja_dojo.taxonomy import NCBITree
 from ninja_dojo.annotaters import GIAnnotater, RefSeqAnnotater, NTAnnotater
 
-from ninja_shogun.wrappers import bowtie2_build
+from shogun.wrappers import bowtie2_build
 
 @click.command()
 @click.option('-i', '--input', type=click.Path(), default='-', help='The input FASTA file for annotating with NCBI TID (default=stdin)')
