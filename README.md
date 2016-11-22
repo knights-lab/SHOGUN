@@ -30,11 +30,11 @@ pip install -I --upgrade setuptools
 # NINJA-utils
 pip install git+https://github.com/knights-lab/NINJA-utils.git --no-cache-dir --upgrade
 
-# NINJA-DOJO
-pip install git+https://github.com/knights-lab/NINJA-DOJO.git --no-cache-dir --upgrade
+# DOJO
+pip install git+https://github.com/knights-lab/DOJO.git --no-cache-dir --upgrade
 
-# NINJA-SHOGUN
-pip install git+https://github.com/knights-lab/NINJA-SHOGUN.git --no-cache-dir --upgrade
+# SHOGUN
+pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
 ```
 
 
