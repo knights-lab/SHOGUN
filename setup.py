@@ -13,7 +13,7 @@ __version__ = "0.0.1-dev"
 long_description = ''
 
 setup(
-    name='ninja_shogun',
+    name='shogun',
     version=__version__,
     packages=find_packages(),
     url='',
@@ -22,22 +22,22 @@ setup(
     author_email=__email__,
     description='',
     long_description=long_description,
-    # scripts=glob(os.path.join('ninja_shogun', 'scripts', '*py')),
+    # scripts=glob(os.path.join('shogun', 'scripts', '*py')),
     keywords='',
     install_requires=['click', 'numpy', 'pandas', 'cytoolz', 'pyfaidx'],
     entry_points={
         'console_scripts': [
-            'shogun_bt2_align = ninja_shogun.scripts.shogun_bt2_align:shogun_bt2_align',
-            'shogun_bt2_db = ninja_shogun.scripts.shogun_bt2_db:shogun_bt2_db',
-            'shogun_bt2_lca = ninja_shogun.scripts.shogun_bt2_lca:shogun_bt2_lca',
-            'shogun_bt2_capitalist = ninja_shogun.scripts.shogun_bt2_capitalist:shogun_bt2_capitalist',
-            'shogun_utree_db = ninja_shogun.scripts.shogun_utree_db:shogun_utree_db',
-            'shogun_utree_lca = ninja_shogun.scripts.shogun_utree_lca:shogun_utree_lca',
-            'shogun_utree_capitalist = ninja_shogun.scripts.shogun_utree_capitalist:shogun_utree_capitalist',
-            'shogun_bugbase = ninja_shogun.scripts.shogun_bugbase:shogun_bugbase',
-            'extract_genome_lengths = ninja_shogun.scripts.extract_genome_lengths:extract_genome_lengths',
-            'kegg_predictions = ninja_shogun.scripts.kegg_predictions:main',
-            'kegg_mapping_extract_img_id = ninja_shogun.scripts.kegg_mapping_extract_img_id:main',
+            'shogun_bt2_align = shogun.scripts.shogun_bt2_align:shogun_bt2_align',
+            'shogun_bt2_db = shogun.scripts.shogun_bt2_db:shogun_bt2_db',
+            'shogun_bt2_lca = shogun.scripts.shogun_bt2_lca:shogun_bt2_lca',
+            'shogun_bt2_capitalist = shogun.scripts.shogun_bt2_capitalist:shogun_bt2_capitalist',
+            'shogun_utree_db = shogun.scripts.shogun_utree_db:shogun_utree_db',
+            'shogun_utree_lca = shogun.scripts.shogun_utree_lca:shogun_utree_lca',
+            'shogun_utree_capitalist = shogun.scripts.shogun_utree_capitalist:shogun_utree_capitalist',
+            'shogun_bugbase = shogun.scripts.shogun_bugbase:shogun_bugbase',
+            'extract_genome_lengths = shogun.scripts.extract_genome_lengths:extract_genome_lengths',
+            'kegg_predictions = shogun.scripts.kegg_predictions:main',
+            'kegg_mapping_extract_img_id = shogun.scripts.kegg_mapping_extract_img_id:main',
         ]
     },
 )
