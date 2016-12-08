@@ -8,7 +8,7 @@ from cytoolz import valmap, valfilter
 from ninja_utils.utils import find_between
 from ninja_utils.utils import verify_make_dir
 
-from ninja_dojo.taxonomy import NCBITree
+from dojo.taxonomy import NCBITree
 
 from shogun.wrappers import bowtie2_align
 from shogun.parsers import yield_alignments_from_sam_inf
