@@ -13,7 +13,7 @@ Once anaconda is installed, get the environment file:
 wget https://raw.githubusercontent.com/knights-lab/SHOGUN/master/environment.yml
 ```
 
-Then install the requirments into the envrionment 'shogun':
+Then install the requirements into the environment 'shogun':
 ```
 conda env create -f environment.yml
 ```
