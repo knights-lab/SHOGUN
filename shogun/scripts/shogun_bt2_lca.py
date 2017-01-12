@@ -1,17 +1,14 @@
-#!/usr/bin/env python
 import click
 from collections import Counter
 import os
 import pandas as pd
 from cytoolz import valmap, valfilter
 
-from ninja_utils.utils import find_between
-from ninja_utils.utils import verify_make_dir
+from shogun.utils.last_common_ancestor import build_lca_map
 
 from dojo.taxonomy import NCBITree
 
-from shogun.wrappers import bowtie2_align
-from shogun.parsers import yield_alignments_from_sam_inf
+from ninja_utils.utils import find_between
 
 
 @click.command()
@@ -35,7 +32,7 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
             print("Found the samfile \"%s\". Skipping the alignment phase for this file." % sam_outf)
         else:
             print(bowtie2_align(fna_inf, sam_outf, bt2_indx, num_threads=threads))
-    
+
     if run_lca:
         tree = NCBITree()
         rank_name = list(tree.lineage_ranks.keys())[depth-1]
@@ -47,16 +44,8 @@ def shogun_bt2_lca(input, output, bt2_indx, extract_ncbi_tid, depth, threads, an
         counts = []
         for basename in basenames:
             sam_file = os.path.join(output, basename + '.sam')
-            lca_map = {}
-            for qname, rname in yield_alignments_from_sam_inf(sam_file):
-                ncbi_tid = int(find_between(rname, begin, end))
-                if qname in lca_map:
-                    current_ncbi_tid = lca_map[qname]
-                    if current_ncbi_tid:
-                        if current_ncbi_tid != ncbi_tid:
-                            lca_map[qname] = tree.lowest_common_ancestor(ncbi_tid, current_ncbi_tid)
-                else:
-                    lca_map[qname] = ncbi_tid
+
+            lca_map = build_lca_map(sam_file, lambda x: int(find_between(x, begin, end)), tree)
 
             if annotate_lineage:
                 lca_map = valmap(lambda x: tree.green_genes_lineage(x, depth=depth), lca_map)
