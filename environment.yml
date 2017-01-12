@@ -1,0 +1,13 @@
+name: shogun
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3
+  - numpy
+  - cytoolz
+  - pip
+  - pip:
+    - "git+https://github.com/knights-lab/NINJA-utils.git"
+    - "git+https://github.com/knights-lab/DOJO.git"
+    - "git+https://github.com/knights-lab/SHOGUN.git"
