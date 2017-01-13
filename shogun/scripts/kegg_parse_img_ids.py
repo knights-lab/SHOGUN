@@ -24,7 +24,8 @@ def make_arg_parser():
 
 
 def yield_alignments_from_sam_inf(inf):
-    csv_inf = csv.reader(inf, delimiter='\t')
+    csv_inf = csv.reader(inf, delimiter='\t'
+                         )
     for line in csv_inf:
         # this function yields qname, rname
         yield line[0], line[2]
