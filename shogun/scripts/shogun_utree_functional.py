@@ -37,7 +37,7 @@ def shogun_utree_functional(input, output, utree_indx, threads):
     if not os.path.isfile(utree_species_outf):
         for basename in basenames:
             lcas = []
-            utree_tsv = os.path.join(output, basename + 'species.utree.tsv')
+            utree_tsv = os.path.join(output, basename + '.species.utree.tsv')
             with open(utree_tsv) as inf:
                 tsv_parser = csv.reader(inf, delimiter='\t')
                 for line in tsv_parser:
