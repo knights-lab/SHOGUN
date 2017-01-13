@@ -34,6 +34,7 @@ setup(
             'shogun_utree_db = shogun.scripts.shogun_utree_db:shogun_utree_db',
             'shogun_utree_lca = shogun.scripts.shogun_utree_lca:shogun_utree_lca',
             'shogun_utree_capitalist = shogun.scripts.shogun_utree_capitalist:shogun_utree_capitalist',
+            'shogun_utree_functional = shogun.scripts.shogun_utree_functional:shogun_utree_functional',
             'shogun_bugbase = shogun.scripts.shogun_bugbase:shogun_bugbase',
             'extract_genome_lengths = shogun.scripts.extract_genome_lengths:extract_genome_lengths',
             'kegg_predictions = shogun.scripts.kegg_predictions:main',
