@@ -49,7 +49,7 @@ def build_lca_map(align_gen, lca, img_map):
                     lca_map[qname][1] = lca(current_rname, new_taxon)
         else:
             lca_map[qname][1] = img_map(img_id)
-        lca_map[qname][0].add(rname)
+        lca_map[qname][0].add(rname)gf
     return lca_map
 
 
