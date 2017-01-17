@@ -79,7 +79,7 @@ shogun_bt2_db -i ./test.hmp_species.fna -x '>, '
 This will take some time, the DOJO software is lazy loading the NCBI Taxonomy.
 
 ```
-shogun_functional -i ./mock_communities -b ./annotated/bt2/test.hmp_species
+shogun_bt2_lca -i ./mock_communities -b ./annotated/bt2/test.hmp_species
 ```
 
 The results of the taxonomy counts will be in the taxon_counts.csv 🐱‍👤
