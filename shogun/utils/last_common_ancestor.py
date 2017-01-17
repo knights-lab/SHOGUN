@@ -1,5 +1,3 @@
-from find_betweens import verify_make_dir
-
 from shogun.parsers import yield_alignments_from_sam_inf
 
 
