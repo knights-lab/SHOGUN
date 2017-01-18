@@ -5,10 +5,11 @@ import pandas as pd
 from cytoolz import valmap, valfilter
 
 from shogun.utils.last_common_ancestor import build_lca_map
+from shogun.wrappers.bowtie import bowtie2_align
 
 from dojo.taxonomy import NCBITree
 
-from ninja_utils.utils import find_between
+from ninja_utils.utils import find_between, verify_make_dir
 
 
 @click.command()
