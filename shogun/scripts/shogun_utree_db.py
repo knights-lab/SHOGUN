@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import click
 import os
 
@@ -7,7 +6,7 @@ from ninja_utils.parsers import FASTA
 
 from dojo.database import RefSeqDatabase
 from dojo.taxonomy import NCBITree
-from dojo.annotaters import GIAnnotater, RefSeqAnnotater, NTAnnotater
+from dojo.annotaters import GIAnnotater, RefSeqAnnotater, NTAnnotater, NCBIAnnotater
 
 from shogun.wrappers import utree_build, utree_compress
 from shogun import SETTINGS
@@ -46,6 +45,8 @@ def shogun_utree_db(input, output, annotater, extract_id, threads, prefixes, dep
             annotater_class = RefSeqAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
         elif annotater == 'nt':
             annotater_class = NTAnnotater(extract_id, prefixes, db, tree, depth=depth, depth_force=depth_force)
+        elif annotater == 'ncbi':
+            annotater_class = NCBIAnnotater(extract_id, tree, depth=depth, depth_force=depth_force)
         else:
             annotater_class = GIAnnotater(extract_id, db, tree, depth=depth, depth_force=depth_force)
 
