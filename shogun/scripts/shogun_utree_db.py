@@ -16,7 +16,7 @@ from shogun import SETTINGS
 @click.option('-i', '--input', type=click.Path(), help='The input FASTA file for annotating with NCBI TID')
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'annotated'),
               help='The directory to output the formatted DB and UTree db', show_default=True)
-@click.option('-a', '-annotater', type=click.Choice(['gi', 'refseq', 'nt']), default='refseq', help='The annotater to use.',
+@click.option('-a', '-annotater', type=click.Choice(['gi', 'refseq', 'nt', 'ncbi']), default='refseq', help='The annotater to use.',
               show_default=True)
 @click.option('-x', '--extract_id', default='ref|,|',
               help='Characters that sandwich the RefSeq Accession Version in the reference FASTA', show_default=True)
