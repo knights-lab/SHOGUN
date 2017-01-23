@@ -4,9 +4,9 @@ import os
 
 __author__ = "Knights Lab"
 __copyright__ = "Copyright (c) 2016--, %s" % __author__
-__credits__ = ["Benjamin Hillmann", "Dan Knights", "Gabe Al-Ghalith", "Tonya Ward", "Pajua Vangay"]
+__credits__ = ["Benjamin Hillmann", "Dan Knights", "Gabe Al-Ghalith", "Tonya Ward", "Pajau Vangay"]
 __email__ = "hillmannben@gmail.com"
-__license__ = "MIT"
+__license__ = "AGPLv3"
 __maintainer__ = "Benjamin Hillmann"
 __version__ = "0.0.1-dev"
 
