@@ -1,3 +1,9 @@
+"""
+Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+
+This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
+"""
+
 from ninja_utils.config import Settings
 from ninja_utils import Logger
 from .config.settings import shogun_settings

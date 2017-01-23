@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+"""
+Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+
+This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
+"""
+
 # usage
 # python extract_IMG_to_KEGG_mapping.py -i IMGDIR -o outputfile.txt
 from __future__ import print_function
