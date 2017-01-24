@@ -39,6 +39,7 @@ setup(
             'extract_genome_lengths = shogun.scripts.extract_genome_lengths:extract_genome_lengths',
             'kegg_predictions = shogun.scripts.kegg_predictions:main',
             'kegg_mapping_extract_img_id = shogun.scripts.kegg_mapping_extract_img_id:main',
+            'kegg_parse_img_ids = shogun.scripts.kegg_parse_img_ids:main',
         ]
     },
 )

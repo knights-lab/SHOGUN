@@ -14,9 +14,9 @@ import os
 import csv
 
 from shogun import SETTINGS
-from shogun.taxonomy.algorithms.last_common_ancestor import LCA
-from shogun.taxonomy.ncbi.maps.img_map import IMGMap
-from shogun.taxonomy.ncbi.ncbi_tree import NCBITree
+
+from dojo.taxonomy.maps import IMGMap
+from dojo.taxonomy import NCBITree
 
 
 def make_arg_parser():
@@ -43,7 +43,7 @@ def rname_img_parser(rname, img_map):
     return ncbi_taxon_id
 
 
-def build_lca_map(align_gen, lca, img_map):
+def build_lca_map(align_gen, tree, img_map):
     lca_map = defaultdict(lambda: [set(), None])
     for qname, rname in align_gen:
         img_id = int(rname.split('_')[0])
@@ -52,7 +52,7 @@ def build_lca_map(align_gen, lca, img_map):
             new_taxon = img_map(img_id)
             if current_rname and new_taxon:
                 if current_rname != new_taxon:
-                    lca_map[qname][1] = lca(current_rname, new_taxon)
+                    lca_map[qname][1] = tree.lowest_common_ancestoer(current_rname, new_taxon)
         else:
             lca_map[qname][1] = img_map(img_id)
         lca_map[qname][0].add(rname)
@@ -68,14 +68,13 @@ def main():
     img_map = IMGMap()
 
     ncbi_tree = NCBITree()
-    lca = LCA(ncbi_tree, args.depth)
 
     with open(args.output, 'w') if args.output else sys.stdout as outf:
         csv_outf = csv.writer(outf, quoting=csv.QUOTE_ALL, lineterminator='\n')
         csv_outf.writerow(['sample_id', 'sequence_id', 'ncbi_tid', 'img_id'])
         for file in sam_files:
             with open(file) as inf:
-                lca_map = build_lca_map(yield_alignments_from_sam_inf(inf), lca, img_map)
+                lca_map = build_lca_map(yield_alignments_from_sam_inf(inf), ncbi_tree, img_map)
                 for key in lca_map:
                     img_ids, ncbi_tid = lca_map[key]
                     csv_outf.writerow([os.path.basename(file).split('.')[0],  key, ncbi_tid, ','.join(img_ids)])
