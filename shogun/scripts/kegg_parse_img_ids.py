@@ -37,25 +37,28 @@ def yield_alignments_from_sam_inf(inf):
         yield line[0], line[2]
 
 
-def rname_img_parser(rname, img_map):
-    img_id = int(rname.split('_')[0])
-    ncbi_taxon_id = img_map.get(img_id)
-    return ncbi_taxon_id
-
-
 def build_lca_map(align_gen, tree, img_map):
+    """
+    Expects the reference names to be annotated like ncbi_tid|<ncbi_tid>|<img_oid.img_gid>
+    :param align_gen:
+    :param tree:
+    :param img_map:
+    :return:
+    """
     lca_map = defaultdict(lambda: [set(), None])
     for qname, rname in align_gen:
-        img_id = int(rname.split('_')[0])
+        img_id = int(rname.split('|')[-1].split('_')[0])
         if qname in lca_map:
-            current_rname = lca_map[qname][1]
-            new_taxon = img_map(img_id)
-            if current_rname and new_taxon:
-                if current_rname != new_taxon:
-                    lca_map[qname][1] = tree.lowest_common_ancestoer(current_rname, new_taxon)
+            ncbi_tid_string = rname.split('|')[1]
+            if ncbi_tid_string != 'NA':
+                ncbi_tid_current = lca_map[qname][1]
+                ncbi_tid_new = int(ncbi_tid_string)
+                if ncbi_tid_new and ncbi_tid_current:
+                    if ncbi_tid_current != ncbi_tid_new:
+                        lca_map[qname][1] = tree.lowest_common_ancestor(ncbi_tid_current, ncbi_tid_new)
         else:
             lca_map[qname][1] = img_map(img_id)
-        lca_map[qname][0].add(rname)
+        lca_map[qname][0].add(img_id)
     return lca_map
 
 
