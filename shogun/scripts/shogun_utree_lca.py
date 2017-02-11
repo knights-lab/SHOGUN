@@ -7,10 +7,12 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import click
 import os
+import sys
 from collections import Counter
 import csv
+import re
 import pandas as pd
-
+from math import floor
 from ninja_utils.utils import verify_make_dir
 
 from shogun.wrappers import utree_search
@@ -40,37 +42,57 @@ def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mi
 
     counts = []
     utree_outf = os.path.join(output, 'taxon_counts.txt')
-    # Indexing for emblalmer
+    # Tabulating
+    print("Tabulating and filtering hits...")
+    
+    # print a row of "-" for every 10 samples
+    if len(basenames) >= 100:
+        for i in range(floor(len(basenames)/10)):
+            sys.stdout.write('-')
+        sys.stdout.write('\n')
+        sys.stdout.flush()
     if not os.path.isfile(utree_outf):
         n_fail_confidence_only = 0
         n_fail_support_only = 0
         n_fail_both = 0
         n = 0
-        n_remain = 0
-        for basename in basenames:
+        n_pass = 0
+        for i,basename in enumerate(basenames):
+            if len(basenames) >= 100:
+                if (i+1) % 10 == 0:
+                    sys.stdout.write('.')
+                    sys.stdout.flush()
             lcas = [] # list of tuples [taxonomy, confidence, support]
             utree_tsv = os.path.join(output, basename + '.utree.tsv')
             with open(utree_tsv) as inf:
                 tsv_parser = csv.reader(inf, delimiter='\t')
                 for line in tsv_parser:
                     if line[1]:
-                        taxonomy  = ';'.join(line[1].split('; '))
+                        taxonomy  = line[1]
+                        is_confident = float(line[2]) >= confidence
+                        is_supported = int(line[3]) >= support
                         n += 1
-                        if float(line[2]) < confidence and int(line[3]) < support:
+                        if not is_confident and not is_supported:
                             n_fail_both += 1
-                        elif float(line[2]) < confidence:
+                        elif not is_confident:
                             n_fail_confidence_only += 1
-                        elif int(line[3]) < support:
+                        elif not is_supported:
                             n_fail_support_only += 1
                         else:
-                            n_remain += 1
+                            n_pass += 1
                             lcas.append(taxonomy)
-            c=Counter(filter(None, lcas))
-            c = Counter(el for el in c.elements() if c[el] > mincount)
-            counts.append(c)
-        print('%d total assignments\n%d failed confidence only\n%d failed support_only\n%d failed both\n%d remaining' %(n,n_fail_confidence_only,n_fail_support_only,n_fail_both,n_remain))
+            counts.append(Counter(lcas))
+        print('%d total assignments\n%d failed confidence only\n%d failed support_only\n%d failed both\n%d remaining' %(n,n_fail_confidence_only,n_fail_support_only,n_fail_both,n_pass))
+    sys.stdout.write('\n')
+    sys.stdout.flush()
 
     df = pd.DataFrame(counts, index=basenames)
+    # filter by mincount
+    df[df < mincount] = 0
+    # drop spaces in column
+    df.columns = [colname.replace('; ',';') for colname in df.columns]
+    # drop trailing t__ in taxonomy
+    df.columns = [re.sub(';t__$','',colname) for colname in df.columns]
     df.T.to_csv(os.path.join(output, 'taxon_counts.csv'),
                 index_label='Taxon',na_rep='0',sep='\t')
 
