@@ -71,7 +71,8 @@ def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mi
         print('%d total assignments\n%d failed confidence only\n%d failed support_only\n%d failed both\n%d remaining' %(n,n_fail_confidence_only,n_fail_support_only,n_fail_both,n_remain))
 
     df = pd.DataFrame(counts, index=basenames)
-    df.T.to_csv(os.path.join(output, 'taxon_counts.csv'))
+    df.T.to_csv(os.path.join(output, 'taxon_counts.csv'),
+                index_label='Taxon',na_rep='0',sep='\t')
 
 if __name__ == '__main__':
     shogun_utree_lca()
