@@ -23,9 +23,9 @@ from shogun.wrappers import utree_search
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
 @click.option('-c', '--confidence', type=click.FLOAT, default=.8, help='Required confidence threshold for kmer matching calculated as 1 - <support for second best> / <support for best> (0 to 1.0) (default=0.8)')
 @click.option('-c', '--support', type=click.INT, default=5, help='Minimum number of sliding-window kmers spaced at least 4 bases apart throughout the query matched the most-matched species? (1 to ~25, depends on query lengths) (default=5)')
-@click.option('-m', '--mincover', type=click.INT, default=20, help='Minimum coverage (number of reads matching) per species (default=20)')
+@click.option('-m', '--mincount', type=click.INT, default=20, help='Minimum count (number of reads matching) per species (default=20)')
 
-def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mincover):
+def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mincount):
     verify_make_dir(output)
 
     basenames = [os.path.basename(filename)[:-4] for filename in os.listdir(input) if filename.endswith('.fna')]
@@ -66,7 +66,7 @@ def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mi
                             n_remain += 1
                             lcas.append(taxonomy)
             c=Counter(filter(None, lcas))
-            c = Counter(el for el in c.elements() if c[el] > mincover)
+            c = Counter(el for el in c.elements() if c[el] > mincount)
             counts.append(c)
         print('%d total assignments\n%d failed confidence only\n%d failed support_only\n%d failed both\n%d remaining' %(n,n_fail_confidence_only,n_fail_support_only,n_fail_both,n_remain))
 
