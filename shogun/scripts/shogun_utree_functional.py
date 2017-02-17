@@ -22,7 +22,7 @@ from shogun.wrappers import utree_search
 @click.command()
 @click.option('-i', '--input', type=click.path(), default=os.getcwd(), help='directory containing the input fasta files with ".fna" extensions (default=cwd)')
 @click.option('-o', '--output', type=click.path(), default=os.path.join(os.getcwd(), 'shogun_utree_lca_out'), help='output directory for the results')
-@click.option('-u', '--utree_indx', required=true, help='path to the bowtie2 index')
+@click.option('-u', '--utree_indx', required=true, help='path to the utree index')
 @click.option('-p', '--threads', type=click.int, default=1, help='the number of threads to use (default=1)')
 def shogun_utree_functional(input, output, utree_indx, threads):
     verify_make_dir(output)
