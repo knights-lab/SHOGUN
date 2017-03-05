@@ -14,6 +14,8 @@ python /project/flatiron2/dan/shogun/shogun/scripts/make_refseq_2_KO_map_from_un
 # step 5. convert the organism 2 refseq protein mapping to an org 2 kegg mapping
 time python /project/flatiron2/dan/shogun/shogun/scripts/convert_GMG.bacteria.protein.table.from.refseq.to.x.py GMG.bacteria.to.protein.ID.map.txt rs2ko.txt GMG.bacteria.to.KO.map.txt
 
+# step 6. convert org 2 KO mapping to strain 2 KO mapping, species 2 KO mapping
+time python /project/flatiron2/dan/shogun/shogun/scripts/make_taxon_to_ko_mapping.py GMG.microbe.to.KO.map.txt GMG.microbe.to.taxon.txt GMG.microbe.taxon.function.profiles/
 
 # optional: download eggnog hierarchy from here? not sure how to use this
 wget http://eggnogdb.embl.de/download/eggnog_4.5/OG_hierarchies.tsv.gz
