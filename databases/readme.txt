@@ -20,3 +20,4 @@ time python /project/flatiron2/dan/shogun/shogun/scripts/make_taxon_to_ko_mappin
 # optional: download eggnog hierarchy from here? not sure how to use this
 wget http://eggnogdb.embl.de/download/eggnog_4.5/OG_hierarchies.tsv.gz
 
+python shogun/scripts/shear_db.py /project/flatiron2/sop/GMG.bacterial.genes.fasta 100 100 > databases/GMG_shear.fna
