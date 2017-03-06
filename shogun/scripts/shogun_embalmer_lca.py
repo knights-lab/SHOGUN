@@ -59,7 +59,7 @@ def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, min
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-    taxon_outf = os.path.join(output_dir, 'taxon_counts.csv')
+    taxon_outf = os.path.join(output_dir, 'taxon_counts.tsv')
     if os.path.isfile(taxon_outf):
         print("Skipping tabulation step, output file %s already exists." %(taxon_outf))
     else:
@@ -68,23 +68,73 @@ def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, min
                 tsv_parser = csv.reader(output_file, delimiter='\t')
                 taxon_counts = Counter()
                 for line in tsv_parser:
-                    taxon_counts[line[12]] += 1
+                    taxon = line[12]
+                    # drop trailing t__ in taxonomy
+                    taxon = re.sub('; t__$','',taxon)
+                    taxon = re.sub('; t__None$','',taxon)
+                    taxon_counts[taxon] += 1
             counts.append(taxon_counts)
-    sys.stdout.write('\n')
-    sys.stdout.flush()
-
-    df = pd.DataFrame(counts, index=basenames)
-    # filter by mincount
-    df[df < mincount] = 0
-    # drop spaces in column
-    df.columns = [colname.replace('; ',';') for colname in df.columns]
-    # drop trailing t__ in taxonomy
-    df.columns = [re.sub(';t__$','',colname) for colname in df.columns]
-    df.columns = [re.sub(';t__None$','',colname) for colname in df.columns]
-    # drop rows that sum to zero
-    df = df.loc[:,(df.sum(axis=0) != 0)]
-    df.T.to_csv(taxon_outf,
+        df = pd.DataFrame(counts, index=basenames)
+        # filter by mincount
+        df[df < mincount] = 0
+        # drop spaces in column
+        df.columns = [colname.replace('; ',';') for colname in df.columns]
+        # drop columns that sum to zero
+        df = df.loc[:,(df.sum(axis=0) != 0)]
+        df.T.to_csv(taxon_outf,
                 index_label='Taxon',na_rep='0',sep='\t')
+
+        get_rank_specific_taxonomy_tables(df,output_dir)
+
+def get_rank_specific_taxonomy_tables(df, output_dir, extrapolate=True):
+    taxa = df.columns
+
+    tables = [] # will be a list of dataframes
+    
+    # aggregate "up" -- add descendant counts to each taxon
+    for level in range(8):
+        taxa_level = [';'.join(taxon.split(';')[:(level+1)]) for taxon in taxa if len(taxon.split(';')) >= level+1]
+        unique_taxa = sorted(set(taxa_level))
+        print('\nLevel',level)
+        print(unique_taxa)
+        # new data frame for this level full of zeros
+        df_i = pd.DataFrame(0, index=df.index, columns=unique_taxa)
+        # fill one taxon at a time
+        for taxon in unique_taxa:
+            df_i[taxon] = df.loc[:,[column.startswith(taxon) for column in df.columns]].sum(axis=1)
+        tables.append(df_i)
+
+    # interpolate "down" -- distribute parent counts to descendants    
+    tables_norm = [tables[0].copy()]
+    for level in range(1,8):
+        df_i = tables[level].copy()
+        unique_taxa = tables[level-1].columns
+        for taxon in unique_taxa:
+            print(taxon)
+            children_ix = [column.startswith(taxon) for column in tables[level]]
+            print(children_ix)
+            child_sum = df_i.iloc[:,children_ix].sum(axis=1) # row sums
+            print(child_sum)
+            weights = df_i.iloc[:,children_ix].apply(lambda col: col / child_sum, axis=0)
+            print(weights)
+            new_child_counts = weights.apply(lambda col: col * tables_norm[level-1][taxon], axis=0)
+            print(new_child_counts)
+            df_i.iloc[:,children_ix] = new_child_counts
+        tables_norm.append(df_i)
+    
+    # write files
+    for level in range(len(tables)):
+        outf = os.path.join(output_dir,'taxon_counts_L%d.tsv' %(level+1))
+        tables[level].T.to_csv(outf,
+                index_label='Taxon',na_rep='0',sep='\t')
+        outf = os.path.join(output_dir,'taxon_counts_interpolate_L%d.tsv' %(level+1))
+        tables_norm[level].T.to_csv(outf,
+                index_label='Taxon',na_rep='0',sep='\t')
+
+    
+    # if extrapolate, then project counts down
+    
+    
 
 if __name__ == '__main__':
     shogun_embalmer_lca()
