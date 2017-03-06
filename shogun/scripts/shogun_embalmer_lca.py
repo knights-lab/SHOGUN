@@ -25,8 +25,6 @@ from shogun.wrappers import embalmer_search
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
 @click.option('-d', '--pct_id', type=click.FLOAT, default=.97, help='The percent ID for alignments (default=.97)')
 @click.option('-m', '--mincount', type=click.INT, default=2, help='Minimum count (number of reads matching) per taxon (default=2)')
-#@click.option('-c', '--confidence', type=click.FLOAT, default=.8, help='Required confidence threshold for kmer matching calculated as 1 - <support for second best> / <support for best> (0 to 1.0) (default=0.8)')
-#@click.option('-c', '--support', type=click.INT, default=5, help='Minimum number of sliding-window kmers spaced at least 4 bases apart throughout the query matched the most-matched species? (1 to ~25, depends on query lengths) (default=5)')
 
 def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, mincount):
     if output_dir is None:
@@ -95,8 +93,6 @@ def get_rank_specific_taxonomy_tables(df, output_dir, extrapolate=True):
     for level in range(8):
         taxa_level = [';'.join(taxon.split(';')[:(level+1)]) for taxon in taxa if len(taxon.split(';')) >= level+1]
         unique_taxa = sorted(set(taxa_level))
-        print('\nLevel',level)
-        print(unique_taxa)
         # new data frame for this level full of zeros
         df_i = pd.DataFrame(0, index=df.index, columns=unique_taxa)
         # fill one taxon at a time
@@ -110,15 +106,10 @@ def get_rank_specific_taxonomy_tables(df, output_dir, extrapolate=True):
         df_i = tables[level].copy()
         unique_taxa = tables[level-1].columns
         for taxon in unique_taxa:
-            print(taxon)
             children_ix = [column.startswith(taxon) for column in tables[level]]
-            print(children_ix)
             child_sum = df_i.iloc[:,children_ix].sum(axis=1) # row sums
-            print(child_sum)
             weights = df_i.iloc[:,children_ix].apply(lambda col: col / child_sum, axis=0)
-            print(weights)
             new_child_counts = weights.apply(lambda col: col * tables_norm[level-1][taxon], axis=0)
-            print(new_child_counts)
             df_i.iloc[:,children_ix] = new_child_counts
         tables_norm.append(df_i)
     
