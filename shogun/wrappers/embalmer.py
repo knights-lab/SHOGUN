@@ -10,7 +10,7 @@ import sys
 
 from .. import SETTINGS
 
-def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc, threads, pct_id, shell=True):
+def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc, threads, pct_id, shell=True, taxa_ncbi=False):
     cmd = [
         'embalmer',
         '--queries', input_fp,
@@ -21,10 +21,14 @@ def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc
         '--threads', str(threads),
         '--mode', "CAPITALIST",
         '--id', str(pct_id),
-        '--npenalize',' '
-        '--fingerprint', ' '
-        '--taxasuppress', ' '
+        '--npenalize',' ',
+        '--fingerprint', ' ',
+        '--taxasuppress', ' ',
+        '--taxa_ncbi', ' '
     ]
+    if taxa_ncbi:
+        cmd += ['--taxa_ncbi', ' ']
+        print('Adding taxa')
 
     print('Running: ' + ' '.join(cmd))
 

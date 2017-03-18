@@ -25,8 +25,9 @@ from shogun.wrappers import embalmer_search
 @click.option('-p', '--threads', type=click.INT, default=1, help='The number of threads to use (default=1)')
 @click.option('-d', '--pct_id', type=click.FLOAT, default=.97, help='The percent ID for alignments (default=.97)')
 @click.option('-m', '--mincount', type=click.INT, default=2, help='Minimum count (number of reads matching) per taxon (default=2)')
+@click.option('-t', '--taxa_ncbi', default=True, is_flag=True, help='Pass --taxa_ncbi to embalmer')
 
-def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, mincount):
+def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, mincount, taxa_ncbi):
     if output_dir is None:
         output_dir = input_dir
     verify_make_dir(output_dir)
@@ -41,7 +42,7 @@ def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, min
         outputfps.append(tsv_outf)
         if not os.path.isfile(tsv_outf):
             print("Did not file the output file \"%s\". Running the alignment phase for this file." % tsv_outf)
-            print(embalmer_search(input_fp, tsv_outf, embalmer_db+".edb", embalmer_db+".tax", embalmer_db+".acc", threads, pct_id))
+            print(embalmer_search(input_fp, tsv_outf, embalmer_db+".edb", embalmer_db+".tax", embalmer_db+".acc", threads, pct_id, taxa_ncbi))
         else:
             print("Found the output file \"%s\". Skipping the alignment phase for this file." % tsv_outf)
 
