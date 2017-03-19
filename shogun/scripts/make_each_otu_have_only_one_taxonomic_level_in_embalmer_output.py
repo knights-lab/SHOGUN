@@ -22,6 +22,26 @@ for line in open(infp):
     elif len(taxonomy) < len(ref2lca[refID]):
         ref2lca[refID] = taxonomy
 
+# add blanks for missing levels
+for refID in ref2lca:
+    taxonomy = ref2lca[refID]
+    levels = taxonomy.split(';')
+    blanks = ['k__','p__','c__','o__','f__','g__','s__']
+    if len(levels) < 
+    if 'p__' not in taxonomy:
+        taxonomy += '; p__; c__; o__; f__; g__; s__'
+    elif 'c__' not in taxonomy:
+        taxonomy += '; c__; o__; f__; g__; s__'
+    elif 'o__' not in taxonomy:
+        taxonomy += '; o__; f__; g__; s__'
+    elif 'f__' not in taxonomy:
+        taxonomy += '; f__; g__; s__'
+    elif 'g__' not in taxonomy:
+        taxonomy += '; g__; s__'
+    elif 's__' not in taxonomy:
+        taxonomy += '; s__'
+    ref2lca[refID] = taxonomy
+
 # read through again and write output file
 outf = open(outfp,'w')
 
