@@ -27,7 +27,6 @@ for refID in ref2lca:
     taxonomy = ref2lca[refID]
     levels = taxonomy.split(';')
     blanks = ['k__','p__','c__','o__','f__','g__','s__']
-    if len(levels) < 
     if 'p__' not in taxonomy:
         taxonomy += '; p__; c__; o__; f__; g__; s__'
     elif 'c__' not in taxonomy:
