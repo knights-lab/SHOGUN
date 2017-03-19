@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # usage
 # Rscript *.r embalmer_taxon_table.tsv > taxon_table_with_taxonomy_column.tsv
 args <- commandArgs(trailing=TRUE)
