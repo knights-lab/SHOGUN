@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# 
+# makes taxonomy labels agree across different hits for a given OTU
+# also outputs the map of refID:LCA taxonomy
 # usage
-# *.py embalmer_hits.tsv embalmer_hits_trunc.tsv
+# *.py embalmer_hits.tsv embalmer_hits_trunc.tsv ref2taxonomy.tsv
 
 import sys
 
@@ -27,3 +31,11 @@ for line in open(infp):
     words[12] = ref2lca[refID]
     outf.write('\t'.join(words) + '\n')
 outf.close()
+
+taxoutf = open(sys.argv[3],'w')
+
+refIDs = sorted(ref2lca.keys())
+taxoutf.write('#OTU ID\ttaxonomy\n')
+for refID in refIDs:
+    taxoutf.write(refID + '\t' + ref2lca[refID] + '\n')
+taxoutf.close()
