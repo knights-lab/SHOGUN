@@ -22,7 +22,7 @@ x <- x[rownames(x) != '',]
 if(length(args) == 3){
     outfp <- args[3]
     ref2taxa <- read.table(args[2],sep='\t',head=T,row=1,check=F,comment='',quote='')
-    x$taxonomy <- ref2taxa[match(rownames(x),rownames(ref2taxa)),1]
+    x$taxonomy <- as.character(ref2taxa[match(rownames(x),rownames(ref2taxa)),1])
 } else {
     outfp <- args[2]
     x$taxonomy <- rownames(x)
