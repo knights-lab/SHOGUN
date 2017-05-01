@@ -34,7 +34,8 @@ def yield_alignments_from_sam_inf(inf):
                          )
     for line in csv_inf:
         # this function yields qname, rname
-        yield line[0], line[2]
+        rname = line[2].split('|')[-1]
+        yield line[0], rname
 
 
 def rname_img_parser(rname, img_map):
