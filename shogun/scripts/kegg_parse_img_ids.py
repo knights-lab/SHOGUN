@@ -53,7 +53,7 @@ def build_lca_map(align_gen, tree, img_map):
             new_taxon = img_map(img_id)
             if current_rname and new_taxon:
                 if current_rname != new_taxon:
-                    lca_map[qname][1] = tree.lowest_common_ancestoer(current_rname, new_taxon)
+                    lca_map[qname][1] = tree.lowest_common_ancestor(current_rname, new_taxon)
         else:
             lca_map[qname][1] = img_map(img_id)
         lca_map[qname][0].add(rname)
