@@ -5,6 +5,18 @@
 #
 # usage:
 # Rscript *.r taxatable.txt species2ko.txt strain2ko.txt kotable.txt
+#
+# taxatable.txt is a QIIME-formatted species or mixed species/strain/other-level table
+# such as would be put out by embalmer's embalmulate script
+#
+# species2ko.txt and strain2ko.txt are tab-delimited tables where the first column is
+# taxon names (same format as those in taxatable.txt) and the rest of each line is
+# a tab-delimited list of the KEGG KOs in that taxon. See shogun/databases/readme.txt
+# for how these files would be generated. Current files of this type are:
+# shogun/databases/megaGMG.species2ko.txt shogun/databases/megaGMG.strain2ko.txt
+#
+# kotable.txt is the output file name
+#
 
 args <- commandArgs(trailing=TRUE)
 # skip first line if comment
