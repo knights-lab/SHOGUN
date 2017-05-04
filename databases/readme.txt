@@ -15,9 +15,14 @@ python /project/flatiron2/dan/shogun/shogun/scripts/make_refseq_2_KO_map_from_un
 time python /project/flatiron2/dan/shogun/shogun/scripts/convert_GMG.bacteria.protein.table.from.refseq.to.x.py GMG.bacteria.to.protein.ID.map.txt rs2ko.txt GMG.bacteria.to.KO.map.txt
 
 # step 6. convert org 2 KO mapping to strain 2 KO mapping, species 2 KO mapping
-time python /project/flatiron2/dan/shogun/shogun/scripts/make_taxon_to_ko_mapping.py GMG.microbe.to.KO.map.txt GMG.microbe.to.taxon.txt GMG.microbe.taxon.function.profiles/
+time python /project/flatiron2/dan/shogun/shogun/scripts/make_taxon_to_ko_mapping.py GMG.microbe.genes.tax GMG.microbe.to.KO.map.txt .8 strain2ko_output.txt species2ko_output.txt
 
 # optional: download eggnog hierarchy from here? not sure how to use this
 wget http://eggnogdb.embl.de/download/eggnog_4.5/OG_hierarchies.tsv.gz
 
 python shogun/scripts/shear_db.py /project/flatiron2/sop/GMG.bacterial.genes.fasta 100 100 > databases/GMG_shear.fna
+time python /project/flatiron2/dan/shogun/shogun/scripts/scrape_organism2protein_map_from_GMG.py megaGMG.fna megaGMG.organism.to.protein.ID.map.txt megaGMG.protein.ID.to.description.map.txt
+time python /project/flatiron2/dan/shogun/shogun/scripts/make_refseq_2_KO_map_from_uniprot_ID_mapping.py idmapping.dat megaGMG.rs2ko.txt
+time python /project/flatiron2/dan/shogun/shogun/scripts/convert_GMG.bacteria.protein.table.from.refseq.to.x.py megaGMG.organism.to.protein.ID.map.txt megaGMG.rs2ko.txt megaGMG.organism.to.KO.map.txt
+time python /project/flatiron2/dan/shogun/shogun/scripts/make_taxon_to_ko_mapping.py megaGMG.tax megaGMG.organism.to.KO.map.txt megaGMG.strain2ko.txt megaGMG.species2ko.txt
+
