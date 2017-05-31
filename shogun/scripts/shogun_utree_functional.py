@@ -9,10 +9,10 @@ functional repertiore prediction with utree species/strain classification
 
 import click
 import os
-from collections import Counter
 import csv
-import pandas as pd
 import numpy as np
+
+from dojo.taxonomy import NCBITree
 
 from ninja_utils.utils import verify_make_dir
 
@@ -20,10 +20,10 @@ from shogun.wrappers import utree_search
 
 
 @click.command()
-@click.option('-i', '--input', type=click.path(), default=os.getcwd(), help='directory containing the input fasta files with ".fna" extensions (default=cwd)')
-@click.option('-o', '--output', type=click.path(), default=os.path.join(os.getcwd(), 'shogun_utree_lca_out'), help='output directory for the results')
-@click.option('-u', '--utree_indx', required=true, help='path to the utree index')
-@click.option('-p', '--threads', type=click.int, default=1, help='the number of threads to use (default=1)')
+@click.option('-i', '--input', type=click.Path(), default=os.getcwd(), help='directory containing the input fasta files with ".fna" extensions (default=cwd)')
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'shogun_utree_lca_out'), help='output directory for the results')
+@click.option('-u', '--utree_indx', required=True, help='path to the bowtie2 index')
+@click.option('-p', '--threads', type=click.INT, default=1, help='the number of threads to use (default=1)')
 def shogun_utree_functional(input, output, utree_indx, threads):
     verify_make_dir(output)
 
@@ -50,6 +50,9 @@ def shogun_utree_functional(input, output, utree_indx, threads):
 
     # Track the hit rates
     basename_counts = np.zeros(len(basenames))
+    # Track the hit rates
+    basename_counts_hits = np.zeros(len(basenames))
+    basename_counts_hits_strain = np.zeros(len(basenames))
 
     # Run the species strain pipeline
     for basename_ix, basename in enumerate(basenames):
@@ -73,23 +76,46 @@ def shogun_utree_functional(input, output, utree_indx, threads):
                     # Check if alignment was made in species
                     if species[1]:
                         # Now we check for strain taxonomy
-                        species_tax = species.split('; ')
+                        species_tax = species[1].split('; ')
                         if strain[1]:
-                            strain_tax = strain.split('; ')
+                            strain_tax = strain[1].split('; ')
+                            basename_counts_hits[basename_ix] += 1
                             # Check for equivalence of strain and species query names
-                            assert(strain_tax[0] == species_tax[0])
+                            assert(strain[0] == species[0])
                             # If they match
                             if strain_tax[-2] == species_tax[-1]:
                                 # TODO: Check for strain confidence here
-                                strain_conf.append(int(strain[2]))
-                                strain_lca.append(strain_tax.join(';'))
+                                strain_conf.append(float(strain[2]))
+                                strain_lca.append('; '.join(species_tax))
+                                basename_counts_hits_strain[basename_ix] += 1
                             # If they don't match
                             else:
                                 discordance_count += 1
                         # TODO: Check for species confidence here
-                        species_conf.append(int(species[2]))
-                        species_lca.append(species_tax.join(';'))
+                        species_conf.append(float(species[2]))
+                        species_lca.append('; '.join(species_tax)
 
+
+        # Verify strain confidence is below species confidence
+        mean_strain_conf = np.mean(strain_conf)
+        mean_species_conf = np.mean(species_conf)
+        print('strain conf\t%f.2\tspecies conf\t%f.2\t' % (mean_strain_conf, mean_species_conf))
+        if mean_strain_conf <= mean_species_conf:
+            print('Confidence checks out')
+        else:
+            print('CONFIDENCE IS BROKEN')
+
+        # Print DISCORDANCE
+        print(discordance_count)
+
+        # Print number reads
+        print("Number reads\t%d" % (basename_counts[basename_ix]))
+
+        # Print ratio of assigned
+        print("Percent hits species reads\t%f.2" % ((basename_counts_hits[basename_ix]/basename_counts[basename_ix])*100))
+
+        # Print ratio of assigned
+        print("Percent hits strain reads\t%f.2" % ((basename_counts_hits_strain[basename_ix]/basename_counts[basename_ix])*100))
 
 if __name__ == '__main__':
     shogun_utree_functional()
