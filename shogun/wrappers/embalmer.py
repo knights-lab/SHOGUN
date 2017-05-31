@@ -24,8 +24,11 @@ def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc
     :param taxa_ncbi:
     :return:
     """
+
+    #TODO: Look up SOP
+
     cmd = [
-        'embalmer',
+        'e15cb',
         '--queries', input_fp,
         '--references', embalmer_db,
         '--taxonomy', embalmer_tax,
@@ -35,11 +38,11 @@ def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc
         '--mode', "CAPITALIST",
         '--id', str(pct_id),
         '--npenalize',
-        '--fingerprint',
         '--taxasuppress',
+        '--skipambig'
     ]
 
     if taxa_ncbi:
-        cmd += ['--taxa_ncbi', ' ']
+        cmd += ['--taxa_ncbi']
 
     return run_command(cmd, shell=shell)

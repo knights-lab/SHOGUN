@@ -22,7 +22,7 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=32, num_thread
            '--no-unal',
            '-x', database,
            '-S', outfile,
-           '--np', '0',
+           '--np', '1',
            '--mp', '"1,1"',
            '--rdg', '"0,1"',
            '--rfg', '"0,1"',
