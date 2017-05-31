@@ -24,7 +24,7 @@ setup(
     install_requires=['Click'],
     entry_points={
         'console_scripts': [
-            'shogun = shogun.cli:cli'
+            'shogun = shogun.__main__:cli'
         ]
     },
 )

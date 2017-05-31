@@ -4,9 +4,7 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-from ninja_utils.utils import run_command
-
-from .. import SETTINGS
+from ..utils import run_command
 
 
 def bowtie2_align(infile, outfile, database, alignments_to_report=32, num_threads=SETTINGS.N_jobs, shell=False):
@@ -29,7 +27,6 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=32, num_thread
            '--rdg', '"0,1"',
            '--rfg', '"0,1"',
            '--score-min', '"L,0,-0.02"',
-           '--norc',
            '-f', infile,
            '--very-sensitive',
            '-k', str(alignments_to_report),
@@ -38,14 +35,13 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=32, num_thread
     return run_command(cmd, shell=shell)
 
 
-def bowtie2_build(infile, outfile, offrate=3, shell=False):
+def bowtie2_build(infile, outfile, shell=False):
     """
     This function will build a bowtie2 index with a given infile and output to the outfile
     :param infile: the FASTA file to build the index with
     :param outfile: the prefix for the bowtie2 index
-    :param offrate: offrate for the index (default=3)
     :param shell: whether to use the shell NOT RECOMMENDED (default=False)
-    :return: teh STDERR/STDOUT
+    :return: the STDERR/STDOUT
     """
-    cmd = ['bowtie2-build', '-f', '-o', str(offrate), infile, outfile]
+    cmd = ['bowtie2-build', '-f', '-o', infile, outfile]
     return run_command(cmd, shell=shell)

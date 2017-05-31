@@ -18,13 +18,18 @@ SHOGUN command-line interface\n
 @click.pass_context
 def cli(ctx, debug):
     ctx.obj['DEBUG'] = debug
+    # TODO: Setup the logger
+    # ctx.obj['LOGGER'] = Logger(logfp=SETTINGS.settings['log'], log_persist=SETTINGS.settings['log_persists'])
 
 
 @cli.command(help="Run the SHOGUN aligner")
-@click.option('--aligner')
+@click.option('-a', '--aligner', type=click.Choice(['bt2', 'embalmer', 'utree']), default='embalmer',
+              help='The aligner to use.', show_default=True)
 @click.pass_context
 def align(ctx):
     click.echo('Debug is %s' % (ctx.obj['DEBUG'] and 'on' or 'off'))
 
+
 if __name__ == '__main__':
     cli(obj={})
+ss
