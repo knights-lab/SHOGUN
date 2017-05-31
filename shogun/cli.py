@@ -8,7 +8,7 @@ import os
 import click
 
 ROOT_COMMAND_HELP = """\
-SHOGUN command-line interface
+SHOGUN command-line interface\n
 --------------------------------------
 """
 
@@ -20,7 +20,7 @@ def cli(ctx, debug):
     ctx.obj['DEBUG'] = debug
 
 
-@cli.command()
+@cli.command(help="Run the SHOGUN aligner")
 @click.option('--aligner')
 @click.pass_context
 def align(ctx):
