@@ -7,7 +7,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 from ..utils import run_command
 
 
-def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=SETTINGS.N_jobs, shell=False):
+def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=1, shell=False):
     # usage: utree-build input_fasta.fa labels.map output.ubt [threads]
     cmd = [
         'utree-build',
@@ -19,7 +19,7 @@ def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threa
     return run_command(cmd, shell=shell)
 
 
-def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=SETTINGS.N_jobs, shell=False):
+def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=1, shell=False):
     # usage: utree-buildGG input_fasta.fa labels.map output.ubt [threads]
     cmd = [
         'utree-build_gg',

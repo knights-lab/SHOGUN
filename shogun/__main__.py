@@ -32,4 +32,3 @@ def align(ctx):
 
 if __name__ == '__main__':
     cli(obj={})
-ss

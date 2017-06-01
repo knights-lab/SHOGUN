@@ -4,13 +4,10 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import subprocess
-import sys
-
 from ..utils import run_command
 
 
-def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc, threads, pct_id, shell=True, taxa_ncbi=False):
+def embalmer_align(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc, threads, pct_id, shell=True, taxa_ncbi=False):
     """
 
     :param input_fp:
@@ -35,7 +32,7 @@ def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc
         '--accelerator', embalmer_acc,
         '--output', output_fp,
         '--threads', str(threads),
-        '--mode', "CAPITALIST",
+        '--mode', 'CAPITALIST',
         '--id', str(pct_id),
         '--npenalize',
         '--taxasuppress',
@@ -46,3 +43,8 @@ def embalmer_search(input_fp, output_fp, embalmer_db, embalmer_tax, embalmer_acc
         cmd += ['--taxa_ncbi']
 
     return run_command(cmd, shell=shell)
+
+
+# TODO: Add the embalmer build
+def embalmer_build():
+    pass

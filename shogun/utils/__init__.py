@@ -15,22 +15,31 @@ def run_command(cmd, shell=False):
     Run prepared behave command in shell and return its output.
     :param cmd: Well-formed behave command to run.
     :param shell: Force subprocess to use shell, not recommended
-    :return: Command output as string.
+    :return:
     """
 
     try:
         cmd = [str(i) for i in cmd]
-        output = subprocess.check_output(
+        proc = subprocess.Popen(
             cmd,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             shell=shell,
+            universal_newlines=True,
             cwd=os.getcwd(),
         )
 
-    except subprocess.CalledProcessError as e:
-        output = e.output
+        out, err = proc.communicate()
 
-    return output
+        out = out.decode('utf-8')
+        err = err.decode('utf-8')
+
+        if proc.returncode != 0:
+            raise AssertionError("exit code is non zero: %d" % proc.returncode)
+
+        return proc.returncode, out, err
+    except subprocess.CalledProcessError as e:
+        raise AssertionError("Called Process Error: %s" % e)
+
 
 __all__ = ['build_lca_map', 'run_command']
