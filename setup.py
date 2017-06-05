@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 __author__ = "Knights Lab"
 __copyright__ = "Copyright (c) 2016--, %s" % __author__
@@ -6,14 +6,14 @@ __credits__ = ["Benjamin Hillmann", "Dan Knights", "Gabe Al-Ghalith", "Tonya War
 __email__ = "hillm096@cs.umn.edu"
 __license__ = "AGPL"
 __maintainer__ = "Benjamin Hillmann"
-__version__ = "0.0.1-dev"
+__version__ = "0.0.1-dev0"
 
 long_description = ''
 
 setup(
     name='shogun',
     version=__version__,
-    packages=find_packages(),
+    packages=["shogun"],
     url='',
     license=__license__,
     author=__author__,
@@ -26,6 +26,11 @@ setup(
         'console_scripts': [
             'shogun = shogun.__main__:cli'
         ]
+    },
+    extras_require={
+        'test': ['pytest', 'pytest-cov'],
+        'demo': ['jupyter', 'jupyter_client', 'ipython'],
+        'doc': ['sphinx'],
     },
 )
 
