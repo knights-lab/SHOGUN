@@ -43,5 +43,5 @@ def bowtie2_build(infile, outfile, shell=False):
     :param shell: whether to use the shell NOT RECOMMENDED (default=False)
     :return: the STDERR/STDOUT
     """
-    cmd = ['bowtie2-build', '-f', '-o', infile, outfile]
+    cmd = ['bowtie2-build', '-f', infile, outfile]
     return run_command(cmd, shell=shell)

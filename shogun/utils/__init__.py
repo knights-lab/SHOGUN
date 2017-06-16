@@ -8,6 +8,7 @@ from .last_common_ancestor import build_lca_map
 
 import subprocess
 import os
+import hashlib
 
 
 def run_command(cmd, shell=False):
@@ -31,9 +32,6 @@ def run_command(cmd, shell=False):
 
         out, err = proc.communicate()
 
-        out = out.decode('utf-8')
-        err = err.decode('utf-8')
-
         if proc.returncode != 0:
             raise AssertionError("exit code is non zero: %d" % proc.returncode)
 
@@ -41,5 +39,24 @@ def run_command(cmd, shell=False):
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
 
+def hash_file(filename):
+   """"This function returns the SHA-1 hash
+   of the file passed into it"""
 
-__all__ = ['build_lca_map', 'run_command']
+   # make a hash object
+   h = hashlib.sha1()
+
+   # open file for reading in binary mode
+   with open(filename,'rb') as file:
+
+       # loop till the end of the file
+       chunk = 0
+       while chunk != b'':
+           # read only 1024 bytes at a time
+           chunk = file.read(1024)
+           h.update(chunk)
+
+   # return the hex representation of digest
+   return h.hexdigest()
+
+__all__ = ['build_lca_map', 'run_command', 'hash_file']
