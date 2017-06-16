@@ -1,4 +1,5 @@
 from setuptools import setup
+import versioneer
 
 __author__ = "Knights Lab"
 __copyright__ = "Copyright (c) 2016--, %s" % __author__
@@ -6,13 +7,13 @@ __credits__ = ["Benjamin Hillmann", "Dan Knights", "Gabe Al-Ghalith", "Tonya War
 __email__ = "hillm096@cs.umn.edu"
 __license__ = "AGPL"
 __maintainer__ = "Benjamin Hillmann"
-__version__ = "0.0.1-dev0"
 
 long_description = ''
 
 setup(
     name='shogun',
-    version=__version__,
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     packages=["shogun"],
     url='',
     license=__license__,
