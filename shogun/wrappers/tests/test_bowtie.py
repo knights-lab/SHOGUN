@@ -23,7 +23,7 @@ class TestBowtie(unittest.TestCase):
         prefix = "shogun-test-temp-"
 
         self.checksums = read_checksums(pkg_resources.resource_filename(
-            'shogun.wrappers.tests', os.path.join('data', 'checksums.txt')))
+            'shogun.wrappers.tests', os.path.join('data', 'bt2', 'checksums.txt')))
 
         self.temp_dir = tempfile.TemporaryDirectory(prefix=prefix)
 
@@ -34,11 +34,13 @@ class TestBowtie(unittest.TestCase):
         self.assertTrue(shutil.which("bowtie2") != None)
 
     def test_bowtie2_align(self):
-        pass
+        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'bt2', 'bowtie2-test'))
+        infile = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'sims.fna'))
+        outfile = os.path.join(self.temp_dir.name, 'bowtie2-test-sims.sam')
+        self.assertTrue(bowtie2_align(infile, outfile, database)[0] == 0)
 
     def test_bowtie2_build(self):
         fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))
-        tax = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.tax'))
         outfile = os.path.join(self.temp_dir.name, 'bowtie2-test')
         bowtie2_build(fasta, outfile, shell=False)
 
