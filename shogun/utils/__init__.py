@@ -9,6 +9,7 @@ from .last_common_ancestor import build_lca_map
 import subprocess
 import os
 import hashlib
+from collections import defaultdict
 
 
 def run_command(cmd, shell=False):
@@ -33,30 +34,27 @@ def run_command(cmd, shell=False):
         out, err = proc.communicate()
 
         if proc.returncode != 0:
-            raise AssertionError("exit code is non zero: %d" % proc.returncode)
+            raise AssertionError("exit code is non zero: %d\n%s\%s" % (proc.returncode, out, err))
 
         return proc.returncode, out, err
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
 
 def hash_file(filename):
-   """"This function returns the SHA-1 hash
-   of the file passed into it"""
-
-   # make a hash object
    h = hashlib.sha1()
 
-   # open file for reading in binary mode
    with open(filename,'rb') as file:
-
-       # loop till the end of the file
        chunk = 0
        while chunk != b'':
-           # read only 1024 bytes at a time
            chunk = file.read(1024)
            h.update(chunk)
 
-   # return the hex representation of digest
    return h.hexdigest()
 
-__all__ = ['build_lca_map', 'run_command', 'hash_file']
+
+def read_checksums(filename):
+    with open(filename) as inf:
+        return defaultdict(str, dict([line.split() for line in inf]))
+
+
+__all__ = ['build_lca_map', 'run_command', 'hash_file', 'read_checksums']

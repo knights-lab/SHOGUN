@@ -9,14 +9,10 @@ import shutil
 import pkg_resources
 import os
 import tempfile
-from collections import defaultdict
 
-from shogun.utils import hash_file
+
+from shogun.utils import hash_file, read_checksums
 from shogun.wrappers.bowtie import bowtie2_align, bowtie2_build
-
-def read_checksums(filename):
-    with open(filename) as inf:
-        return defaultdict(str, dict([line.split() for line in inf]))
 
 class TestBowtie(unittest.TestCase):
     def setUp(self):
