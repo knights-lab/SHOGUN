@@ -181,8 +181,5 @@ fabric.properties
 sftp-config.json
 
 # Custom entries
-data
-results
-docs
 SETTINGS.json
 !src/lib

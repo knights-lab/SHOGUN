@@ -1,0 +1,6 @@
+73302dc28889d41749bcca604980f035b0dfb538  bowtie2-test.1.bt2
+882a0d07dd5e8a11756e080a0ed0cd6e7d9346dc  bowtie2-test.2.bt2
+96189b9fa96e7fe3a91ee2c253a100b14bd24cdd  bowtie2-test.3.bt2
+bafac5128266eec0f319d2fae7263484f38b3ebf  bowtie2-test.4.bt2
+983b508baa7a22494b84d763cfb63f7562ebe7f0  bowtie2-test.rev.1.bt2
+f4ce00581ca85c84b55bd37f4a89b4ce31610872  bowtie2-test.rev.2.bt2
