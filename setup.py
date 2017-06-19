@@ -28,7 +28,7 @@ setup(
     description='',
     long_description=long_description,
     keywords='',
-    install_requires=['Click'],
+    install_requires=['Click', 'pyyaml'],
     entry_points={
         'console_scripts': [
             'shogun = shogun.__main__:cli'

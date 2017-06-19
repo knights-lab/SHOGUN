@@ -6,7 +6,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import os
 
-from ..utils import run_command
+from shogun.utils import run_command
 
 
 def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.98, tax=False,
@@ -51,7 +51,7 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
 
     if not accelerator:
         if os.path.exists(embalmer_db_prefix + '.tax'):
-            cmd += ['--taxaonomy', embalmer_db_prefix + '.tax']
+            cmd += ['--taxonomy', embalmer_db_prefix + '.tax']
     else:
         cmd += ['--taxonomy', tax]
 

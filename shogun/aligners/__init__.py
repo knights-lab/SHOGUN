@@ -12,23 +12,33 @@ from shogun.wrappers import embalmer_align
 class Aligner:
     _name = None
 
-    def __init__(self, database_dir, name):
-        check, msg = self.check_database(database_dir, name)
+    def __init__(self, database_dir, threads=1, shell=False):
+        self.threads = threads
+        self.shell = shell
+        check, msg = self.check_database(database_dir)
 
-        self.data_files = load(os.path.join(database_dir, 'metadata.yaml'))
+        with open(os.path.join(database_dir, 'metadata.yaml')) as stream:
+            self.data_files = load(stream)
+
         if not check:
             raise Exception("Database %s is not formatted correctly: %s" % (database_dir, msg))
 
         self.database_dir = database_dir
 
+        self.tax = self.data_files['general']['taxonomy']
+        self.fasta = self.data_files['general']['fasta']
+
     @classmethod
     def check_database(cls, dir):
-        stream = open(os.path.join(dir, 'metadata.yaml'))
-        data_files = load(stream)
-        for key, value in data_files[cls._name].items():
-            if value:
-                if not os.path.exists(os.path.join(dir, value)):
-                    return False, '%s not found' % (os.path.join(dir, value))
+        with open(os.path.join(dir, 'metadata.yaml'), 'r') as stream:
+            data_files = load(stream)
+
+        SUFFICES = {
+            'embalmer': ['.edb']
+        }
+        for value in SUFFICES[cls._name]:
+            if not os.path.exists(os.path.join(dir, data_files[cls._name] + value)):
+                return False, '%s not found' % (os.path.join(dir, value))
         return True, ''
 
     def align(self):
@@ -37,13 +47,26 @@ class Aligner:
 class EmbalmerAligner(Aligner):
     _name = 'embalmer'
 
-    def __init__(self, database_dir):
-        super().__init__(database_dir)
+    def __init__(self, database_dir, threads=1, shell=False):
+        super().__init__(database_dir, threads=threads, shell=shell)
 
-    def align(self, infile, outfile):
-        embalmer_align(infile, outfile,
-            self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell, taxa_ncbi=self.taxa_ncbi)
+        # Setup the embalmer database
+        prefix = self.data_files[self._name]
+        self.database = os.path.join(self.database_dir, prefix)
 
+        if os.path.exists(self.database + '.acc'):
+            self.accelerator = True
+        else:
+            self.accelerator = False
+
+    def align(self, infile, outdir):
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        outfile = os.path.join(outdir, 'results.b6')
+
+        return embalmer_align(infile, outfile,
+            self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell, taxa_ncbi=False, threads=self.threads)
 
 
 

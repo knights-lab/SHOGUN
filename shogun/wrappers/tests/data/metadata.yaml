@@ -1,10 +1,6 @@
 general:
   taxonomy: genomes.small.tax
   fasta: genomes.small.fna
-embalmer:
-  accelerator: False
-  database: embalmer/genomes.small.edb
-bowtie2:
-  prefix: bowtie2/genomes.small
-utree:
-  ctr: utree/genomes.small.ctr
+embalmer: embalmer/genomes.small
+bowtie2: bowtie2/genomes.small
+utree: utree/genomes.small

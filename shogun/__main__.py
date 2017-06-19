@@ -9,6 +9,7 @@ import click
 
 import logging
 
+from shogun.aligners import EmbalmerAligner
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
@@ -37,21 +38,30 @@ def cli(ctx, debug):
     root_logger.addHandler(console_handler)
 
 
+ALIGNERS = {
+    'embalmer': EmbalmerAligner
+}
+
 @cli.command(help="Run the SHOGUN aligner")
 @click.option('-a', '--aligner', type=click.Choice(['bt2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use.', show_default=True)
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='The output folder directory', show_default=True)
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
+@click.option('-d', '--database', type=click.Path(), required=True, help="The database file.")
+@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='The output folder directory', show_default=True)
 @click.pass_context
-def align(ctx, aligner, output, input):
+def align(ctx, aligner, input, database, output):
     # Set up the logger
     file_handler = logging.FileHandler(os.path.join(output, 'shogun.log'))
     log_formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     file_handler.setFormatter(log_formatter)
     logging.getLogger().addHandler(file_handler)
 
-    logging.debug('Debug is %s' % (ctx.obj['DEBUG'] and 'on' or 'off'))
-    logging.info('Hello World!')
+    aligner = ALIGNERS[aligner](database)
+
+    aligner.align(infile, outfile)
+
+
+
 
 
 if __name__ == '__main__':
