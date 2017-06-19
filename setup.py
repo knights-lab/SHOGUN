@@ -35,7 +35,7 @@ setup(
         ]
     },
     extras_require={
-        'test': ['pytest', 'pytest-cov'],
+        'develop': ['ipython', 'ipdb'],
         'demo': ['jupyter', 'jupyter_client', 'ipython'],
         'doc': ['sphinx'],
     },
