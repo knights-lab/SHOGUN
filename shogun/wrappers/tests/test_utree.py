@@ -11,7 +11,9 @@ import os
 import tempfile
 
 from shogun.utils import hash_file, read_checksums
+#TODO: Implement utree rank flexible testing
 from shogun.wrappers.utree import utree_build, utree_build_gg, utree_compress, utree_search, utree_search_gg
+
 
 class TestUtree(unittest.TestCase):
     def setUp(self):
@@ -26,9 +28,9 @@ class TestUtree(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_utree_path(self):
-        self.assertTrue(shutil.which("utree-build") != None)
-        self.assertTrue(shutil.which("utree-compress") != None)
-        self.assertTrue(shutil.which("utree-search") != None)
+        self.assertTrue(shutil.which("utree-build") is not None)
+        self.assertTrue(shutil.which("utree-compress") is not None)
+        self.assertTrue(shutil.which("utree-search") is not None)
 
     def test_utree_build(self):
         fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))

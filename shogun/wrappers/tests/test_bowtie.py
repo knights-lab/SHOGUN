@@ -14,6 +14,7 @@ import tempfile
 from shogun.utils import hash_file, read_checksums
 from shogun.wrappers.bowtie import bowtie2_align, bowtie2_build
 
+
 class TestBowtie(unittest.TestCase):
     def setUp(self):
         prefix = "shogun-test-temp-"
@@ -27,7 +28,7 @@ class TestBowtie(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_bowtie2_path(self):
-        self.assertTrue(shutil.which("bowtie2") != None)
+        self.assertTrue(shutil.which("bowtie2") is not None)
 
     def test_bowtie2_align(self):
         database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'bt2', 'bowtie2-test'))

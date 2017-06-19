@@ -27,7 +27,7 @@ class TestEmbalmer(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_embalmer_path(self):
-        self.assertTrue(shutil.which("emb15") != None)
+        self.assertTrue(shutil.which("emb15") is not None)
 
     def test_embalmer_align(self):
         database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'embalmer', 'embalmer-test'))
