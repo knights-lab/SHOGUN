@@ -31,14 +31,14 @@ class TestBowtie(unittest.TestCase):
         self.assertTrue(shutil.which("bowtie2") is not None)
 
     def test_bowtie2_align(self):
-        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'bt2', 'bowtie2-test'))
+        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'bt2', 'genomes.small'))
         infile = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'sims.fna'))
-        outfile = os.path.join(self.temp_dir.name, 'bowtie2-test-sims.sam')
+        outfile = os.path.join(self.temp_dir.name, 'sims.sam')
         self.assertTrue(bowtie2_align(infile, outfile, database)[0] == 0)
 
     def test_bowtie2_build(self):
         fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))
-        outfile = os.path.join(self.temp_dir.name, 'bowtie2-test')
+        outfile = os.path.join(self.temp_dir.name, 'genomes.small')
         bowtie2_build(fasta, outfile, shell=False)
 
         for file in os.listdir(self.temp_dir.name):

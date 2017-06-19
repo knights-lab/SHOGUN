@@ -30,15 +30,15 @@ class TestEmbalmer(unittest.TestCase):
         self.assertTrue(shutil.which("emb15") is not None)
 
     def test_embalmer_align(self):
-        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'embalmer', 'embalmer-test'))
+        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'embalmer', 'genomes.small'))
         infile = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'sims.fna'))
-        outfile = os.path.join(self.temp_dir.name, 'embalmer-test-sims.b6')
+        outfile = os.path.join(self.temp_dir.name, 'sims.b6')
         tax = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.tax'))
         self.assertTrue(embalmer_align(infile, outfile, database, tax=tax)[0] == 0)
 
     def test_embalmer_build(self):
         fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))
-        outfile = os.path.join(self.temp_dir.name, 'embalmer-test')
+        outfile = os.path.join(self.temp_dir.name, 'genomes.small')
         embalmer_build(fasta, outfile, shell=False, cr=1050, s=500)
 
         for file in os.listdir(self.temp_dir.name):
