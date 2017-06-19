@@ -26,7 +26,6 @@ from shogun.wrappers import embalmer_search
 @click.option('-d', '--pct_id', type=click.FLOAT, default=.97, help='The percent ID for alignments (default=.97)')
 @click.option('-m', '--mincount', type=click.INT, default=2, help='Minimum count (number of reads matching) per taxon (default=2)')
 @click.option('-t', '--taxa_ncbi', default=True, is_flag=True, help='Pass --taxa_ncbi to embalmer')
-
 def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, mincount, taxa_ncbi):
     if output_dir is None:
         output_dir = input_dir
@@ -50,7 +49,7 @@ def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, min
 
     # Tabulating
     print("Tabulating and filtering hits...")
-    
+
     # print a row of "-" for every 10 samples
     if len(inputfiles) >= 100:
         for i in range(floor(len(basenames)/10)):
@@ -85,11 +84,12 @@ def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, min
 
         get_rank_specific_taxonomy_tables(df,output_dir)
 
+
 def get_rank_specific_taxonomy_tables(df, output_dir, extrapolate=True):
     taxa = df.columns
 
     tables = [] # will be a list of dataframes
-    
+
     # aggregate "up" -- add descendant counts to each taxon
     for level in range(8):
         taxa_level = [';'.join(taxon.split(';')[:(level+1)]) for taxon in taxa if len(taxon.split(';')) >= level+1]
@@ -101,7 +101,7 @@ def get_rank_specific_taxonomy_tables(df, output_dir, extrapolate=True):
             df_i[taxon] = df.loc[:,[column.startswith(taxon) for column in df.columns]].sum(axis=1)
         tables.append(df_i)
 
-    # interpolate "down" -- distribute parent counts to descendants    
+    # interpolate "down" -- distribute parent counts to descendants
     tables_norm = [tables[0].copy()]
     for level in range(1,8):
         df_i = tables[level].copy()
@@ -113,20 +113,20 @@ def get_rank_specific_taxonomy_tables(df, output_dir, extrapolate=True):
             new_child_counts = weights.apply(lambda col: col * tables_norm[level-1][taxon], axis=0)
             df_i.iloc[:,children_ix] = new_child_counts
         tables_norm.append(df_i)
-    
+
     # write files
     for level in range(len(tables)):
-        outf = os.path.join(output_dir,'taxon_counts_L%d.tsv' %(level+1))
+        outf = os.path.join(output_dir, 'taxon_counts_L%d.tsv' %(level+1))
         tables[level].T.to_csv(outf,
-                index_label='Taxon',na_rep='0',sep='\t')
-        outf = os.path.join(output_dir,'taxon_counts_interpolate_L%d.tsv' %(level+1))
+                index_label='Taxon',na_rep='0', sep='\t')
+        outf = os.path.join(output_dir, 'taxon_counts_interpolate_L%d.tsv' %(level+1))
         tables_norm[level].T.to_csv(outf,
-                index_label='Taxon',na_rep='0',sep='\t')
+                index_label='Taxon',na_rep='0', sep='\t')
 
-    
+
     # if extrapolate, then project counts down
-    
-    
+
+
 
 if __name__ == '__main__':
     shogun_embalmer_lca()

@@ -40,16 +40,17 @@ def run_command(cmd, shell=False):
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
 
+
 def hash_file(filename):
-   h = hashlib.sha1()
+    h = hashlib.sha1()
 
-   with open(filename,'rb') as file:
-       chunk = 0
-       while chunk != b'':
-           chunk = file.read(1024)
-           h.update(chunk)
+    with open(filename, "rb") as file:
+        chunk = 0
+        while chunk != b'':
+            chunk = file.read(1024)
+            h.update(chunk)
 
-   return h.hexdigest()
+    return h.hexdigest()
 
 
 def read_checksums(filename):
