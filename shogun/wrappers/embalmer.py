@@ -30,30 +30,25 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
     cmd = [
         'emb15',
         '--queries', input_fp,
-        '--references', embalmer_db_prefix + '.edb',
+        '--references', embalmer_db_prefix + '.edx',
         '--output', output_fp,
         '--threads', str(threads),
         '--mode', 'CAPITALIST',
         '--id', str(pct_id),
         '--npenalize',
         '--taxasuppress',
-        '--skipambig'
+        '--skipambig',
+        '--forwardreverse'
     ]
 
     if taxa_ncbi:
         cmd += ['--taxa_ncbi']
 
-    if not accelerator:
-        if os.path.exists(embalmer_db_prefix + '.acc'):
-            cmd += ['--accelerator', embalmer_db_prefix + '.acc']
-    else:
+    if accelerator:
         cmd += ['--accelerator', accelerator]
 
-    if not accelerator:
-        if os.path.exists(embalmer_db_prefix + '.tax'):
-            cmd += ['--taxonomy', embalmer_db_prefix + '.tax']
-    else:
-        cmd += ['--taxonomy', tax]
+    if tax:
+        cmd += ['--taxonomy', tax, '--taxasuppress']
 
     return run_command(cmd, shell=shell)
 
@@ -61,11 +56,11 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
 def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, cr=None, s=None):
     cmd = [
         'emb15',
-        '-r', infile,
-        '-o', outfile_prefix + ".edb",
-        '-n',
-        '-d',
-        '-f',
+        '--references', infile,
+        '--output', outfile_prefix + ".edb",
+        '--npenalize',
+        '--makedb',
+        '--fingerprint',
     ]
 
     cmd += ['-s']
@@ -74,9 +69,21 @@ def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, cr=No
         cmd += ['--accelerator', accelerator]
 
     if s:
-        cmd += [s]
+        cmd += ['--shear', s]
 
     if cr:
-        cmd += ['-cr', cr]
+        cmd += ['--clustradius', cr]
+
+    return run_command(cmd, shell=shell)
+
+
+def embalmulate(infile, outdir, shell=False):
+    cmd = [
+        'embalmulate',
+        infile,
+        os.path.join(outdir, 'otutable.txt'),
+        os.path.join(outdir, 'taxatable.txt'),
+        'GGtrim'
+    ]
 
     return run_command(cmd, shell=shell)

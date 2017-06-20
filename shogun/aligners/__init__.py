@@ -7,7 +7,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 import os
 from yaml import load
 
-from shogun.wrappers import embalmer_align
+from shogun.wrappers import embalmer_align, embalmulate
 
 class Aligner:
     _name = None
@@ -25,8 +25,8 @@ class Aligner:
 
         self.database_dir = database_dir
 
-        self.tax = self.data_files['general']['taxonomy']
-        self.fasta = self.data_files['general']['fasta']
+        self.tax = os.path.join(database_dir, self.data_files['general']['taxonomy'])
+        self.fasta = os.path.join(database_dir, self.data_files['general']['fasta'])
 
     @classmethod
     def check_database(cls, dir):
@@ -67,6 +67,10 @@ class EmbalmerAligner(Aligner):
 
         return embalmer_align(infile, outfile,
             self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell, taxa_ncbi=False, threads=self.threads)
+
+        #TODO: Embalmulate
+
+        #TODO: pie chart and coverage
 
 
 

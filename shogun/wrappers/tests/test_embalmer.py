@@ -11,7 +11,7 @@ import os
 import tempfile
 
 from shogun.utils import hash_file, read_checksums
-from shogun.wrappers.embalmer import embalmer_align, embalmer_build
+from shogun.wrappers.embalmer import embalmer_align, embalmer_build, embalmulate
 
 
 class TestEmbalmer(unittest.TestCase):
@@ -35,6 +35,8 @@ class TestEmbalmer(unittest.TestCase):
         outfile = os.path.join(self.temp_dir.name, 'sims.b6')
         tax = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.tax'))
         self.assertTrue(embalmer_align(infile, outfile, database, tax=tax)[0] == 0)
+        self.assertTrue(embalmulate(outfile, self.temp_dir.name)[0] == 0)
+
 
     def test_embalmer_build(self):
         fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))

@@ -1,1 +1,2 @@
 dce8ac68bd7b92b2bc39f83386c482b2e5a92a7b  genomes.small.edb
+5346534f611b3b34b012586b1bbc13dad962486f  genomes.small.edx
