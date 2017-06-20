@@ -7,7 +7,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 import os
 from yaml import load
 
-from shogun.wrappers import embalmer_align, embalmulate
+from shogun.wrappers import embalmer_align, embalmulate, utree_search, bowtie2_align
 
 class Aligner:
     _name = None
@@ -34,11 +34,13 @@ class Aligner:
             data_files = load(stream)
 
         SUFFICES = {
-            'embalmer': ['.edb']
+            'embalmer': ['.edx'],
+            'utree': ['.ctr'],
+            'bowtie2': ['.1.bt2']
         }
         for value in SUFFICES[cls._name]:
             if not os.path.exists(os.path.join(dir, data_files[cls._name] + value)):
-                return False, '%s not found' % (os.path.join(dir, value))
+                return False, '%s not found' % (os.path.join(data_files[cls._name] + value))
         return True, ''
 
     def align(self):
@@ -47,8 +49,8 @@ class Aligner:
 class EmbalmerAligner(Aligner):
     _name = 'embalmer'
 
-    def __init__(self, database_dir, threads=1, shell=False):
-        super().__init__(database_dir, threads=threads, shell=shell)
+    def __init__(self, database_dir, **kwargs):
+        super().__init__(database_dir,**kwargs)
 
         # Setup the embalmer database
         prefix = self.data_files[self._name]
@@ -65,22 +67,45 @@ class EmbalmerAligner(Aligner):
 
         outfile = os.path.join(outdir, 'results.b6')
 
+        #TODO: pie chart and coverage
         return embalmer_align(infile, outfile,
             self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell, taxa_ncbi=False, threads=self.threads)
 
-        #TODO: Embalmulate
-
-        #TODO: pie chart and coverage
-
-
 
 class UtreeAligner(Aligner):
-    def __init__(self, database_dir):
-        super().__init__(database_dir)
+    _name = 'utree'
+
+    def __init__(self, database_dir, **kwargs):
+        super().__init__(database_dir, **kwargs)
+
+        # Setup the utree database
+        prefix = self.data_files[self._name]
+        self.compressed_tree = os.path.join(self.database_dir, prefix + ".ctr")
+
+    def align(self, infile, outdir):
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        outfile = os.path.join(outdir, 'results.tsv')
+
+        #TODO: pie chart and coverage
+        return utree_search(self.compressed_tree, infile, outfile, shell=self.shell)
 
 
 class BowtieAligner(Aligner):
-    def __init__(self, database_dir):
-        super().__init__(database_dir)
+    _name = 'bowtie2'
+
+    def __init__(self, database_dir, **kwargs):
+        super().__init__(database_dir, **kwargs)
+
+        # Setup the bowtie2 db
+        self.prefix = os.path.join(database_dir, self.data_files[self._name])
+
+    def align(self, infile, outdir, alignments_to_report=16):
+        outfile = os.path.join(outdir, 'results.sam')
+
+        #TODO: pie chart and coverage
+        return bowtie2_align(infile, outfile, self.prefix,
+                             num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
 
 __all__ = ["BowtieAligner", "UtreeAligner", "EmbalmerAligner"]

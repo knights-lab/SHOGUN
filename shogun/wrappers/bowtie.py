@@ -7,7 +7,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 from shogun.utils import run_command
 
 
-def bowtie2_align(infile, outfile, database, alignments_to_report=32, num_threads=1, shell=False):
+def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_threads=1, shell=False):
     """
     Search a bowtie2 index with multiple alignment.
     :param infile: the query FASTA file
