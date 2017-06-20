@@ -19,7 +19,7 @@ class TestEmbalmer(unittest.TestCase):
         prefix = "shogun-test-temp-"
 
         self.checksums = read_checksums(pkg_resources.resource_filename(
-           'shogun.wrappers.tests', os.path.join('data', 'embalmer', 'checksums.txt')))
+           'shogun.tests', os.path.join('data', 'embalmer', 'checksums.txt')))
 
         self.temp_dir = tempfile.TemporaryDirectory(prefix=prefix)
 
@@ -30,16 +30,16 @@ class TestEmbalmer(unittest.TestCase):
         self.assertTrue(shutil.which("emb15") is not None)
 
     def test_embalmer_align(self):
-        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'embalmer', 'genomes.small'))
-        infile = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'sims.fna'))
+        database = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'embalmer', 'genomes.small'))
+        infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'combined_seqs.fna'))
         outfile = os.path.join(self.temp_dir.name, 'sims.b6')
-        tax = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.tax'))
+        tax = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.tax'))
         self.assertTrue(embalmer_align(infile, outfile, database, tax=tax)[0] == 0)
         self.assertTrue(embalmulate(outfile, self.temp_dir.name)[0] == 0)
 
 
     def test_embalmer_build(self):
-        fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))
+        fasta = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.fna'))
         outfile = os.path.join(self.temp_dir.name, 'genomes.small')
         embalmer_build(fasta, outfile, shell=False, cr=1050, s=500)
 

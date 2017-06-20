@@ -63,16 +63,14 @@ def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, cr=No
         '--fingerprint',
     ]
 
-    cmd += ['-s']
-
     if accelerator:
         cmd += ['--accelerator', accelerator]
 
     if s:
-        cmd += ['--shear', s]
+        cmd += ['--shear', str(s)]
 
     if cr:
-        cmd += ['--clustradius', cr]
+        cmd += ['--clustradius', str(cr)]
 
     return run_command(cmd, shell=shell)
 

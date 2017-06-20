@@ -20,7 +20,7 @@ class TestUtree(unittest.TestCase):
         prefix = "shogun-test-temp-"
 
         self.checksums = read_checksums(pkg_resources.resource_filename(
-            'shogun.wrappers.tests', os.path.join('data', 'utree', 'checksums.txt')))
+            'shogun.tests', os.path.join('data', 'utree', 'checksums.txt')))
 
         self.temp_dir = tempfile.TemporaryDirectory(prefix=prefix)
 
@@ -33,8 +33,8 @@ class TestUtree(unittest.TestCase):
         self.assertTrue(shutil.which("utree-search") is not None)
 
     def test_utree_build(self):
-        fasta = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.fna'))
-        tax = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'genomes.small.tax'))
+        fasta = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.fna'))
+        tax = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.tax'))
         outfile_uncompressed = os.path.join(self.temp_dir.name, 'genomes.small.utr')
         outfile_compressed = os.path.join(self.temp_dir.name, 'genomes.small.ctr')
         utree_build(fasta, tax, outfile_uncompressed, shell=False)
@@ -45,8 +45,8 @@ class TestUtree(unittest.TestCase):
         pass
 
     def test_utree_align(self):
-        database = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'utree', 'genomes.small.ctr'))
-        infile = pkg_resources.resource_filename('shogun.wrappers.tests', os.path.join('data', 'sims.fna'))
+        database = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'utree', 'genomes.small.ctr'))
+        infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'combined_seqs.fna'))
         outfile = os.path.join(self.temp_dir.name, 'bowtie2-test-sims.txt')
         self.assertTrue(utree_search(database, infile, outfile)[0] == 0)
 

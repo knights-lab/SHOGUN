@@ -68,8 +68,9 @@ class EmbalmerAligner(Aligner):
         outfile = os.path.join(outdir, 'results.b6')
 
         #TODO: pie chart and coverage
-        return embalmer_align(infile, outfile,
+        embalmer_align(infile, outfile,
             self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell, taxa_ncbi=False, threads=self.threads)
+        return embalmulate(outfile, outdir)
 
 
 class UtreeAligner(Aligner):
