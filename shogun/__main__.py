@@ -6,7 +6,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import os
 import click
-
+from datetime import date
 import logging
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
@@ -45,11 +45,11 @@ ALIGNERS = {
 }
 
 @cli.command(help="Run the SHOGUN aligner")
-@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'embalmer', 'utree']), default='embalmer',
+@click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database file.")
-@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'results'), help='The output folder directory', show_default=True)
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.pass_context
 def align(ctx, aligner, input, database, output):
     if not os.path.exists(output):
@@ -61,9 +61,13 @@ def align(ctx, aligner, input, database, output):
     file_handler.setFormatter(log_formatter)
     logging.getLogger().addHandler(file_handler)
 
-    aligner_cl = ALIGNERS[aligner](database)
-
-    aligner_cl.align(input, output)
+    if aligner == 'all':
+        for align in ALIGNERS.values():
+            aligner_cl = align(database)
+            aligner_cl.align(input, output)
+    else:
+        aligner_cl = ALIGNERS[aligner](database)
+        aligner_cl.align(input, output)
 
 
 

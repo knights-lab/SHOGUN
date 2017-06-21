@@ -9,6 +9,8 @@ from yaml import load
 from collections import defaultdict, Counter
 import pandas as pd
 from cytoolz import valfilter
+import csv
+import datetime
 
 from shogun.wrappers import embalmer_align, embalmulate, utree_search, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
@@ -75,7 +77,7 @@ class EmbalmerAligner(Aligner):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        outfile = os.path.join(outdir, 'results.b6')
+        outfile = os.path.join(outdir, 'embalmer_results.b6')
 
         #TODO: pie chart and coverage
         proc, out, err = embalmer_align(infile, outfile,
@@ -102,11 +104,27 @@ class UtreeAligner(Aligner):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        outfile = os.path.join(outdir, 'results.tsv')
+        outfile = os.path.join(outdir, 'utree_results.tsv')
 
         #TODO: pie chart and coverage
-        return utree_search(self.compressed_tree, infile, outfile, shell=self.shell)
+        proc, out, err = utree_search(self.compressed_tree, infile, outfile, shell=self.shell)
 
+        df = self._post_align(outfile)
+        df.to_csv(os.path.join(outdir, 'utree_taxon_counts.txt'), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+        return proc, out, err
+
+    def _post_align(self, utree_out: str) -> pd.DataFrame:
+        samples_lca_map = defaultdict(Counter)
+        with open(utree_out) as utree_f:
+            csv_utree = csv.reader(utree_f, delimiter='\t')
+            # qname, lca, confidence, support
+            for line  in csv_utree:
+                if len(line) > 1:
+                    #TODO confidence/support filter
+                    samples_lca_map['_'.join(line[0].split('_')[:-1])].update([line[1]])
+
+        df = pd.DataFrame(samples_lca_map, dtype=int)
+        return df
 
 class BowtieAligner(Aligner):
     _name = 'bowtie2'
@@ -119,14 +137,14 @@ class BowtieAligner(Aligner):
         self.tree = Taxonomy(self.tax)
 
     def align(self, infile, outdir, alignments_to_report=16):
-        outfile = os.path.join(outdir, 'results.sam')
+        outfile = os.path.join(outdir, 'bowtie2_results.sam')
 
 
         #TODO: pie chart and coverage
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
         df = self._post_align(outfile)
-        df.T.to_csv(os.path.join(outdir, 'taxon_counts.txt'), delimiter='\t')
+        df.to_csv(os.path.join(outdir, 'bowtie2_taxon_counts.txt'), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
     def _post_align(self, sam_file: str) -> pd.DataFrame:
@@ -136,7 +154,8 @@ class BowtieAligner(Aligner):
         for key, value in valfilter(lambda x: x is not None, lca_map).items():
             samples_lca_map['_'.join(key.split('_')[:-1])].update([value])
 
-        return pd.DataFrame(samples_lca_map)
+        df = pd.DataFrame(samples_lca_map, dtype=int)
+        return df
 
 
 __all__ = ["BowtieAligner", "UtreeAligner", "EmbalmerAligner"]
