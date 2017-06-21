@@ -1,0 +1,8 @@
+#OTU ID	sample3	sample1	sample2
+NC_004851.1 Shigella flexneri 2a str. 301 plasmid pCP301, complete sequence	16	18	16
+NC_003277.2 Salmonella enterica subsp. enterica serovar Typhimurium str. LT2 plasmid pSLT, complete sequence	9	6	8
+NC_002490.1 Xylella fastidiosa 9a5c plasmid pXF51, complete sequence	4	6	6
+NC_002182.1 Chlamydia muridarum Nigg plasmid pMoPn, complete sequence	1	1	0
+NC_003080.1 Corynebacterium jeikeium K411 plasmid pKW4, complete sequence	2	2	0
+NC_013792.1 Bacillus pseudofirmus OF4 plasmid pBpOF4-01, complete sequence	27	26	23
+NC_013793.1 Bacillus pseudofirmus OF4 plasmid pBpOF4-02, complete sequence	9	9	9

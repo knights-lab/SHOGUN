@@ -1,0 +1,2 @@
+#OTU ID	sample3	sample1	sample2
+	68	68	62
