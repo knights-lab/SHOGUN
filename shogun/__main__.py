@@ -9,7 +9,7 @@ import click
 
 import logging
 
-from shogun.aligners import EmbalmerAligner
+from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
@@ -39,28 +39,31 @@ def cli(ctx, debug):
 
 
 ALIGNERS = {
-    'embalmer': EmbalmerAligner
+    'embalmer': EmbalmerAligner,
+    'utree': UtreeAligner,
+    'bowtie2': BowtieAligner
 }
 
 @cli.command(help="Run the SHOGUN aligner")
-@click.option('-a', '--aligner', type=click.Choice(['bt2', 'embalmer', 'utree']), default='embalmer',
+@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
-@click.option('-d', '--database', type=click.Path(), required=True, help="The database file.")
-@click.option('-o', '--output', type=click.Path(), default=os.getcwd(), help='The output folder directory', show_default=True)
+@click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database file.")
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), 'results'), help='The output folder directory', show_default=True)
 @click.pass_context
 def align(ctx, aligner, input, database, output):
+    if not os.path.exists(output):
+        os.makedirs(output)
+
     # Set up the logger
     file_handler = logging.FileHandler(os.path.join(output, 'shogun.log'))
     log_formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     file_handler.setFormatter(log_formatter)
     logging.getLogger().addHandler(file_handler)
 
-    aligner = ALIGNERS[aligner](database)
+    aligner_cl = ALIGNERS[aligner](database)
 
-    aligner.align(infile, outfile)
-
-
+    aligner_cl.align(input, output)
 
 
 

@@ -46,6 +46,9 @@ class Aligner:
     def align(self):
         raise NotImplementedError
 
+    def _post_align(self):
+        pass
+
 class EmbalmerAligner(Aligner):
     _name = 'embalmer'
 
@@ -68,8 +71,13 @@ class EmbalmerAligner(Aligner):
         outfile = os.path.join(outdir, 'results.b6')
 
         #TODO: pie chart and coverage
-        embalmer_align(infile, outfile,
-            self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell, taxa_ncbi=False, threads=self.threads)
+        proc, out, err = embalmer_align(infile, outfile,
+            self.database,tax=self.tax, accelerator=self.accelerator, shell=self.shell,
+                                        taxa_ncbi=False, threads=self.threads)
+        proc2, out2, err2 = self._post_align(outfile, outdir)
+        return (proc and proc2)
+
+    def _post_align(self, outfile, outdir):
         return embalmulate(outfile, outdir)
 
 

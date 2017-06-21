@@ -36,7 +36,6 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
         '--mode', 'CAPITALIST',
         '--id', str(pct_id),
         '--npenalize',
-        '--taxasuppress',
         '--skipambig',
         '--forwardreverse'
     ]
@@ -53,7 +52,7 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
     return run_command(cmd, shell=shell)
 
 
-def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, cr=None, s=None):
+def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, clustradius=None, shear=None):
     cmd = [
         'emb15',
         '--references', infile,
@@ -66,11 +65,11 @@ def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, cr=No
     if accelerator:
         cmd += ['--accelerator', accelerator]
 
-    if s:
-        cmd += ['--shear', str(s)]
+    if shear:
+        cmd += ['--shear', str(shear)]
 
-    if cr:
-        cmd += ['--clustradius', str(cr)]
+    if clustradius:
+        cmd += ['--clustradius', str(clustradius)]
 
     return run_command(cmd, shell=shell)
 

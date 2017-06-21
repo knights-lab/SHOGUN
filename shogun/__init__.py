@@ -18,4 +18,5 @@ __all__ = [
     'config',
     'parsers',
     'scripts',
+    'taxonomy',
     'wrappers']
