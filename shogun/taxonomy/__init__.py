@@ -15,4 +15,7 @@ class Taxonomy:
             csv_inf = csv.reader(inf, delimiter='\t')
             return dict(csv_inf)
 
+    def __call__(self, id: str):
+        return self.tax[id]
+
 __all__ = ["Taxonomy"]

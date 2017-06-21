@@ -6,8 +6,14 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import os
 from yaml import load
+from collections import defaultdict, Counter
+import pandas as pd
 
 from shogun.wrappers import embalmer_align, embalmulate, utree_search, bowtie2_align
+from shogun.utils.last_common_ancestor import build_lca_map
+from shogun.parsers import yield_alignments_from_sam_inf
+from shogun.taxonomy import Taxonomy
+
 
 class Aligner:
     _name = None
@@ -109,12 +115,27 @@ class BowtieAligner(Aligner):
 
         # Setup the bowtie2 db
         self.prefix = os.path.join(database_dir, self.data_files[self._name])
+        self.tree = Taxonomy(self.tax)
 
     def align(self, infile, outdir, alignments_to_report=16):
         outfile = os.path.join(outdir, 'results.sam')
 
+
         #TODO: pie chart and coverage
-        return bowtie2_align(infile, outfile, self.prefix,
+        proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
+        df = self._post_align(outfile, outdir)
+        print()
+
+    def _post_align(self, sam_file: str, outdir: str) -> pd.DataFrame:
+        align_gen = yield_alignments_from_sam_inf(sam_file)
+        lca_map = build_lca_map(align_gen, self.tree)
+        lca_map = filter(None, lca_map.values())
+        samples_lca_map = defaultdict(Counter)
+        for key, value in lca_map.items():
+            samples_lca_map['_'.join(key.splt('_')[:-1])].update(value)
+
+        return pd.DataFrame(samples_lca_map, index=samples_lca_map.keys())
+
 
 __all__ = ["BowtieAligner", "UtreeAligner", "EmbalmerAligner"]
