@@ -8,6 +8,7 @@ import os
 from yaml import load
 from collections import defaultdict, Counter
 import pandas as pd
+from cytoolz import valfilter
 
 from shogun.wrappers import embalmer_align, embalmulate, utree_search, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
@@ -124,18 +125,18 @@ class BowtieAligner(Aligner):
         #TODO: pie chart and coverage
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
-        df = self._post_align(outfile, outdir)
-        print()
+        df = self._post_align(outfile)
+        df.T.to_csv(os.path.join(outdir, 'taxon_counts.txt'), delimiter='\t')
+        return proc, out, err
 
-    def _post_align(self, sam_file: str, outdir: str) -> pd.DataFrame:
+    def _post_align(self, sam_file: str) -> pd.DataFrame:
         align_gen = yield_alignments_from_sam_inf(sam_file)
         lca_map = build_lca_map(align_gen, self.tree)
-        lca_map = filter(None, lca_map.values())
         samples_lca_map = defaultdict(Counter)
-        for key, value in lca_map.items():
-            samples_lca_map['_'.join(key.splt('_')[:-1])].update(value)
+        for key, value in valfilter(lambda x: x is not None, lca_map).items():
+            samples_lca_map['_'.join(key.split('_')[:-1])].update([value])
 
-        return pd.DataFrame(samples_lca_map, index=samples_lca_map.keys())
+        return pd.DataFrame(samples_lca_map)
 
 
 __all__ = ["BowtieAligner", "UtreeAligner", "EmbalmerAligner"]
