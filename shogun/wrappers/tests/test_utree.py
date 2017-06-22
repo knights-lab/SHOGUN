@@ -42,16 +42,26 @@ class TestUtree(unittest.TestCase):
         self.assertTrue(self.checksums[hash_file(outfile_compressed)] == os.path.basename(outfile_compressed))
 
     def test_utree_build_gg(self):
-        pass
+        fasta = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.fna'))
+        tax = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.tax'))
+        outfile_uncompressed = os.path.join(self.temp_dir.name, 'genomes.small.gg.utr')
+        outfile_compressed = os.path.join(self.temp_dir.name, 'genomes.small.gg.ctr')
+        utree_build_gg(fasta, tax, outfile_uncompressed, shell=False)
+        utree_compress(outfile_uncompressed, outfile_compressed, shell=False)
+        self.assertTrue(self.checksums[hash_file(outfile_compressed)] == os.path.basename(outfile_compressed))
 
     def test_utree_align(self):
         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'utree', 'genomes.small.ctr'))
         infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'combined_seqs.fna'))
-        outfile = os.path.join(self.temp_dir.name, 'bowtie2-test-sims.txt')
+        outfile = os.path.join(self.temp_dir.name, 'utree-test-sims.txt')
         self.assertTrue(utree_search(database, infile, outfile)[0] == 0)
 
     def test_utree_align_gg(self):
-        pass
+        database = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'utree', 'genomes.small.gg.ctr'))
+        infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'combined_seqs.fna'))
+        outfile = os.path.join(self.temp_dir.name, 'utreegg-test-sims.txt')
+        self.assertTrue(utree_search_gg(database, infile, outfile)[0] == 0)
+        print()
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,1 +1,2 @@
 9334360951c78dc5ea3d64d245bd3172879e1701  genomes.small.ctr
+9a3bfccac451643f6abf3b5cc778c627ca423f032eac73fcfc107cdd65be8527  genomes.small.gg.ctr

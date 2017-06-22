@@ -12,7 +12,7 @@ from cytoolz import valfilter
 import csv
 import datetime
 
-from shogun.wrappers import embalmer_align, embalmulate, utree_search, bowtie2_align
+from shogun.wrappers import embalmer_align, embalmulate, utree_search_gg, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
 from shogun.parsers import yield_alignments_from_sam_inf
 from shogun.taxonomy import Taxonomy
@@ -107,7 +107,7 @@ class UtreeAligner(Aligner):
         outfile = os.path.join(outdir, 'utree_results.tsv')
 
         #TODO: pie chart and coverage
-        proc, out, err = utree_search(self.compressed_tree, infile, outfile, shell=self.shell)
+        proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, shell=self.shell)
 
         df = self._post_align(outfile)
         df.to_csv(os.path.join(outdir, 'utree_taxon_counts.txt'), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
