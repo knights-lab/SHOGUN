@@ -61,7 +61,6 @@ class TestUtree(unittest.TestCase):
         infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'combined_seqs.fna'))
         outfile = os.path.join(self.temp_dir.name, 'utreegg-test-sims.txt')
         self.assertTrue(utree_search_gg(database, infile, outfile)[0] == 0)
-        print()
 
 if __name__ == '__main__':
     unittest.main()

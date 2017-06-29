@@ -78,8 +78,8 @@ def embalmulate(infile, outdir, shell=False):
     cmd = [
         'embalmulate',
         infile,
-        os.path.join(outdir, 'otutable.txt'),
-        os.path.join(outdir, 'taxatable.txt'),
+        os.path.join(outdir, 'embalmer_otutable.txt'),
+        os.path.join(outdir, 'embalmer_taxatable.txt'),
         'GGtrim'
     ]
 
