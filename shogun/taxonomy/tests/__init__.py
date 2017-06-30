@@ -8,7 +8,7 @@ import unittest
 import pkg_resources
 import os
 
-from shogun.taxonomy import Taxonomy, parse_bayes
+from shogun.taxonomy import Taxonomy, parse_bayes, pie_chart_taxatable
 
 class TestTaxonomy(unittest.TestCase):
     def setUp(self):
@@ -24,4 +24,14 @@ class TestTaxonomy(unittest.TestCase):
 
     def test_read_bayes(self):
         bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.txt'))
-        parse_bayes(bayes)
+        df = parse_bayes(bayes)
+
+    def test_taxatable(self):
+        bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.txt'))
+        df_bayes = parse_bayes(bayes)
+        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
+        taxatable_df_5 = pie_chart_taxatable(taxatable, df_bayes, level=5)
+        taxatable_df_6 = pie_chart_taxatable(taxatable, df_bayes, level=6)
+        taxatable_df_7 = pie_chart_taxatable(taxatable, df_bayes, level=7)
+        taxatable_df_8 = pie_chart_taxatable(taxatable, df_bayes, level=8)
+        taxatable_df_8.head()
