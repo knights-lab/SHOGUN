@@ -23,11 +23,11 @@ class TestTaxonomy(unittest.TestCase):
         self.assertTrue(d['NC_002182.1'] == 'k__Bacteria;p__Chlamydiae;c__Chlamydiia;o__Chlamydiales;f__Chlamydiaceae;g__Chlamydia;s__Chlamydia_muridarum;t__Chlamydia_muridarum_str._Nigg')
 
     def test_read_bayes(self):
-        bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.txt'))
+        bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.100.txt'))
         df = parse_bayes(bayes)
 
     def test_taxatable(self):
-        bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.txt'))
+        bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.32.txt'))
         df_bayes = parse_bayes(bayes)
         taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
         taxatable_df_5 = pie_chart_taxatable(taxatable, df_bayes, level=5)

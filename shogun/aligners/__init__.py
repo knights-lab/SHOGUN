@@ -36,6 +36,7 @@ class Aligner:
 
         self.tax = os.path.join(database_dir, self.data_files['general']['taxonomy'])
         self.fasta = os.path.join(database_dir, self.data_files['general']['fasta'])
+        self.outfile = None
 
     @classmethod
     def check_database(cls, dir):
@@ -77,17 +78,17 @@ class EmbalmerAligner(Aligner):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        outfile = os.path.join(outdir, 'embalmer_results.b6')
+        self.outfile = os.path.join(outdir, 'embalmer_results.b6')
 
         #TODO: pie chart and coverage
         proc, out, err = embalmer_align(infile, outfile,
             self.database,tax=self.tax, accelerator=self.accelerator, shell=self.shell,
                                         taxa_ncbi=False, threads=self.threads)
-        proc2, out2, err2 = self._post_align(outfile, outdir)
+        proc2, out2, err2 = self._post_align(outdir)
         return (proc and proc2)
 
-    def _post_align(self, outfile, outdir):
-        return embalmulate(outfile, outdir)
+    def _post_align(self, outdir):
+        return embalmulate(self.outfile, outdir)
 
 
 class UtreeAligner(Aligner):
@@ -110,7 +111,8 @@ class UtreeAligner(Aligner):
         proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, shell=self.shell)
 
         df = self._post_align(outfile)
-        df.to_csv(os.path.join(outdir, 'utree_taxon_counts.txt'), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+        self.outfile = os.path.join(outdir, 'utree_taxon_counts.txt'),
+        df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
     def _post_align(self, utree_out: str) -> pd.DataFrame:
@@ -144,7 +146,8 @@ class BowtieAligner(Aligner):
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
         df = self._post_align(outfile)
-        df.to_csv(os.path.join(outdir, 'bowtie2_taxon_counts.txt'), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+        self.outfile = os.path.join(outdir, 'bowtie2_taxon_counts.txt'),
+        df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
     def _post_align(self, sam_file: str) -> pd.DataFrame:
