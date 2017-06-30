@@ -12,6 +12,7 @@ from yaml import load
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
 from shogun.taxonomy import pie_chart_taxatable, parse_bayes
+from multiprocessing import cpu_count
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
@@ -54,8 +55,9 @@ ALIGNERS = {
 @click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database file.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse too (not required, can specify off).')
+@click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
-def align(ctx, aligner, input, database, output, level):
+def align(ctx, aligner, input, database, output, level, threads):
     if not os.path.exists(output):
         os.makedirs(output)
 
@@ -67,7 +69,7 @@ def align(ctx, aligner, input, database, output, level):
 
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database)
+            aligner_cl = align(database, threads=threads)
             aligner_cl.align(input, output)
             if level is not 'off':
                 with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
@@ -76,7 +78,7 @@ def align(ctx, aligner, input, database, output, level):
                 redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
                 _redistribute(shear, level, redist_out, aligner_cl.outfile)
     else:
-        aligner_cl = ALIGNERS[aligner](database)
+        aligner_cl = ALIGNERS[aligner](database, threads=threads)
         aligner_cl.align(input, output)
         if level is not 'off':
             with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
