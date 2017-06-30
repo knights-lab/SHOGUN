@@ -33,7 +33,8 @@ def parse_bayes(filename: str) -> pd.DataFrame:
 
 def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
     df = pd.read_csv(filename, sep="\t", index_col=0)
-    df['level'] = [_.count(';') + 1 if type('_') == str else 0 for _ in df.index]
+    df = df[[type(_) == str for _ in df.index]]
+    df['level'] = [_.count(';') + 1 if type(_) == str else 0 for _ in df.index]
     # summarize up
     below_level = df['level'] >= level
     leaf_counts = dict()

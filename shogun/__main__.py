@@ -11,7 +11,7 @@ import logging
 from yaml import load
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
-from shogun.taxonomy import pie_chart_taxatable
+from shogun.taxonomy import pie_chart_taxatable, parse_bayes
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
@@ -53,7 +53,7 @@ ALIGNERS = {
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database file.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
-@click.option('-l', '--level', type=click.Choice(TAXA + ['off']), default='strain', help='The level to collapse too (not required, can specify off).')
+@click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse too (not required, can specify off).')
 @click.pass_context
 def align(ctx, aligner, input, database, output, level):
     if not os.path.exists(output):
@@ -72,33 +72,42 @@ def align(ctx, aligner, input, database, output, level):
             if level is not 'off':
                 with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
                     data_files = load(stream)
-                shear = data_files['shear']
-                redist_inf = os.path.join(aligner_cl.outfile, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
-                _redistribute(input, shear, level, redist_inf)
+                shear = os.path.join(database, data_files['general']['shear'])
+                redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
+                _redistribute(shear, level, redist_out, aligner_cl.outfile)
     else:
         aligner_cl = ALIGNERS[aligner](database)
         aligner_cl.align(input, output)
         if level is not 'off':
             with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
                 data_files = load(stream)
-            shear = data_files['shear']
-            redist_inf = os.path.join(aligner_cl.outfile, "taxatable.%s.txt" % (level))
-            _redistribute(input, shear, level, redist_inf)
+            shear = os.path.join(database, data_files['general']['shear'])
+            redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
+            _redistribute(shear, level, redist_out, aligner_cl.outfile)
 
 
-@cli.command(help="Run the SHOGUN aligner")
+@cli.command(help="Run the SHOGUN redistrbution algorithm.")
 @click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
 @click.option('-s', '--shear', type=click.Path(), required=True, help="The path to the sheared results.")
-@click.option('-l', '--level', type=click.Choice(TAXA), default='strain', help='The level to collapse too.')
-@click.option('-o', '--output', type=click.File(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output folder directory', show_default=True)
+@click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse too.')
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
 @click.pass_context
-def redistribute(input, shear, level, output):
+def redistribute(ctx, input, shear, level, output):
     _redistribute(shear, level, output, input)
 
 
 def _redistribute(shear, level, outfile, redist_inf):
-    df_output = pie_chart_taxatable(shear, redist_inf, level=TAXAMAP[level])
-    df_output.to_csv(outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+    shear_df = parse_bayes(shear)
+    print(shear, level, outfile, redist_inf)
+    if level == 'all':
+        for l in TAXA:
+            df_output = pie_chart_taxatable(redist_inf, shear_df, level=TAXAMAP[l])
+            tmp_spl = outfile.split('.')
+            tmp_path = '.'.join(tmp_spl[:-1] + [l] + [tmp_spl[-1]])
+            df_output.to_csv(tmp_path, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+    else:
+        df_output = pie_chart_taxatable(redist_inf, shear_df, level=TAXAMAP[level])
+        df_output.to_csv(outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
 
 if __name__ == '__main__':
     cli()

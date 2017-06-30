@@ -81,10 +81,11 @@ class EmbalmerAligner(Aligner):
         self.outfile = os.path.join(outdir, 'embalmer_results.b6')
 
         #TODO: pie chart and coverage
-        proc, out, err = embalmer_align(infile, outfile,
+        proc, out, err = embalmer_align(infile, self.outfile,
             self.database,tax=self.tax, accelerator=self.accelerator, shell=self.shell,
                                         taxa_ncbi=False, threads=self.threads)
         proc2, out2, err2 = self._post_align(outdir)
+        self.outfile = os.path.join(outdir, 'embalmer_taxatable.txt')
         return (proc and proc2)
 
     def _post_align(self, outdir):
@@ -111,7 +112,7 @@ class UtreeAligner(Aligner):
         proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, shell=self.shell)
 
         df = self._post_align(outfile)
-        self.outfile = os.path.join(outdir, 'utree_taxon_counts.txt'),
+        self.outfile = os.path.join(outdir, 'utree_taxon_counts.txt')
         df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
@@ -146,7 +147,7 @@ class BowtieAligner(Aligner):
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
         df = self._post_align(outfile)
-        self.outfile = os.path.join(outdir, 'bowtie2_taxon_counts.txt'),
+        self.outfile = os.path.join(outdir, 'bowtie2_taxon_counts.txt')
         df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 

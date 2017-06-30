@@ -1,6 +1,7 @@
 general:
   taxonomy: genomes.small.tax
   fasta: genomes.small.fna
+  shear: sheared_bayes.32.txt
 embalmer: embalmer/genomes.small
 bowtie2: bowtie2/genomes.small
 utree: utree/genomes.small
