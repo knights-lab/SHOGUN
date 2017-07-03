@@ -18,7 +18,7 @@ def longest_path_tree(t, path):
     s = []
     temp_spot = t
     for node in path.split(';'):
-        if temp_spot[node]:
+        if node in temp_spot:
             temp_spot = temp_spot[node]
             s.extend([node])
         else:
@@ -57,7 +57,6 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
 
     df['summary'] = [longest_path_tree(cb_index, v) for v in df.index]
     df = df.groupby('summary').sum()
-
 
     df['level'] = [_.count(';') + 1 if type(_) == str else 0 for _ in df.index]
 
