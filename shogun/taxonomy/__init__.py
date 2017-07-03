@@ -77,6 +77,7 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
         leave_filter = _filter_leaves_for_tax(leaf_counts_df, tmp_name)
         num_leaves = np.sum(leave_filter)
         if num_leaves == 0 or num_leaves is None:
+            print(tmp_name)
             # Filter back row names until in counts_bayes
             blank = ['k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__', 't__']
             for i, _ in enumerate(row.name.split(';')):
