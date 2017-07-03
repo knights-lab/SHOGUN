@@ -34,20 +34,51 @@ def parse_bayes(filename: str) -> pd.DataFrame:
 def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
     df = pd.read_csv(filename, sep="\t", index_col=0)
     df = df[[type(_) == str for _ in df.index]]
+
+    # tmp_indx = df.index.values
+    # # Filter for leaf names only in DF bayes
+    # for i, tmp_name in enumerate(df.index):
+    #     while tmp_name not in counts_bayes.index:
+    #         if tmp_name.count(';') > 0:
+    #             tmp_name = ';'.join(tmp_name.split(';')[-1])
+    #         else:
+    #             tmp_name = False
+    #             break
+    #     tmp_indx[i] = tmp_name
+    #
+    # df.index = tmp_indx
+    # df = df[df.index != False]
     df['level'] = [_.count(';') + 1 if type(_) == str else 0 for _ in df.index]
+
+    names = set((';'.join(v.split(';')[:level]) for v in counts_bayes.index))
+
     # summarize up
     below_level = df['level'] >= level
     leaf_counts = dict()
     for i, row in df[below_level].iterrows():
         tax = ';'.join(row.name.split(';')[:level])
-        if tax in leaf_counts:
-            leaf_counts[tax] += row[:-1]
+        if tax in names:
+            if tax in leaf_counts:
+                leaf_counts[tax] += row[:-1]
+            else:
+                leaf_counts[tax] = row[:-1]
         else:
-            leaf_counts[tax] = row[:-1]
+            tax = ';'.join(tax.split(';')[:level-1])
+            df.drop(row.name)
+            if tax in df.index:
+                df[tax] += row
+            else:
+                row.name = tax
+                row['level'] -= 1
+                df.append(row)
+            below_level = df['level'] >= level
+
     # taxa x sample
     leaf_counts_df = pd.DataFrame(leaf_counts).T
+
     # summarize bayes to level
     counts_bayes_sum = _summarize_bayes_at_level(counts_bayes, leaf_counts_df.index, level=level)
+
     # summarize down
     for i, row in df[~below_level].sort_values('level').iterrows():
         # Get all children of item
