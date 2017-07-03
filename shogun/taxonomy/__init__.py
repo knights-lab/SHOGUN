@@ -63,27 +63,21 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
 
     # summarize up
     below_level = df['level'] >= level
-    leaf_counts = dict()
-    for i, row in df[below_level].iterrows():
-        tax = ';'.join(row.name.split(';')[:level])
-        if tax in leaf_counts:
-            leaf_counts[tax] += row[:-1]
-        else:
-            leaf_counts[tax] = row[:-1]
-
-    # taxa x sample
-    leaf_counts_df = pd.DataFrame(leaf_counts).T
+    leaf_counts_df = df[below_level]
+    leaf_counts_df['summary'] = [';'.join(v.split(';')[:level]) for v in df[below_level].index]
+    leaf_counts_df = leaf_counts_df.groupby('summary').sum()
+    leaf_counts_df = leaf_counts_df.drop('level', axis=1)
 
     # summarize bayes to level
     counts_bayes_sum = _summarize_bayes_at_level(counts_bayes, leaf_counts_df.index, level=level)
 
     # summarize down
-    for i, row in df[~below_level].sort_values('level').iterrows():
+    for i, row in df[~below_level].sort_values('level', ascending=False).iterrows():
         # Get all children of item
         tmp_name = row.name
         leave_filter = _filter_leaves_for_tax(leaf_counts_df, tmp_name)
         num_leaves = np.sum(leave_filter)
-        if num_leaves == 0:
+        if num_leaves == 0 or num_leaves is None:
             # Filter back row names until in counts_bayes
             blank = ['k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__', 't__']
             for i, _ in enumerate(row.name.split(';')):
@@ -92,20 +86,19 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
             tmp_counts_bayes_row.name = ';'.join(blank[:level])
             row.name = tmp_counts_bayes_row.name
             leaf_counts_df = leaf_counts_df.append(row[:-1])
-            counts_bayes_sum = counts_bayes_sum.append(tmp_counts_bayes_row)
-            counts_bayes_sum = counts_bayes_sum.fillna(0)
+            if tmp_counts_bayes_row.name not in counts_bayes_sum.index:
+                counts_bayes_sum = counts_bayes_sum.append(tmp_counts_bayes_row)
+                counts_bayes_sum = counts_bayes_sum.fillna(0)
         elif num_leaves == 1:
             leaf_counts_df.loc[leave_filter] += row.values[:-1]
         elif num_leaves > 1:
             tmp_level = row.name.count(';')
             tmp_leaves = leaf_counts_df[leave_filter].sort_index()
-            tmp_bayes = counts_bayes_sum.loc[tmp_leaves.index].sort_index()
+            tmp_bayes = counts_bayes_sum.loc[tmp_leaves.index]
             # Series 1xn where n is the number of leave nodes below tax
             prob_tax_given_level = (tmp_bayes.iloc[:,tmp_level] + 1)/(tmp_bayes['genome_length'] + 1)
             prob_tax_given_level = prob_tax_given_level/np.sum(prob_tax_given_level)
             # Series 1xn where n is the number of unique reads for a given taxa
-            print(tmp_leaves.T)
-            print(uniqueness_per_genome.values)
             uniqueness_per_genome = tmp_bayes.iloc[:,level-1]/tmp_bayes['genome_length']
             # Matrix divide each observed count by uniqueness
             counts_over_uniqueness = tmp_leaves.T / uniqueness_per_genome.values
@@ -133,8 +126,7 @@ def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7):
 
 
 def _filter_leaves_for_tax(leaf_counts_df, taxa):
-    return np.array([_.startswith(taxa) for _ in leaf_counts_df.index])
-
+     return np.array([_.startswith(taxa + ';') for _ in leaf_counts_df.index])
 
 def parse_taxatable2(filename: str, level: int = 7):
     with open(filename) as inf:
