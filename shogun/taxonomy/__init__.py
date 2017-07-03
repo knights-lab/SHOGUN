@@ -8,6 +8,23 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 
+def tree(): return defaultdict(tree)
+
+def add_tree(t, path):
+  for node in path.split(';'):
+    t = t[node]
+
+def longest_path_tree(t, path):
+    s = []
+    temp_spot = t
+    for node in path.split(';'):
+        if temp_spot[node]:
+            temp_spot = temp_spot[node]
+            s.extend([node])
+        else:
+            break
+    return ';'.join(s)
+
 class Taxonomy:
     def __init__(self, filename: str):
         self.tax = self.parse_taxonomy(filename)
@@ -35,43 +52,24 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
     df = pd.read_csv(filename, sep="\t", index_col=0)
     df = df[[type(_) == str for _ in df.index]]
 
-    # tmp_indx = df.index.values
-    # # Filter for leaf names only in DF bayes
-    # for i, tmp_name in enumerate(df.index):
-    #     while tmp_name not in counts_bayes.index:
-    #         if tmp_name.count(';') > 0:
-    #             tmp_name = ';'.join(tmp_name.split(';')[-1])
-    #         else:
-    #             tmp_name = False
-    #             break
-    #     tmp_indx[i] = tmp_name
-    #
-    # df.index = tmp_indx
-    # df = df[df.index != False]
-    df['level'] = [_.count(';') + 1 if type(_) == str else 0 for _ in df.index]
+    cb_index = tree()
+    _ = [add_tree(cb_index, v) for v in counts_bayes.index]
 
-    names = set((';'.join(v.split(';')[:level]) for v in counts_bayes.index))
+    df['summary'] = [longest_path_tree(cb_index, v) for v in df.index]
+    df = df.groupby('summary').sum()
+
+
+    df['level'] = [_.count(';') + 1 if type(_) == str else 0 for _ in df.index]
 
     # summarize up
     below_level = df['level'] >= level
     leaf_counts = dict()
     for i, row in df[below_level].iterrows():
         tax = ';'.join(row.name.split(';')[:level])
-        if tax in names:
-            if tax in leaf_counts:
-                leaf_counts[tax] += row[:-1]
-            else:
-                leaf_counts[tax] = row[:-1]
+        if tax in leaf_counts:
+            leaf_counts[tax] += row[:-1]
         else:
-            tax = ';'.join(tax.split(';')[:level-1])
-            df.drop(row.name)
-            if tax in df.index:
-                df[tax] += row
-            else:
-                row.name = tax
-                row['level'] -= 1
-                df.append(row)
-            below_level = df['level'] >= level
+            leaf_counts[tax] = row[:-1]
 
     # taxa x sample
     leaf_counts_df = pd.DataFrame(leaf_counts).T
@@ -86,6 +84,7 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
         leave_filter = _filter_leaves_for_tax(leaf_counts_df, tmp_name)
         num_leaves = np.sum(leave_filter)
         if num_leaves == 0:
+            # Filter back row names until in counts_bayes
             blank = ['k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__', 't__']
             for i, _ in enumerate(row.name.split(';')):
                 blank[i] = _
@@ -102,7 +101,7 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
             tmp_leaves = leaf_counts_df[leave_filter].sort_index()
             tmp_bayes = counts_bayes_sum.loc[tmp_leaves.index].sort_index()
             # Series 1xn where n is the number of leave nodes below tax
-            prob_tax_given_level = (tmp_bayes.ix[:,tmp_level] + 1)/(tmp_bayes['genome_length'] + 1)
+            prob_tax_given_level = (tmp_bayes.iloc[:,tmp_level] + 1)/(tmp_bayes['genome_length'] + 1)
             prob_tax_given_level = prob_tax_given_level/np.sum(prob_tax_given_level)
             # Series 1xn where n is the number of unique reads for a given taxa
             uniqueness_per_genome = tmp_bayes.ix[:,level-1]/tmp_bayes['genome_length']
@@ -124,8 +123,8 @@ def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7):
     if level < 8:
         counts_bayes['summary_taxa'] = [';'.join(_.split(';')[:level]) for _ in counts_bayes.index]
         counts_bayes = counts_bayes.groupby('summary_taxa').sum()
-        counts = counts_bayes.ix[:, level-1:8].sum(axis=1)
-        counts_bayes.ix[:, level-1] = counts
+        counts = counts_bayes.iloc[:, level-1:8].sum(axis=1)
+        counts_bayes.iloc[:, level-1] = counts
         counts_bayes = counts_bayes.drop(counts_bayes.columns[[level, 7]], axis=1)
         counts_bayes = counts_bayes.loc[leave_names]
     return counts_bayes
