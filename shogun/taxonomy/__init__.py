@@ -104,6 +104,8 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
             prob_tax_given_level = (tmp_bayes.iloc[:,tmp_level] + 1)/(tmp_bayes['genome_length'] + 1)
             prob_tax_given_level = prob_tax_given_level/np.sum(prob_tax_given_level)
             # Series 1xn where n is the number of unique reads for a given taxa
+            print(tmp_leaves.T)
+            print(uniqueness_per_genome.values)
             uniqueness_per_genome = tmp_bayes.iloc[:,level-1]/tmp_bayes['genome_length']
             # Matrix divide each observed count by uniqueness
             counts_over_uniqueness = tmp_leaves.T / uniqueness_per_genome.values
