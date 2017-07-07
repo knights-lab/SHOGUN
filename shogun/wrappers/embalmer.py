@@ -10,7 +10,7 @@ from shogun.utils import run_command
 
 
 def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.98, tax=False,
-                   accelerator=False, shell=False, taxa_ncbi=False):
+                   accelerator=False, taxacut=2, shell=False, taxa_ncbi=False):
     """
 
     :param input_fp:
@@ -47,7 +47,7 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
         cmd += ['--accelerator', accelerator]
 
     if tax:
-        cmd += ['--taxonomy', tax, '--taxasuppress']
+        cmd += ['--taxonomy', tax, '--taxacut', taxacut]
 
     return run_command(cmd, shell=shell)
 

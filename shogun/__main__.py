@@ -9,6 +9,7 @@ import click
 from datetime import date
 import logging
 from yaml import load
+import glob.glob as glob
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
 from shogun.taxonomy import pie_chart_taxatable, parse_bayes
@@ -88,8 +89,8 @@ def align(ctx, aligner, input, database, output, level, threads):
             _redistribute(shear, level, redist_out, aligner_cl.outfile)
 
 
-@cli.command(help="Run the SHOGUN redistrbution algorithm.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
+@cli.command(help="Run the SHOGUN redistribution algorithm.")
+@click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
 @click.option('-s', '--shear', type=click.Path(), required=True, help="The path to the sheared results.")
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse too.')
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
@@ -110,6 +111,29 @@ def _redistribute(shear, level, outfile, redist_inf):
     else:
         df_output = pie_chart_taxatable(redist_inf, shear_df, level=TAXAMAP[level])
         df_output.to_csv(outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+
+def _check_function_db(metadata: dict, database: str) -> bool:
+    if not 'function' in metadata:
+        return False
+    else:
+        file_set = set(glob(os.path.join(database, metadata['function'] + '*')))
+        suffices = ['module-annotations.txt', 'species2ko.txt', 'strain2ko.txt']
+        files = ["%s-%s" % (os.path.join(database, metadata['function']), suffix) for suffix in suffices]
+        for file in files:
+            if file not in file_set:
+                return False
+        return dict(zip(('modules', 'species', 'strain'), files))
+
+@cli.command(help="Run the SHOGUN redistrbution algorithm.")
+@click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
+@click.option('-c', '--function', type=click.Path(), required=True, help="The path to the folder containing the functional database.")
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
+@click.pass_context
+def function(ctx, input, function, output):
+    pass
+
+def _function(input, function, output):
+    pass
 
 if __name__ == '__main__':
     cli()
