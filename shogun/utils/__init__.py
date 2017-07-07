@@ -11,6 +11,10 @@ import os
 import hashlib
 from collections import defaultdict
 
+import numpy as np
+import pandas as pd
+import scipy.sparse as ss
+
 
 def run_command(cmd, shell=False):
     """
@@ -57,5 +61,35 @@ def read_checksums(filename):
     with open(filename) as inf:
         return defaultdict(str, dict([line.split() for line in inf]))
 
+def save_csr_matrix(filename, matrix, row_names, column_names):
+    """Save compressed sparse row (csr) matrix to file.
 
-__all__ = ['build_lca_map', 'run_command', 'hash_file', 'read_checksums']
+    Based on http://stackoverflow.com/a/8980156/232571
+
+    """
+    assert filename.endswith('.npz')
+    attributes = {
+        'data': matrix.data,
+        'indices': matrix.indices,
+        'indptr': matrix.indptr,
+        'shape': matrix.shape,
+        'rownames': row_names,
+        'columnnames': column_names,
+    }
+    np.savez(filename, **attributes)
+
+def load_csr_matrix(filename):
+    """Load compressed sparse row (csr) matrix from file.
+
+    Based on http://stackoverflow.com/a/8980156/232571
+
+    """
+    assert filename.endswith('.npz')
+    loader = np.load(filename)
+    args = (loader['data'], loader['indices'], loader['indptr'])
+    matrix = ss.csr_matrix(args, shape=loader['shape'])
+    return loader['rownames'], loader['columnnames'], matrix
+
+
+
+__all__ = ['build_lca_map', 'run_command', 'hash_file', 'read_checksums', 'save_csr_matrix', 'load_csr_matrix']

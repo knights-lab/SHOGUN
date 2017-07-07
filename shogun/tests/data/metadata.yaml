@@ -2,7 +2,7 @@ general:
   taxonomy: genomes.small.tax
   fasta: genomes.small.fna
   shear: sheared_bayes.32.txt
-functional: functional/ko
+function: function/ko
 embalmer: embalmer/genomes.small
 bowtie2: bowtie2/genomes.small
 utree: utree/genomes.small

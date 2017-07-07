@@ -8,15 +8,19 @@ import unittest
 import pkg_resources
 import os
 from yaml import load
+import tempfile
 
-from shogun.__main__ import _parse_function_db, _parse_kegg_table
+import pandas as pd
+
+from shogun.__main__ import _parse_function_db, _parse_kegg_table, _prep_and_do_functions
 
 class TestFunctionCheck(unittest.TestCase):
     def setUp(self):
-        pass
+        prefix = 'shogun-temp-dir-'
+        self.temp_dir = tempfile.TemporaryDirectory(prefix=prefix)
 
     def tearDown(self):
-        pass
+        self.temp_dir.cleanup()
 
     def test_check_database(self):
         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
@@ -27,12 +31,13 @@ class TestFunctionCheck(unittest.TestCase):
 
     def test_function(self):
         taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
-        database =         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
-        with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-            data_files = load(stream)
-        function_db = _parse_function_db(data_files, database)
+        database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
 
-        kegg_table = _parse_kegg_table(function_db['strain'])
-        print(kegg_table.head())
+
+        outdir = os.path.join(self.temp_dir.name)
+
+        _prep_and_do_functions(taxatable, database, outdir, 8)
+
+
 
 

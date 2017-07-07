@@ -16,6 +16,7 @@ from .config.settings import shogun_settings
 __all__ = [
     'aligners',
     'config',
+    'function',
     'parsers',
     'scripts',
     'taxonomy',
