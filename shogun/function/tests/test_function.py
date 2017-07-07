@@ -38,7 +38,3 @@ class TestFunctionCheck(unittest.TestCase):
         _prep_and_do_functions(taxatable, database, outdir, 8)
         # Species
         _prep_and_do_functions(taxatable, database, outdir, 7)
-
-
-
-

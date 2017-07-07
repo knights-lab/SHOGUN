@@ -209,8 +209,7 @@ def _prep_and_do_functions(input, database, output, level):
     out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage = _do_function(taxatable_df, strain_names, kegg_ids, kegg_table_csr, kegg_modules_df)
     out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
     out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
-    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modcov.txt" % prefix), sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
-
+    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modules.coverage.txt" % prefix), sep='\t', float_format="%f", na_rep=0, index_label="#OTU ID")
 
 
 def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df):
