@@ -33,10 +33,11 @@ class TestFunctionCheck(unittest.TestCase):
         taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
 
-
         outdir = os.path.join(self.temp_dir.name)
-
+        # Strain
         _prep_and_do_functions(taxatable, database, outdir, 8)
+        # Species
+        _prep_and_do_functions(taxatable, database, outdir, 7)
 
 
 

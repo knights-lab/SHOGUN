@@ -18,7 +18,6 @@ import numpy as np
 import pandas as pd
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
-from shogun.utils import save_csr_matrix, load_csr_matrix
 from shogun.taxonomy import pie_chart_taxatable, parse_bayes
 from multiprocessing import cpu_count
 
@@ -100,7 +99,7 @@ def align(ctx, aligner, input, database, output, level, threads):
 @cli.command(help="Run the SHOGUN redistribution algorithm.")
 @click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
 @click.option('-s', '--shear', type=click.Path(), required=True, help="The path to the sheared results.")
-@click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse too.')
+@click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse to.')
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
 @click.pass_context
 def redistribute(ctx, input, shear, level, output):
@@ -125,7 +124,7 @@ def _parse_function_db(metadata: dict, database: str) -> dict:
         return {}
     else:
         file_set = set(glob.glob(os.path.join(database, metadata['function'] + '*')))
-        suffices = ['module-annotations.txt', 'strain2ko.txt']
+        suffices = ['module-annotations.txt', 'strain2ko.txt', 'species2ko.txt']
         files = ["%s-%s" % (os.path.join(database, metadata['function']), suffix) for suffix in suffices]
         for file in files:
             if file not in file_set:
@@ -133,14 +132,15 @@ def _parse_function_db(metadata: dict, database: str) -> dict:
 
         modules_df = _parse_modules(files[0])
         #TODO: Implement the save csr, this works but requires write permissions to db folder
-        npz = os.path.join(database, metadata['function']) + "-strain2ko.npz"
+        #npz = os.path.join(database, metadata['function']) + "-strain2ko.npz"
         # if not npz in file_set:
         #    row_names, column_names, csr = _parse_kegg_table(files[1])
         #    save_csr_matrix(npz, csr, row_names, column_names)
         # else:
         #   row_names, column_names, csr = load_csr_matrix(npz)
-        row_names, column_names, csr = _parse_kegg_table(files[1])
-        return dict(zip(('modules_file', 'strain_file', 'strain_names', 'kegg_ids', 'csr', 'modules'), files + [row_names, column_names, csr, modules_df]))
+        _strains = list(_parse_kegg_table(files[1]))
+        _species = list(_parse_kegg_table(files[2]))
+        return dict(zip(('modules_file', 'strain_file', 'species_file', 'strain_names', 'strain_kegg_ids', 'strain_csr','species_names', 'species_kegg_ids', 'species_csr', 'modules'), files + _strains + _species + [modules_df]))
 
 def _parse_modules(infile):
     modules_keggs = defaultdict(Counter)
@@ -172,9 +172,10 @@ def _parse_kegg_table(infile):
 @click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
 @click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
-@click.option('-l', '--level', type=click.Choice(['species', 'strain']), default='strain', help='The level to collapse too.')
+@click.option('-l', '--level', type=click.Choice(['species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
 def function(ctx, input, database, output, level):
+
     _prep_and_do_functions(input, database, output, TAXAMAP[level])
 
 def _prep_and_do_functions(input, database, output, level):
@@ -183,10 +184,21 @@ def _prep_and_do_functions(input, database, output, level):
 
     db = _parse_function_db(data_files, database)
 
+    prefix = ".".join(os.path.basename(input).split('.')[:-1])
+
     kegg_modules_df = db['modules']
-    strain_names = db['strain_names']
-    kegg_ids = db['kegg_ids']
-    kegg_table_csr = db['csr']
+    if level == 8:
+        strain_names = db['strain_names']
+        kegg_ids = db['strain_kegg_ids']
+        kegg_table_csr = db['strain_csr']
+        prefix += ".strain"
+    elif level == 7:
+        strain_names = db['species_names']
+        kegg_ids = db['species_kegg_ids']
+        kegg_table_csr = db['species_csr']
+        prefix += ".species"
+    else:
+        raise Exception("Level was set to %d but can only by 7 or 8." % level)
 
     taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
@@ -194,7 +206,10 @@ def _prep_and_do_functions(input, database, output, level):
     taxatable_df['summary'] = [';'.join(_.split(';')[:level]) for _ in taxatable_df.index]
     taxatable_df = taxatable_df.groupby('summary').sum()
 
-    function_df, kegg_modules = _do_function(taxatable_df, strain_names, kegg_ids, kegg_table_csr, kegg_modules_df)
+    out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage = _do_function(taxatable_df, strain_names, kegg_ids, kegg_table_csr, kegg_modules_df)
+    out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+    out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modcov.txt" % prefix), sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
 
@@ -209,9 +224,25 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
 
     out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns, columns=sorted(column_names, key=column_names.get), dtype=np.int)
+
+
+    filtered_kegg_ids = out_kegg_table_df.loc[:, kegg_modules_df.columns].T.fillna(0)
     # kegg modules df
-    out_kegg_modules_df = kegg_modules_df.dot(out_kegg_table_df.loc[:,kegg_modules_df.columns].T.fillna(0))
-    return out_kegg_table_df, out_kegg_modules_df
+    out_kegg_modules_df = kegg_modules_df.dot(filtered_kegg_ids)
+
+    out_kegg_modules_coverage = ((kegg_modules_df).dot(filtered_kegg_ids > 0).fillna(0)).div(kegg_modules_df.sum(axis=1), axis=0)
+
+    # Filter out zeros
+    out_kegg_modules_df = out_kegg_modules_df[(out_kegg_modules_df.T != 0).any()]
+
+    # Filter out zeros
+    out_kegg_table_df = out_kegg_table_df.T
+    out_kegg_table_df = out_kegg_table_df[(out_kegg_table_df.T != 0).any()]
+
+    # Filter out zeros
+    out_kegg_modules_coverage = out_kegg_modules_coverage[(out_kegg_modules_coverage.T != 0).any()]
+
+    return out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage
 
 if __name__ == '__main__':
     cli()
