@@ -163,19 +163,22 @@ def _parse_kegg_table(infile):
             row_names.setdefault(line[0], len(row_names))
             counts = Counter(line[1:])
             for key, value in counts.items():
-                indices.append(kegg_ids.setdefault(key, len(kegg_ids)))
-                data.append(value)
+                if not key == '':
+                    indices.append(kegg_ids.setdefault(key, len(kegg_ids)))
+                    data.append(value)
             indptr.append(len(indices))
     return row_names, kegg_ids, csr_matrix((data, indices, indptr), dtype=np.int8)
 
-@cli.command(help="Run the SHOGUN redistribution algorithm.")
+@cli.command(help="Run the SHOGUN functional algorithm.")
 @click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
 @click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
-@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
+@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.option('-l', '--level', type=click.Choice(['species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
 def function(ctx, input, database, output, level):
-
+    # Check if output exists, if not then make
+    if not os.path.exists(output):
+        os.makedirs(output)
     _prep_and_do_functions(input, database, output, TAXAMAP[level])
 
 def _prep_and_do_functions(input, database, output, level):
@@ -198,7 +201,7 @@ def _prep_and_do_functions(input, database, output, level):
         kegg_table_csr = db['species_csr']
         prefix += ".species"
     else:
-        raise Exception("Level was set to %d but can only by 7 or 8." % level)
+        raise Exception("Level was set to %d but can only by 7 (species) or 8 (strain)." % level)
 
     taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
@@ -222,10 +225,9 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
             idx = row_names[row.name]
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
 
-    out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns, columns=sorted(column_names, key=column_names.get), dtype=np.int)
+    out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns, columns=sorted(column_names, key=column_names.get), dtype=np.int).T
 
-
-    filtered_kegg_ids = out_kegg_table_df.loc[:, kegg_modules_df.columns].T.fillna(0)
+    filtered_kegg_ids = out_kegg_table_df.loc[kegg_modules_df.columns].fillna(0)
     # kegg modules df
     out_kegg_modules_df = kegg_modules_df.dot(filtered_kegg_ids)
 
@@ -235,7 +237,6 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
     out_kegg_modules_df = out_kegg_modules_df[(out_kegg_modules_df.T != 0).any()]
 
     # Filter out zeros
-    out_kegg_table_df = out_kegg_table_df.T
     out_kegg_table_df = out_kegg_table_df[(out_kegg_table_df.T != 0).any()]
 
     # Filter out zeros
