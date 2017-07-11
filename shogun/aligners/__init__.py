@@ -15,7 +15,7 @@ import datetime
 from shogun.wrappers import embalmer_align, embalmulate, utree_search_gg, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
 from shogun.parsers import yield_alignments_from_sam_inf
-from shogun.taxonomy import Taxonomy
+from shogun.redistribute import Taxonomy
 
 
 class Aligner:
@@ -34,7 +34,7 @@ class Aligner:
 
         self.database_dir = database_dir
 
-        self.tax = os.path.join(database_dir, self.data_files['general']['taxonomy'])
+        self.tax = os.path.join(database_dir, self.data_files['general']['redistribute'])
         self.fasta = os.path.join(database_dir, self.data_files['general']['fasta'])
         self.outfile = None
 

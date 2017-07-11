@@ -12,7 +12,7 @@ import tempfile
 
 import pandas as pd
 
-from shogun.__main__ import _parse_function_db, _parse_kegg_table, _prep_and_do_functions
+from shogun.function import parse_function_db, parse_kegg_table, function_run_and_save
 
 class TestFunctionCheck(unittest.TestCase):
     def setUp(self):
@@ -26,7 +26,7 @@ class TestFunctionCheck(unittest.TestCase):
         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
         with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
             data_files = load(stream)
-        results = _parse_function_db(data_files, database)
+        results = parse_function_db(data_files, database)
         self.assertTrue(results is not None)
 
     def test_function(self):
@@ -35,6 +35,6 @@ class TestFunctionCheck(unittest.TestCase):
 
         outdir = os.path.join(self.temp_dir.name)
         # Strain
-        _prep_and_do_functions(taxatable, database, outdir, 8)
+        function_run_and_save(taxatable, database, outdir, 8)
         # Species
-        _prep_and_do_functions(taxatable, database, outdir, 7)
+        function_run_and_save(taxatable, database, outdir, 7)

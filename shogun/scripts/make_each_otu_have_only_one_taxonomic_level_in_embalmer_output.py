@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# 
-# makes taxonomy labels agree across different hits for a given OTU
-# also outputs the map of refID:LCA taxonomy
+#
+# makes redistribute labels agree across different hits for a given OTU
+# also outputs the map of refID:LCA redistribute
 # usage
 # *.py embalmer_hits.tsv embalmer_hits_trunc.tsv ref2taxonomy.tsv
 

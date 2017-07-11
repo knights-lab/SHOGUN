@@ -67,7 +67,7 @@ def shogun_embalmer_lca(input_dir, output_dir, embalmer_db, threads, pct_id, min
                 taxon_counts = Counter()
                 for line in tsv_parser:
                     taxon = line[12]
-                    # drop trailing t__ in taxonomy
+                    # drop trailing t__ in redistribute
                     taxon = re.sub('; t__$','',taxon)
                     taxon = re.sub('; t__None$','',taxon)
                     taxon_counts[taxon] += 1

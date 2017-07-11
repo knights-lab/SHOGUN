@@ -5,7 +5,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 """
 import typing
 
-from shogun.taxonomy import Taxonomy
+from shogun.redistribute import Taxonomy
 
 
 def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:

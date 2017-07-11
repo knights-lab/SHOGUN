@@ -3,10 +3,26 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
+
 import csv
 import pandas as pd
 from collections import defaultdict
 import numpy as np
+
+class Taxonomy:
+    def __init__(self, filename: str):
+        self.tax = self.parse_taxonomy(filename)
+
+    @classmethod
+    def parse_taxonomy(cls, filename: str) -> dict:
+        with open(filename) as inf:
+            csv_inf = csv.reader(inf, delimiter='\t')
+            return dict(csv_inf)
+
+    def __call__(self, id: str):
+        return self.tax[id]
+
+TAX_LEVELS = ['k', 'p', 'c', 'o', 'f', 'g', 's', 't']
 
 def tree(): return defaultdict(tree)
 
@@ -25,30 +41,12 @@ def longest_path_tree(t, path):
             break
     return ';'.join(s)
 
-class Taxonomy:
-    def __init__(self, filename: str):
-        self.tax = self.parse_taxonomy(filename)
-
-    @classmethod
-    def parse_taxonomy(cls, filename: str) -> dict:
-        with open(filename) as inf:
-            csv_inf = csv.reader(inf, delimiter='\t')
-            return dict(csv_inf)
-
-    def __call__(self, id: str):
-        return self.tax[id]
-
-TAX_LEVELS = ['k', 'p', 'c', 'o', 'f', 'g', 's', 't']
-class Tree:
-    def __init__(self):
-        pass
-
 def parse_bayes(filename: str) -> pd.DataFrame:
     columns = ["tax"] + TAX_LEVELS + ["genome_length"]
     df = pd.read_csv(filename, sep="\t", header=None, names=columns, index_col = 0)
     return df.sort_index()
 
-def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
+def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
     df = pd.read_csv(filename, sep="\t", index_col=0)
     df = df[[type(_) == str for _ in df.index]]
 
@@ -62,9 +60,9 @@ def pie_chart_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
 
     # summarize up
     below_level = df['level'] >= level
-    leaf_counts_df = df[below_level]
-    leaf_counts_df['summary'] = [';'.join(v.split(';')[:level]) for v in df[below_level].index]
-    leaf_counts_df = leaf_counts_df.groupby('summary').sum()
+    leaf_counts_df = df[below_level].copy()
+    leaf_counts_df['taxa_name'] = [';'.join(v.split(';')[:level]) for v in df[below_level].index]
+    leaf_counts_df = leaf_counts_df.groupby('taxa_name').sum()
     leaf_counts_df = leaf_counts_df.drop('level', axis=1)
 
     # summarize bayes to level
@@ -120,31 +118,10 @@ def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7):
         counts_bayes = counts_bayes.groupby('summary_taxa').sum()
         counts = counts_bayes.iloc[:, level-1:8].sum(axis=1)
         counts_bayes.iloc[:, level-1] = counts
-        counts_bayes = counts_bayes.drop(counts_bayes.columns[[level, 7]], axis=1)
+        counts_bayes = counts_bayes.drop(counts_bayes.columns[level:8], axis=1)
         counts_bayes = counts_bayes.loc[leave_names]
     return counts_bayes
 
 
 def _filter_leaves_for_tax(leaf_counts_df, taxa):
      return np.array([_.startswith(taxa + ';') for _ in leaf_counts_df.index])
-
-def parse_taxatable2(filename: str, level: int = 7):
-    with open(filename) as inf:
-        csv_inf = csv.reader(inf, delimiter='\t')
-        header = next(csv_inf)
-        # sample_collection -> collection of samples
-        num_samples = len(header)-1
-        leaves = defaultdict(lambda: np.zeros(num_samples, dtype=int))
-        inner_nodes = defaultdict(lambda: np.zeros(num_samples, dtype=int))
-        for row in csv_inf:
-            tax_row = row[0].split(';')
-            if len(tax_row) >= level:
-                tax = ';'.join(tax_row[:level])
-                leaves[tax] += np.array(row[1:])
-            else:
-                tax = ';'.join(tax_row)
-                inner_nodes[tax] = np.array(row[1:])
-        df_leaves = pd.DataFrame(leaves)
-        df_inner = pd.DataFrame(inner_nodes)
-
-__all__ = ["Taxonomy", "parse_bayes", "pie_chart_taxatable"]

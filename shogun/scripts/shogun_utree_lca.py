@@ -44,7 +44,7 @@ def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mi
     utree_outf = os.path.join(output, 'taxon_counts.txt')
     # Tabulating
     print("Tabulating and filtering hits...")
-    
+
     # print a row of "-" for every 10 samples
     if len(basenames) >= 100:
         for i in range(floor(len(basenames)/10)):
@@ -62,7 +62,7 @@ def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mi
                 if (i+1) % 10 == 0:
                     sys.stdout.write('.')
                     sys.stdout.flush()
-            lcas = [] # list of tuples [taxonomy, confidence, support]
+            lcas = [] # list of tuples [redistribute, confidence, support]
             utree_tsv = os.path.join(output, basename + '.utree.tsv')
             with open(utree_tsv) as inf:
                 tsv_parser = csv.reader(inf, delimiter='\t')
@@ -91,7 +91,7 @@ def shogun_utree_lca(input, output, utree_indx, threads, confidence, support, mi
     df[df < mincount] = 0
     # drop spaces in column
     df.columns = [colname.replace('; ',';') for colname in df.columns]
-    # drop trailing t__ in taxonomy
+    # drop trailing t__ in redistribute
     df.columns = [re.sub(';t__$','',colname) for colname in df.columns]
     df.T.to_csv(os.path.join(output, 'taxon_counts.csv'),
                 index_label='Taxon',na_rep='0',sep='\t')

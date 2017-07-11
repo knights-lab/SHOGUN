@@ -60,7 +60,7 @@ def shogun_utree_functional(input, output, utree_indx, threads):
         strain_tsv = os.path.join(output, basename + '.strain.utree.tsv')
         # Keep track of the number of times that species and strain are not equivalent
         discordance_count = 0
-        # Lists for taxonomy information
+        # Lists for redistribute information
         species_lca = []
         strain_lca = []
         # Track the confidence for each LCA
@@ -75,7 +75,7 @@ def shogun_utree_functional(input, output, utree_indx, threads):
                     basename_counts[basename_ix] += 1
                     # Check if alignment was made in species
                     if species[1]:
-                        # Now we check for strain taxonomy
+                        # Now we check for strain redistribute
                         species_tax = species[1].split('; ')
                         if strain[1]:
                             strain_tax = strain[1].split('; ')

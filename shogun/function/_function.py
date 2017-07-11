@@ -1,0 +1,130 @@
+"""
+Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+
+This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
+"""
+
+import csv
+import glob
+import os
+from collections import defaultdict, Counter
+
+import numpy as np
+import pandas as pd
+from scipy.sparse import csr_matrix
+from yaml import load
+
+
+def function_run_and_save(input, database, output, level):
+    with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
+        data_files = load(stream)
+
+    db = parse_function_db(data_files, database)
+
+    prefix = ".".join(os.path.basename(input).split('.')[:-1])
+
+    kegg_modules_df = db['modules']
+    if level == 8:
+        strain_names = db['strain_names']
+        kegg_ids = db['strain_kegg_ids']
+        kegg_table_csr = db['strain_csr']
+        prefix += ".strain"
+    elif level == 7:
+        strain_names = db['species_names']
+        kegg_ids = db['species_kegg_ids']
+        kegg_table_csr = db['species_csr']
+        prefix += ".species"
+    else:
+        raise Exception("Level was set to %d but can only by 7 (species) or 8 (strain)." % level)
+
+    taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
+    taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
+
+    taxatable_df['summary'] = [';'.join(_.split(';')[:level]) for _ in taxatable_df.index]
+    taxatable_df = taxatable_df.groupby('summary').sum()
+
+    out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage = _do_function(taxatable_df, strain_names, kegg_ids, kegg_table_csr, kegg_modules_df)
+    out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#KEGG ID")
+    out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#MODULE ID")
+    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modules.coverage.txt" % prefix), sep='\t', float_format="%f", na_rep=0, index_label="#MODULE ID")
+
+
+def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df):
+    _, num_kegg_ids = kegg_table_csr.shape
+    _, num_samples = taxatable_df.shape
+
+    kegg_table = np.zeros((num_samples, num_kegg_ids), dtype=np.int)
+    for i, row in taxatable_df.iterrows():
+        if row.name in row_names:
+            idx = row_names[row.name]
+            kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
+
+    out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns, columns=sorted(column_names, key=column_names.get), dtype=np.int).T
+
+    filtered_kegg_ids = out_kegg_table_df.loc[kegg_modules_df.columns].fillna(0)
+    # kegg modules df
+    out_kegg_modules_df = kegg_modules_df.dot(filtered_kegg_ids)
+
+    out_kegg_modules_coverage = ((kegg_modules_df).dot(filtered_kegg_ids > 0).fillna(0)).div(kegg_modules_df.sum(axis=1), axis=0)
+
+    # Filter out zeros
+    out_kegg_modules_df = out_kegg_modules_df[(out_kegg_modules_df.T != 0).any()]
+
+    # Filter out zeros
+    out_kegg_table_df = out_kegg_table_df[(out_kegg_table_df.T != 0).any()]
+
+    # Filter out zeros
+    out_kegg_modules_coverage = out_kegg_modules_coverage[(out_kegg_modules_coverage.T != 0).any()]
+
+    return out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage
+
+def parse_function_db(metadata: dict, database: str) -> dict:
+    if not 'function' in metadata:
+        return {}
+    else:
+        file_set = set(glob.glob(os.path.join(database, metadata['function'] + '*')))
+        suffices = ['module-annotations.txt', 'strain2ko.txt', 'species2ko.txt']
+        files = ["%s-%s" % (os.path.join(database, metadata['function']), suffix) for suffix in suffices]
+        for file in files:
+            if file not in file_set:
+                return {}
+
+        modules_df = _parse_modules(files[0])
+        #TODO: Implement the save csr, this works but requires write permissions to db folder
+        #npz = os.path.join(database, metadata['function']) + "-strain2ko.npz"
+        # if not npz in file_set:
+        #    row_names, column_names, csr = _parse_kegg_table(files[1])
+        #    save_csr_matrix(npz, csr, row_names, column_names)
+        # else:
+        #   row_names, column_names, csr = load_csr_matrix(npz)
+        _strains = list(parse_kegg_table(files[1]))
+        _species = list(parse_kegg_table(files[2]))
+        return dict(zip(('modules_file', 'strain_file', 'species_file', 'strain_names', 'strain_kegg_ids', 'strain_csr','species_names', 'species_kegg_ids', 'species_csr', 'modules'), files + _strains + _species + [modules_df]))
+
+def _parse_modules(infile):
+    modules_keggs = defaultdict(Counter)
+    with open(infile) as inf:
+        csv_inf = csv.reader(inf, delimiter="\t")
+        for row in csv_inf:
+            modules_keggs[row[0]].update([row[-1][:7]])
+    return pd.DataFrame(modules_keggs).fillna(0.0).astype(int)
+
+
+def parse_kegg_table(infile):
+    indptr = [0]
+    indices = []
+    kegg_ids = {}
+    row_names = {}
+    data = []
+    with open(infile) as inf:
+        csv_inf = csv.reader(inf, delimiter="\t")
+        for line in csv_inf:
+            row_names.setdefault(line[0], len(row_names))
+            counts = Counter(line[1:])
+            # Filter out the blank KEGG IDs
+            for key, value in counts.items():
+                if not key == '':
+                    indices.append(kegg_ids.setdefault(key, len(kegg_ids)))
+                    data.append(value)
+            indptr.append(len(indices))
+    return row_names, kegg_ids, csr_matrix((data, indices, indptr), dtype=np.int8)
