@@ -19,6 +19,7 @@ from scipy.sparse import csr_matrix
 from yaml import load
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
+from shogun.function import function_run_and_save
 from shogun.redistribute import redistribute_taxatable, parse_bayes
 
 ROOT_COMMAND_HELP = """\
@@ -89,7 +90,7 @@ def align(ctx, aligner, input, database, output, level, function, threads):
                 strain_taxatable = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, 'strain'))
                 if not os.path.exists(strain_taxatable):
                     _redistribute(shear, 'strain', strain_taxatable, aligner_cl.outfile)
-                _prep_and_do_functions(strain_taxatable, database, os.path.join(output, aligner_cl._name), 8)
+                function_run_and_save(strain_taxatable, database, os.path.join(output, aligner_cl._name), 8)
     else:
         aligner_cl = ALIGNERS[aligner](database, threads=threads)
         aligner_cl.align(input, output)
@@ -104,7 +105,7 @@ def align(ctx, aligner, input, database, output, level, function, threads):
                 strain_taxatable = os.path.join(output, "taxatable.strain.txt")
                 if not os.path.exists(strain_taxatable):
                     _redistribute(shear, 'strain', strain_taxatable, aligner_cl.outfile)
-                _prep_and_do_functions(strain_taxatable, database, output, function)
+                function_run_and_save(strain_taxatable, database, output, function)
 
 
 @cli.command(help="Run the SHOGUN redistribution algorithm.")
@@ -141,10 +142,10 @@ def function(ctx, input, database, output, level):
     if not os.path.exists(output):
         os.makedirs(output)
     if level == "all":
-        _prep_and_do_functions(input, database, output, 7)
-        _prep_and_do_functions(input, database, output, 8)
+        function_run_and_save(input, database, output, 7)
+        function_run_and_save(input, database, output, 8)
     else:
-        _prep_and_do_functions(input, database, output, TAXAMAP[level])
+        function_run_and_save(input, database, output, TAXAMAP[level])
 
 if __name__ == '__main__':
     cli()
