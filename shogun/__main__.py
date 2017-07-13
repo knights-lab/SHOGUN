@@ -123,7 +123,7 @@ def _redistribute(shear, level, outfile, redist_inf):
     print(shear, level, outfile, redist_inf)
     if level == 'all':
         for l in TAXA:
-            df_output = pie_chart_taxatable(redist_inf, shear_df, level=TAXAMAP[l])
+            df_output = redistribute_taxatable(redist_inf, shear_df, level=TAXAMAP[l])
             tmp_spl = outfile.split('.')
             tmp_path = '.'.join(tmp_spl[:-1] + [l] + [tmp_spl[-1]])
             df_output.to_csv(tmp_path, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")

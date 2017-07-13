@@ -10,7 +10,6 @@ from collections import defaultdict, Counter
 import pandas as pd
 from cytoolz import valfilter
 import csv
-import datetime
 
 from shogun.wrappers import embalmer_align, embalmulate, utree_search_gg, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
