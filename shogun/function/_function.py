@@ -14,28 +14,20 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from yaml import load
 
+TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 
-def function_run_and_save(input, database, output, level):
-    with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-        data_files = load(stream)
-
-    db = parse_function_db(data_files, database)
-
+def function_run_and_save(input, func_db, output, level):
     prefix = ".".join(os.path.basename(input).split('.')[:-1])
 
-    kegg_modules_df = db['modules']
-    if level == 8:
-        strain_names = db['strain_names']
-        kegg_ids = db['strain_kegg_ids']
-        kegg_table_csr = db['strain_csr']
-        prefix += ".strain"
-    elif level == 7:
-        strain_names = db['species_names']
-        kegg_ids = db['species_kegg_ids']
-        kegg_table_csr = db['species_csr']
-        prefix += ".species"
-    else:
-        raise Exception("Level was set to %d but can only by 7 (species) or 8 (strain)." % level)
+    kegg_modules_df = func_db['modules']
+    row_names = func_db['names']
+    kegg_ids = func_db['kegg_ids']
+    kegg_table_csr = func_db['csr']
+    if level < 8:
+        kegg_table_csr, row_names = summarize_at_level(kegg_table_csr, row_names, kegg_ids, level)
+
+    if TAXA[level-1] not in prefix:
+        prefix += "." + TAXA[level-1]
 
     taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
@@ -43,10 +35,32 @@ def function_run_and_save(input, database, output, level):
     taxatable_df['summary'] = [';'.join(_.split(';')[:level]) for _ in taxatable_df.index]
     taxatable_df = taxatable_df.groupby('summary').sum()
 
-    out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage = _do_function(taxatable_df, strain_names, kegg_ids, kegg_table_csr, kegg_modules_df)
+    out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage = _do_function(taxatable_df, row_names, kegg_ids, kegg_table_csr, kegg_modules_df)
     out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#KEGG ID")
     out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#MODULE ID")
     out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modules.coverage.txt" % prefix), sep='\t', float_format="%f", na_rep=0, index_label="#MODULE ID")
+
+
+def summarize_at_level(csr, names, kegg_ids, level):
+    s = pd.DataFrame(sorted(names, key=names.get), columns=["names"])
+    s['group'] = [";".join(_.split(';')[:level]) for _ in s['names']]
+    indptr = [0]
+    indices = []
+    row_names = {}
+    data = []
+    for name, df in s.groupby("group"):
+        _mat = csr[df.index, :].todense()
+        # Threshold to over 80%
+        _mat_thresh = np.divide((_mat > 0).sum(axis=0), _mat.shape[0]) > .8
+        _mat_thresh = np.asarray(_mat_thresh).reshape(-1)
+        if _mat_thresh.any():
+            # Get the medians
+            _medians = np.asarray(np.median(_mat[:, _mat_thresh], axis=0)).reshape(-1)
+            indices.extend(np.where(_mat_thresh)[0])
+            data.extend(_medians)
+            row_names.setdefault(name, len(row_names))
+            indptr.append(len(indices))
+    return csr_matrix((data, indices, np.array(indptr)), dtype=np.int8), row_names
 
 
 def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df):
@@ -83,7 +97,7 @@ def parse_function_db(metadata: dict, database: str) -> dict:
         return {}
     else:
         file_set = set(glob.glob(os.path.join(database, metadata['function'] + '*')))
-        suffices = ['module-annotations.txt', 'strain2ko.txt', 'species2ko.txt']
+        suffices = ['module-annotations.txt', 'strain2ko.txt']
         files = ["%s-%s" % (os.path.join(database, metadata['function']), suffix) for suffix in suffices]
         for file in files:
             if file not in file_set:
@@ -98,8 +112,7 @@ def parse_function_db(metadata: dict, database: str) -> dict:
         # else:
         #   row_names, column_names, csr = load_csr_matrix(npz)
         _strains = list(parse_kegg_table(files[1]))
-        _species = list(parse_kegg_table(files[2]))
-        return dict(zip(('modules_file', 'strain_file', 'species_file', 'strain_names', 'strain_kegg_ids', 'strain_csr','species_names', 'species_kegg_ids', 'species_csr', 'modules'), files + _strains + _species + [modules_df]))
+        return dict(zip(('modules_file', 'file', 'names', 'kegg_ids', 'csr','modules'), files + _strains + [modules_df]))
 
 def _parse_modules(infile):
     modules_keggs = defaultdict(Counter)

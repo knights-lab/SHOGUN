@@ -19,13 +19,14 @@ from scipy.sparse import csr_matrix
 from yaml import load
 
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
-from shogun.function import function_run_and_save
+from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
 --------------------------------------
 """
+
 
 SETTINGS = dict()
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
@@ -62,8 +63,8 @@ ALIGNERS = {
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database file.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
-@click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse to (not required, can specify off).')
-@click.option('-f', '--function', type=click.Choice(['species', 'strain', 'all', 'off']), default='strain', help='The level to collapse functions to (not required, can specify off).')
+@click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions too (not required, can specify off).')
+@click.option('--function/--no-function', default=True, help='Run functional algorithms.')
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
 def align(ctx, aligner, input, database, output, level, function, threads):
@@ -77,75 +78,88 @@ def align(ctx, aligner, input, database, output, level, function, threads):
     logging.getLogger().addHandler(file_handler)
 
     if aligner == 'all':
+        redist_outs = []
+        redist_levels = []
         for align in ALIGNERS.values():
             aligner_cl = align(database, threads=threads)
             aligner_cl.align(input, output)
             if level is not 'off':
-                with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-                    data_files = load(stream)
-                shear = os.path.join(database, data_files['general']['shear'])
                 redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
-                _redistribute(shear, level, redist_out, aligner_cl.outfile)
-            if function is not 'off':
-                strain_taxatable = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, 'strain'))
-                if not os.path.exists(strain_taxatable):
-                    _redistribute(shear, 'strain', strain_taxatable, aligner_cl.outfile)
-                function_run_and_save(strain_taxatable, database, os.path.join(output, aligner_cl._name), 8)
+                _redist_outs, _redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
+                redist_outs.extend(_redist_outs)
+                redist_levels.extend(_redist_levels)
     else:
         aligner_cl = ALIGNERS[aligner](database, threads=threads)
         aligner_cl.align(input, output)
         if level is not 'off':
-            with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-                data_files = load(stream)
-            shear = os.path.join(database, data_files['general']['shear'])
             redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
-            _redistribute(shear, level, redist_out, aligner_cl.outfile)
+            redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
 
-            if function is not 'off':
-                strain_taxatable = os.path.join(output, "taxatable.strain.txt")
-                if not os.path.exists(strain_taxatable):
-                    _redistribute(shear, 'strain', strain_taxatable, aligner_cl.outfile)
-                function_run_and_save(strain_taxatable, database, output, function)
+    if function:
+        _function(redist_outs, database, output, redist_levels)
 
 
 @cli.command(help="Run the SHOGUN redistribution algorithm.")
 @click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
-@click.option('-s', '--shear', type=click.Path(), required=True, help="The path to the sheared results.")
+@click.option('-d', '--database', type=click.Path(), required=True, help="The path to the database.")
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse to.')
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
 @click.pass_context
-def redistribute(ctx, input, shear, level, output):
-    _redistribute(shear, level, output, input)
+def redistribute(ctx, input, database, level, output):
+    _redistribute(database, level, output, input)
 
+def _redistribute(database, level, outfile, redist_inf):
+    with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
+        data_files = load(stream)
 
-def _redistribute(shear, level, outfile, redist_inf):
+    shear = os.path.join(database, data_files['general']['shear'])
+
     shear_df = parse_bayes(shear)
-    print(shear, level, outfile, redist_inf)
+
+    output_files = []
+    output_levels = []
+
     if level == 'all':
         for l in TAXA:
             df_output = redistribute_taxatable(redist_inf, shear_df, level=TAXAMAP[l])
             tmp_spl = outfile.split('.')
             tmp_path = '.'.join(tmp_spl[:-1] + [l] + [tmp_spl[-1]])
             df_output.to_csv(tmp_path, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+            output_files.append(tmp_path)
+            output_levels.append(l)
     else:
         df_output = redistribute_taxatable(redist_inf, shear_df, level=TAXAMAP[level])
-        df_output.to_csv(outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+        df_output.to_csv(outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
+        output_files.append(outfile)
+        output_levels.append(level)
+
+    return output_files, output_levels
 
 @cli.command(help="Run the SHOGUN functional algorithm.")
 @click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
 @click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
-@click.option('-l', '--level', type=click.Choice(['species', 'strain']), default='strain', help='The level to collapse to.')
+@click.option('-l', '--level', type=click.Choice(['family', 'genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
 def function(ctx, input, database, output, level):
+    _function([input], database, output, [level])
+
+def _function(inputs, database, output, levels):
     # Check if output exists, if not then make
     if not os.path.exists(output):
         os.makedirs(output)
-    if level == "all":
-        function_run_and_save(input, database, output, 7)
-        function_run_and_save(input, database, output, 8)
-    else:
-        function_run_and_save(input, database, output, TAXAMAP[level])
+
+    with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
+        data_files = load(stream)
+
+    func_db = parse_function_db(data_files, database)
+
+    for input, level in zip(inputs, levels):
+        # Verify it is in a reasonable level
+        if level in ['genus', 'species', 'strain']:
+            function_run_and_save(input, func_db, output, TAXAMAP[level])
+        else:
+            continue
 
 if __name__ == '__main__':
     cli()

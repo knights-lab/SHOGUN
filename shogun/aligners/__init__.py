@@ -33,7 +33,7 @@ class Aligner:
 
         self.database_dir = database_dir
 
-        self.tax = os.path.join(database_dir, self.data_files['general']['redistribute'])
+        self.tax = os.path.join(database_dir, self.data_files['general']['taxonomy'])
         self.fasta = os.path.join(database_dir, self.data_files['general']['fasta'])
         self.outfile = None
 

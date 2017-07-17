@@ -47,7 +47,7 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
         cmd += ['--accelerator', accelerator]
 
     if tax:
-        cmd += ['--redistribute', tax, '--taxacut', taxacut]
+        cmd += ['--taxonomy', tax, '--taxacut', taxacut]
 
     return run_command(cmd, shell=shell)
 

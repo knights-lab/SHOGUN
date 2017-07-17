@@ -12,7 +12,8 @@ import tempfile
 
 import pandas as pd
 
-from shogun.function import parse_function_db, parse_kegg_table, function_run_and_save
+from shogun.function import parse_function_db, function_run_and_save
+from shogun.__main__ import _function
 
 class TestFunctionCheck(unittest.TestCase):
     def setUp(self):
@@ -35,6 +36,4 @@ class TestFunctionCheck(unittest.TestCase):
 
         outdir = os.path.join(self.temp_dir.name)
         # Strain
-        function_run_and_save(taxatable, database, outdir, 8)
-        # Species
-        function_run_and_save(taxatable, database, outdir, 7)
+        _function([taxatable, taxatable, taxatable], database, outdir, ['genus', 'species', 'strain'])
