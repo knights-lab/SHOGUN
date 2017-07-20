@@ -10,6 +10,7 @@ from collections import defaultdict, Counter
 import pandas as pd
 from cytoolz import valfilter
 import csv
+import numpy as np
 
 from shogun.wrappers import embalmer_align, embalmulate, utree_search_gg, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
@@ -83,12 +84,23 @@ class EmbalmerAligner(Aligner):
         proc, out, err = embalmer_align(infile, self.outfile,
             self.database,tax=self.tax, accelerator=self.accelerator, shell=self.shell,
                                         taxa_ncbi=False, threads=self.threads)
-        proc2, out2, err2 = self._post_align(outdir)
+        df = self._post_align(self.outfile)
         self.outfile = os.path.join(outdir, 'embalmer_taxatable.txt')
-        return (proc and proc2)
+        df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
+        return proc, out, err
 
-    def _post_align(self, outdir):
-        return embalmulate(self.outfile, outdir)
+    def _post_align(self, outf):
+        samples_lca_map = defaultdict(lambda: defaultdict(int))
+        with open(outf) as utree_f:
+            csv_embalm = csv.reader(utree_f, delimiter='\t')
+            # qname, lca, confidence, support
+            for line  in csv_embalm:
+                if line[-1] is not None:
+                    #TODO confidence/support filter
+                    samples_lca_map['_'.join(line[0].split('_')[:-1])][line[-1]] += 1
+
+        df = pd.DataFrame(samples_lca_map, dtype=np.int).fillna(0).astype(np.int)
+        return df
 
 
 class UtreeAligner(Aligner):
