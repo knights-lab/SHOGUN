@@ -49,3 +49,87 @@ pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgra
 ```
 
 With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened.
+
+### SHOGUN help for Command-Line
+
+
+```
+Usage: shogun [OPTIONS] COMMAND [ARGS]...
+
+  SHOGUN command-line interface
+
+  --------------------------------------
+
+Options:
+  --debug / --no-debug
+  --version             Show the version and exit.
+  --help                Show this message and exit.
+
+Commands:
+  align         Run the SHOGUN aligner
+  function      Run the SHOGUN functional algorithm.
+  redistribute  Run the SHOGUN redistribution algorithm.
+  ```
+
+#### align
+  The command ```align``` runs the standard pipeline, including alignment, redistribution and functional annotational. If you wish, you can run the alignment with all backends ```<Bowtie2, BURSt, UTree>```, followed by redistribution at all taxonomic, and functional alignment at levels genus through strain.
+
+```
+Usage: shogun align [OPTIONS]
+
+  Run the SHOGUN aligner
+
+Options:
+  -a, --aligner [all|bowtie2|embalmer|utree]
+                                  The aligner to use.  [default: embalmer]
+  -i, --input PATH                The file containing the combined seqs.
+                                  [required]
+  -d, --database PATH             The database file.
+  -o, --output PATH               The output folder directory  [default:
+                                  /mnt/c/Users/bhill/results-170801]
+  -l, --level [kingdom|phylum|class|order|family|genus|species|strain|all|off]
+                                  The level to collapse taxatables and
+                                  functions too (not required, can specify
+                                  off).
+  --function / --no-function      Run functional algorithms.
+  -t, --threads INTEGER           Number of threads to use.
+  --help                          Show this message and exit.
+```
+
+#### function
+This command assigns function at a certain taxonomic level. Lower level KEGG IDs are assigned to higher level KEGG IDs through plurality voting. Note that plasmids are not included the KEGG ID annotation.
+
+```
+Usage: shogun function [OPTIONS]
+
+  Run the SHOGUN functional algorithm.
+
+Options:
+  -i, --input PATH                The the taxatable.  [required]
+  -d, --database PATH             The path to the folder containing the
+                                  function database.  [required]
+  -o, --output PATH               The output file  [default:
+                                  /mnt/c/Users/bhill/results-170801]
+  -l, --level [family|genus|species|strain]
+                                  The level to collapse to.
+  --help                          Show this message and exit.
+```
+
+
+#### redistribute
+  This command redistributes the reads at a certain taxonomic level. This assumes that you have a BIOM txt file output from SHOGUN align, or even a summarized table from redistribute at a lower level.
+
+  ```
+  Usage: shogun redistribute [OPTIONS]
+
+  Run the SHOGUN redistribution algorithm.
+
+Options:
+  -i, --input PATH                The taxatable.  [required]
+  -d, --database PATH             The path to the database.  [required]
+  -l, --level [kingdom|phylum|class|order|family|genus|species|strain|all]
+                                  The level to collapse to.
+  -o, --output PATH               The output file  [default:
+                                  /mnt/c/Users/bhill/taxatable-170801.txt]
+  --help                          Show this message and exit.
+  ```
