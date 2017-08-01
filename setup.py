@@ -4,7 +4,7 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-from setuptools import setup
+from setuptools import setup, find_packages
 import versioneer
 
 __author__ = "Knights Lab"
@@ -20,7 +20,7 @@ setup(
     name='shogun',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    packages=["shogun"],
+    packages=find_packages(exclude=[]),
     url='',
     license=__license__,
     author=__author__,
