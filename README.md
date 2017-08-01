@@ -50,8 +50,16 @@ pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgra
 
 With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened.
 
-### SHOGUN help for Command-Line
+### Testing you install
 
+For testing, we are currently using the built in python unittests. In order to run the test suite, change directory into the root folder of the repository. Then run:
+
+```
+python -m unittest discover shogun
+```
+
+### SHOGUN help for Command-Line
+SHOGUN is a command line application. It is meant to be run with a single command. The helpful for the command is below.
 
 ```
 Usage: shogun [OPTIONS] COMMAND [ARGS]...
