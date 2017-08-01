@@ -50,7 +50,6 @@ def build_lca_map(align_gen, tree, img_map):
     for qname, rname in align_gen:
         img_id = int(rname.split('|')[-1].split('_')[0])
         if qname in lca_map:
-<<<<<<< HEAD:shogun/scripts/old/kegg_parse_img_ids.py
             ncbi_tid_string = rname.split('|')[1]
             if ncbi_tid_string != 'NA':
                 ncbi_tid_current = lca_map[qname][1]
@@ -58,13 +57,6 @@ def build_lca_map(align_gen, tree, img_map):
                 if ncbi_tid_new and ncbi_tid_current:
                     if ncbi_tid_current != ncbi_tid_new:
                         lca_map[qname][1] = tree.lowest_common_ancestor(ncbi_tid_current, ncbi_tid_new)
-=======
-            current_rname = lca_map[qname][1]
-            new_taxon = img_map(img_id)
-            if current_rname and new_taxon:
-                if current_rname != new_taxon:
-                    lca_map[qname][1] = tree.lowest_common_ancestor(current_rname, new_taxon)
->>>>>>> master:shogun/scripts/kegg_parse_img_ids.py
         else:
             lca_map[qname][1] = img_map(img_id)
         lca_map[qname][0].add(img_id)
