@@ -18,6 +18,7 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from yaml import load
 
+from shogun import __version__
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
 from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
@@ -34,6 +35,7 @@ TAXAMAP = dict(zip(TAXA, range(1, 9)))
 
 @click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP)
 @click.option('--debug/--no-debug', default=False)
+@click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, debug):
     ctx.obj = {'DEBUG': debug}
