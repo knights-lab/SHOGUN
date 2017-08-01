@@ -4,6 +4,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - bowtie2
   - python=3
   - Click
   - pyyaml
