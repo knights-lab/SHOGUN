@@ -1,0 +1,5 @@
+#OTU ID	sample1	sample2	sample3
+	78	83	83
+k__Bacteria;p__Firmicutes;c__Bacilli;o__Bacillales;f__Bacillaceae;g__Bacillus;s__Bacillus_pseudofirmus;t__Bacillus_pseudofirmus_OF4	17	9	12
+k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;o__Enterobacterales;f__Enterobacteriaceae;g__Shigella;s__Shigella_flexneri;t__Shigella_flexneri_2a_str._301	5	7	5
+k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;o__Xanthomonadales;f__Xanthomonadaceae;g__Xylella;s__Xylella_fastidiosa;t__Xylella_fastidiosa_9a5c	0	1	0

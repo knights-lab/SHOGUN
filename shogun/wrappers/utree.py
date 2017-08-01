@@ -4,12 +4,10 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-from ninja_utils.utils import run_command
-
-from .. import SETTINGS
+from shogun.utils import run_command
 
 
-def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=SETTINGS.N_jobs, shell=False):
+def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=1, shell=False):
     # usage: utree-build input_fasta.fa labels.map output.ubt [threads]
     cmd = [
         'utree-build',
@@ -21,7 +19,7 @@ def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threa
     return run_command(cmd, shell=shell)
 
 
-def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=SETTINGS.N_jobs, shell=False):
+def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=1, overlap=16, shell=False):
     # usage: utree-buildGG input_fasta.fa labels.map output.ubt [threads]
     cmd = [
         'utree-build_gg',
@@ -29,6 +27,7 @@ def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, th
         input_fasta_labels,
         output_uncompressed_tree,
         threads,
+        overlap
     ]
     return run_command(cmd, shell=shell)
 
@@ -60,6 +59,7 @@ def utree_search_gg(input_compressed_tree, input_fasta_to_search, output, shell=
         'utree-search_gg',
         input_compressed_tree,
         input_fasta_to_search,
-        output
+        output,
+        'RC'
     ]
     return run_command(cmd, shell=shell)

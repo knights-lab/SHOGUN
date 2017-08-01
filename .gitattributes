@@ -1,0 +1,2 @@
+shogun/_version.py export-subst
+tests\data\** filter=lfs diff=lfs merge=lfs -text
