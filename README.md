@@ -50,7 +50,7 @@ pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgra
 
 With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened.
 
-### Testing you install
+### Testing your install
 
 For testing, we are currently using the built in python unittests. In order to run the test suite, change directory into the root folder of the repository. Then run:
 
