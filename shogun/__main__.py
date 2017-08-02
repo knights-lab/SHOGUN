@@ -63,9 +63,9 @@ ALIGNERS = {
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
-@click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database file.")
+@click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database folder.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
-@click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions too (not required, can specify off).')
+@click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions to (not required, can specify off).')
 @click.option('--function/--no-function', default=True, help='Run functional algorithms.')
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
