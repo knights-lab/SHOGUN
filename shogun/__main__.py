@@ -4,18 +4,12 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import csv
-import glob
 import logging
 import os
-from collections import Counter, defaultdict
 from datetime import date
 from multiprocessing import cpu_count
 
 import click
-import numpy as np
-import pandas as pd
-from scipy.sparse import csr_matrix
 from yaml import load
 
 from shogun import __version__
@@ -63,7 +57,7 @@ ALIGNERS = {
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
-@click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The database folder.")
+@click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions to (not required, can specify off).')
 @click.option('--function/--no-function', default=True, help='Run functional algorithms.')
@@ -103,7 +97,7 @@ def align(ctx, aligner, input, database, output, level, function, threads):
 
 @cli.command(help="Run the SHOGUN redistribution algorithm.")
 @click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
-@click.option('-d', '--database', type=click.Path(), required=True, help="The path to the database.")
+@click.option('-d', '--database', type=click.Path(), required=True, help="The path to the database folder.")
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse to.')
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
 @click.pass_context
@@ -141,7 +135,7 @@ def _redistribute(database, level, outfile, redist_inf):
 @click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
 @click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
-@click.option('-l', '--level', type=click.Choice(['family', 'genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
+@click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
 def function(ctx, input, database, output, level):
     _function([input], database, output, [level])

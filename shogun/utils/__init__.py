@@ -16,7 +16,7 @@ import pandas as pd
 import scipy.sparse as ss
 
 
-def run_command(cmd, shell=False):
+def run_command(cmd, shell=False, stdout=False, stderr=False):
     """
     Run prepared behave command in shell and return its output.
     :param cmd: Well-formed behave command to run.
@@ -26,10 +26,15 @@ def run_command(cmd, shell=False):
 
     try:
         cmd = [str(i) for i in cmd]
+        FNULL = open(os.devnull, 'w')
+        if not stdout:
+            stdout = FNULL
+        if not stderr:
+            stderr = FNULL
         proc = subprocess.Popen(
             cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=stdout,
+            stderr=stderr,
             shell=shell,
             universal_newlines=True,
             cwd=os.getcwd(),
