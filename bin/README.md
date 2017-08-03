@@ -1,6 +1,6 @@
 ## Enabling tab completion
 
-Adapted instructions from [qiime2]: https://github.com/qiime2/q2cli/blob/master/README.md
+Adapted instructions from [qiime2](https://github.com/qiime2/q2cli/blob/master/README.md)
 
 ### Bash
 
