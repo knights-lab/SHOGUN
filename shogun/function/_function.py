@@ -39,7 +39,10 @@ def function_run_and_save(input, func_db, output, level):
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
 
     taxatable_df['summary'] = [';'.join(_.split(';')[:level]).replace(' ', '_') for _ in taxatable_df.index]
+    # Drop names above
+    taxatable_df = taxatable_df[[_.count(';') < level for _ in taxatable_df['summary']]]
     taxatable_df = taxatable_df.groupby('summary').sum()
+
 
     # Normalizing for depth at median depth
     logger.debug("Normalizing to median depth")
