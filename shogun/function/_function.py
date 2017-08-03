@@ -38,7 +38,7 @@ def function_run_and_save(input, func_db, output, level):
     logger.debug("Taxatable for functional prediction shape %s" % str(taxatable_df.shape))
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
 
-    taxatable_df['summary'] = [';'.join(_.split(';')[:level]) for _ in taxatable_df.index]
+    taxatable_df['summary'] = [';'.join(_.split(';')[:level]).replace(' ', '_') for _ in taxatable_df.index]
     taxatable_df = taxatable_df.groupby('summary').sum()
 
     # Normalizing for depth at median depth
