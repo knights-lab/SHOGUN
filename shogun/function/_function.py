@@ -29,7 +29,9 @@ def function_run_and_save(input, func_db, output, level):
     if TAXA[level-1] not in prefix:
         prefix += "." + TAXA[level-1]
 
+    print("Reading in taxatable.")
     taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
+    print("Taxatable shape %s" % str(taxatable_df.shape))
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
 
     taxatable_df['summary'] = [';'.join(_.split(';')[:level]) for _ in taxatable_df.index]
@@ -68,8 +70,11 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
     _, num_samples = taxatable_df.shape
 
     kegg_table = np.zeros((num_samples, num_kegg_ids), dtype=np.int)
+
+    print("Doing function.")
     for i, row in taxatable_df.iterrows():
         if row.name in row_names:
+            print("Found row name.")
             idx = row_names[row.name]
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
 

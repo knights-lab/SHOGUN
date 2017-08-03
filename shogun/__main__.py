@@ -132,7 +132,7 @@ def _redistribute(database, level, outfile, redist_inf):
     return output_files, output_levels
 
 @cli.command(help="Run the SHOGUN functional algorithm.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The the taxatable.")
+@click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
 @click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
 @click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
