@@ -80,10 +80,10 @@ def summarize_at_level(csr, names, kegg_ids, level):
 
 
 def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df):
-    _, num_kegg_ids = kegg_table_csr.shape
+    num_taxa_kegg, num_kegg_ids = kegg_table_csr.shape
     #pd.DataFrame(kegg_table_csr.todense(), index=sorted(row_names, key=row_names.get), columns=sorted(column_names, key=column_names.get), dtype=np.int).to_csv("/project/flatiron2/ben/kegg_species.csv")
     logger.debug("Kegg table for functional prediction shape %s" % (str(kegg_table_csr.shape)))
-    _, num_samples = taxatable_df.shape
+    num_taxa, num_samples = taxatable_df.shape
     logger.debug("Taxatable for functional prediction shape %s" % (str(taxatable_df.shape)))
 
     kegg_table = np.zeros((num_samples, num_kegg_ids), dtype=np.int)
@@ -96,6 +96,12 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
             row_names_found += 1
             idx = row_names[row.name]
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
+
+    overlap = float(num_taxa)/row_names_found
+    if overlap < .5:
+        logger.warning("Overlap of taxa and function %.2f" % overlap)
+    else:
+        logger.debug("Overlap of taxa and function %.2f" % overlap)
 
     logger.debug("Row names found in taxatable %d" % row_names_found)
 
