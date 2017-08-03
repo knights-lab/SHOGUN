@@ -70,7 +70,7 @@ class EmbalmerAligner(Aligner):
         self.database = os.path.join(self.database_dir, prefix)
 
         if os.path.exists(self.database + '.acx'):
-            self.accelerator = True
+            self.accelerator = self.database + '.acx'
         else:
             self.accelerator = False
 
