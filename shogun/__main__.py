@@ -29,22 +29,26 @@ TAXAMAP = dict(zip(TAXA, range(1, 9)))
 
 @click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP)
 @click.option('--debug/--no-debug', default=False)
+@click.option('--verbose/--no-verbose', default=True)
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, debug):
-    ctx.obj = {'DEBUG': debug}
+def cli(ctx, debug, verbose):
+    ctx.obj = {'DEBUG': debug, 'VERBOSE': verbose}
     # Setup the logger
     log_formatter = logging.Formatter('%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     root_logger = logging.getLogger()
 
     if ctx.obj['DEBUG']:
         root_logger.setLevel(logging.DEBUG)
-    else:
+    elif verbose:
         root_logger.setLevel(logging.INFO)
+    else:
+        root_logger.setLevel(logging.WARNING)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(log_formatter)
     root_logger.addHandler(console_handler)
+    global root_logger
 
 
 ALIGNERS = {
@@ -153,6 +157,7 @@ def _function(inputs, database, output, levels):
     for input, level in zip(inputs, levels):
         # Verify it is in a reasonable level
         if level in ['genus', 'species', 'strain']:
+            root_logger.info("Starting functional prediction with input file %s at level %s" % (input, level))
             function_run_and_save(input, func_db, output, TAXAMAP[level])
         else:
             continue
