@@ -10,8 +10,19 @@ del get_versions
 
 from .config.settings import shogun_settings
 
-# SETTINGS = Settings('shogun', shogun_settings)
-# LOGGER = Logger(logfp=SETTINGS.settings['log'], log_persist=SETTINGS.settings['log_persists'])
+import logging
+
+def _logging_setup():
+    # Set up the logger
+    log_formatter = logging.Formatter('%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    root_logger = logging.getLogger()
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(log_formatter)
+    root_logger.addHandler(console_handler)
+    return root_logger
+
+logger = _logging_setup()
 
 __all__ = [
     'aligners',

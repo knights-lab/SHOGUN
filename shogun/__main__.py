@@ -4,15 +4,15 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import logging
 import os
+import logging
 from datetime import date
 from multiprocessing import cpu_count
 
 import click
 from yaml import load
 
-from shogun import __version__
+from shogun import __version__, logger
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
 from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
@@ -34,21 +34,15 @@ TAXAMAP = dict(zip(TAXA, range(1, 9)))
 @click.pass_context
 def cli(ctx, debug, verbose):
     ctx.obj = {'DEBUG': debug, 'VERBOSE': verbose}
-    # Setup the logger
-    log_formatter = logging.Formatter('%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    root_logger = logging.getLogger()
 
     if ctx.obj['DEBUG']:
-        root_logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
     elif verbose:
-        root_logger.setLevel(logging.INFO)
+        logger.setLevel(logging.INFO)
     else:
-        root_logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.WARNING)
 
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(log_formatter)
-    root_logger.addHandler(console_handler)
-    global root_logger
+
 
 
 ALIGNERS = {
@@ -149,18 +143,32 @@ def _function(inputs, database, output, levels):
     if not os.path.exists(output):
         os.makedirs(output)
 
-    with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-        data_files = load(stream)
+    # Load the datafiles to locate function db
+    data_files = _load_metadata(database)
 
+    # Load the functional db
     func_db = parse_function_db(data_files, database)
 
     for input, level in zip(inputs, levels):
         # Verify it is in a reasonable level
         if level in ['genus', 'species', 'strain']:
-            root_logger.info("Starting functional prediction with input file %s at level %s" % (input, level))
+            logger.info("Starting functional prediction with input file %s at level %s" % (input, level))
             function_run_and_save(input, func_db, output, TAXAMAP[level])
         else:
             continue
+
+def _load_metadata(database):
+    metadata_file = os.path.join(database, 'metadata.yaml')
+    if os.path.exists(metadata_file):
+        with open(metadata_file, 'r') as stream:
+            logger.debug(
+                "Attempting to load the database metadata file at %s" % (os.path.join(database, 'metadata.yaml')))
+            data_files = load(stream)
+        return data_files
+    else:
+        logger.critical("Unable to load database at %s" % metadata_file)
+        raise Exception()
+
 
 if __name__ == '__main__':
     cli()
