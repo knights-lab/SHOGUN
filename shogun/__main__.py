@@ -11,11 +11,13 @@ from multiprocessing import cpu_count
 
 import click
 from yaml import load
+import pandas as pd
 
 from shogun import __version__, logger
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
 from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
+from shogun.utils import normalize_by_median_depth
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
@@ -149,6 +151,14 @@ def _function(inputs, database, output, levels):
             function_run_and_save(input, func_db, output, TAXAMAP[level])
         else:
             continue
+
+@cli.command(help="Normalize a taxatable by median depth.")
+@click.option('-i', '--input', type=click.Path(), required=True, help="The output taxatable.")
+@click.option('-o', '--output', type=click.Path(), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
+def normalize(input, output):
+    df = pd.read_csv(input, sep="\t", index_col=0)
+    outdf = normalize_by_median_depth(df)
+    outdf.to_csv(output, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
 
 def _load_metadata(database):
     metadata_file = os.path.join(database, 'metadata.yaml')

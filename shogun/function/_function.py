@@ -14,6 +14,7 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 
 from shogun import logger
+from shogun.utils import normalize_by_median_depth
 
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 
@@ -45,8 +46,7 @@ def function_run_and_save(input, func_db, output, level):
     taxatable_df = taxatable_df.groupby('summary').sum()
 
     # Normalizing for depth at median depth
-    logger.debug("Normalizing to median depth")
-    taxatable_df = taxatable_df.div(taxatable_df.sum(axis=0).div(taxatable_df.sum(axis=0).median()), axis=1).round().astype(int)
+    taxatable_df = normalize_by_median_depth(taxatable_df)
 
     logger.debug("Taxatable summarized shape %s" % str(taxatable_df.shape))
 
