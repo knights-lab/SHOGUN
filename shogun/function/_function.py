@@ -90,7 +90,6 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
     row_names_found = 0
 
     for i, row in taxatable_df.iterrows():
-        logger.debug(row.name)
         row.name = row.name
         if row.name in row_names:
             row_names_found += 1
