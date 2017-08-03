@@ -28,21 +28,20 @@ TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'st
 TAXAMAP = dict(zip(TAXA, range(1, 9)))
 
 @click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP)
-@click.option('--debug/--no-debug', default=False)
-@click.option('--verbose/--no-verbose', default=True)
+@click.option('--log', type=click.Choice(('debug', 'info', 'warning', 'critical')), help="The log level to record.", default="warning")
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, debug, verbose):
-    ctx.obj = {'DEBUG': debug, 'VERBOSE': verbose}
+def cli(ctx, log):
+    ctx.obj = {'log': log}
 
-    if ctx.obj['DEBUG']:
+    if log == 'debug':
         logger.setLevel(logging.DEBUG)
-    elif verbose:
+    elif log == 'info':
         logger.setLevel(logging.INFO)
-    else:
+    elif log == 'warning':
         logger.setLevel(logging.WARNING)
-
-
+    else:
+        logger.setLevel(logging.CRITICAL)
 
 
 ALIGNERS = {
@@ -64,12 +63,6 @@ ALIGNERS = {
 def align(ctx, aligner, input, database, output, level, function, threads):
     if not os.path.exists(output):
         os.makedirs(output)
-
-    # Set up the logger
-    file_handler = logging.FileHandler(os.path.join(output, 'shogun.log'))
-    log_formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    file_handler.setFormatter(log_formatter)
-    logging.getLogger().addHandler(file_handler)
 
     if aligner == 'all':
         redist_outs = []
@@ -147,12 +140,13 @@ def _function(inputs, database, output, levels):
     data_files = _load_metadata(database)
 
     # Load the functional db
+    logger.info("Loading the functional database and converting.")
     func_db = parse_function_db(data_files, database)
 
     for input, level in zip(inputs, levels):
         # Verify it is in a reasonable level
         if level in ['genus', 'species', 'strain']:
-            logger.info("Starting functional prediction with input file %s at level %s" % (input, level))
+            logger.info("Starting functional prediction with input file %s at level %s" % (os.path.abspath(input), level))
             function_run_and_save(input, func_db, output, TAXAMAP[level])
         else:
             continue
@@ -162,13 +156,12 @@ def _load_metadata(database):
     if os.path.exists(metadata_file):
         with open(metadata_file, 'r') as stream:
             logger.debug(
-                "Attempting to load the database metadata file at %s" % (os.path.join(database, 'metadata.yaml')))
+                "Attempting to load the database metadata file at %s" % (os.path.abspath(metadata_file)))
             data_files = load(stream)
         return data_files
     else:
-        logger.critical("Unable to load database at %s" % metadata_file)
-        raise Exception()
-
+        logger.critical("Unable to load database at %s" % os.path.abspath(metadata_file))
+        raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
 
 if __name__ == '__main__':
     cli()

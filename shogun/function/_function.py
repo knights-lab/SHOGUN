@@ -12,7 +12,8 @@ from collections import defaultdict, Counter
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
-from yaml import load
+
+from shogun import logger
 
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 
@@ -23,20 +24,30 @@ def function_run_and_save(input, func_db, output, level):
     row_names = func_db['names']
     kegg_ids = func_db['kegg_ids']
     kegg_table_csr = func_db['csr']
+
+    logger.debug("Level for summarization %d and starting summarizing KEGG Table at level with median." % level)
     if level < 8:
         kegg_table_csr, row_names = summarize_at_level(kegg_table_csr, row_names, kegg_ids, level)
+    logger.debug("Head of row names %s" % str(list(row_names.keys())[:3]))
 
     if TAXA[level-1] not in prefix:
         prefix += "." + TAXA[level-1]
 
-    print("Reading in taxatable.")
+    logger.info("Reading in taxatable for functional prediction at %s." % os.path.abspath(input))
     taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
-    print("Taxatable shape %s" % str(taxatable_df.shape))
+    logger.debug("Taxatable for functional prediction shape %s" % str(taxatable_df.shape))
     taxatable_df = taxatable_df[[type(_) == str for _ in taxatable_df.index]]
 
     taxatable_df['summary'] = [';'.join(_.split(';')[:level]) for _ in taxatable_df.index]
     taxatable_df = taxatable_df.groupby('summary').sum()
 
+    # Normalizing for depth at median depth
+    logger.debug("Normalizing to median depth")
+    taxatable_df = taxatable_df.div(taxatable_df.sum(axis=0).div(taxatable_df.sum(axis=0).median()), axis=1).round().astype(int)
+
+    logger.debug("Taxatable summarized shape %s" % str(taxatable_df.shape))
+
+    logger.info("Starting functional prediction.")
     out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage = _do_function(taxatable_df, row_names, kegg_ids, kegg_table_csr, kegg_modules_df)
     out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#KEGG ID")
     out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#MODULE ID")
@@ -67,16 +78,21 @@ def summarize_at_level(csr, names, kegg_ids, level):
 
 def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df):
     _, num_kegg_ids = kegg_table_csr.shape
+    logger.debug("Kegg table for functional prediction shape %s" % (str(kegg_table_csr.shape)))
     _, num_samples = taxatable_df.shape
+    logger.debug("Taxatable for functional prediction shape %s" % (str(taxatable_df.shape)))
 
     kegg_table = np.zeros((num_samples, num_kegg_ids), dtype=np.int)
 
-    print("Doing function.")
     for i, row in taxatable_df.iterrows():
+        row_names_found = 0
+        logger.debug(row.name)
         if row.name in row_names:
-            print("Found row name.")
+            row_names_found += 1
             idx = row_names[row.name]
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
+
+    logger.debug("Row names found in taxatable %d" % row_names_found)
 
     out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns, columns=sorted(column_names, key=column_names.get), dtype=np.int).T
 

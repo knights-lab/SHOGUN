@@ -14,7 +14,7 @@ import logging
 
 def _logging_setup():
     # Set up the logger
-    log_formatter = logging.Formatter('%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    log_formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     root_logger = logging.getLogger()
 
     console_handler = logging.StreamHandler()
