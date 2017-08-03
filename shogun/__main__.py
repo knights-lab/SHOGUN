@@ -96,8 +96,7 @@ def redistribute(ctx, input, database, level, output):
     _redistribute(database, level, output, input)
 
 def _redistribute(database, level, outfile, redist_inf):
-    with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-        data_files = load(stream)
+    data_files = _load_metadata(database)
 
     shear = os.path.join(database, data_files['general']['shear'])
 

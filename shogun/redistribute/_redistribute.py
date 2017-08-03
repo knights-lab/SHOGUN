@@ -44,6 +44,8 @@ def longest_path_tree(t, path):
 def parse_bayes(filename: str) -> pd.DataFrame:
     columns = ["tax"] + TAX_LEVELS + ["genome_length"]
     df = pd.read_csv(filename, sep="\t", header=None, names=columns, index_col = 0)
+    # Remove spaces in taxonomy for legacy reasons
+    df.index = [_.replace(" ", "_") for _ in df.index]
     return df.sort_index()
 
 def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
@@ -52,6 +54,9 @@ def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
 
     cb_index = tree()
     _ = [add_tree(cb_index, v) for v in counts_bayes.index]
+
+    # Remove spaces in taxonomy for legacy reasons
+    df.index = [_.replace(" ", "_") for _ in df.index]
 
     df['summary'] = [longest_path_tree(cb_index, v) for v in df.index]
     df = df.groupby('summary').sum()
