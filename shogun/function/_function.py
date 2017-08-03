@@ -29,6 +29,7 @@ def function_run_and_save(input, func_db, output, level):
     if level < 8:
         kegg_table_csr, row_names = summarize_at_level(kegg_table_csr, row_names, kegg_ids, level)
     logger.debug("Head of row names %s" % str(list(row_names.keys())[:3]))
+    logger.debug("Number of rows %d" % len(list(row_names.keys())))
 
     if TAXA[level-1] not in prefix:
         prefix += "." + TAXA[level-1]
@@ -42,7 +43,6 @@ def function_run_and_save(input, func_db, output, level):
     # Drop names above
     taxatable_df = taxatable_df[[_.count(';') + 1 >= level for _ in taxatable_df['summary']]]
     taxatable_df = taxatable_df.groupby('summary').sum()
-
 
     # Normalizing for depth at median depth
     logger.debug("Normalizing to median depth")
@@ -81,15 +81,17 @@ def summarize_at_level(csr, names, kegg_ids, level):
 
 def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df):
     _, num_kegg_ids = kegg_table_csr.shape
+    #pd.DataFrame(kegg_table_csr.todense(), index=sorted(row_names, key=row_names.get), columns=sorted(column_names, key=column_names.get), dtype=np.int).to_csv("/project/flatiron2/ben/kegg_species.csv")
     logger.debug("Kegg table for functional prediction shape %s" % (str(kegg_table_csr.shape)))
     _, num_samples = taxatable_df.shape
     logger.debug("Taxatable for functional prediction shape %s" % (str(taxatable_df.shape)))
 
     kegg_table = np.zeros((num_samples, num_kegg_ids), dtype=np.int)
+    row_names_found = 0
 
     for i, row in taxatable_df.iterrows():
-        row_names_found = 0
         logger.debug(row.name)
+        row.name = row.name
         if row.name in row_names:
             row_names_found += 1
             idx = row_names[row.name]
