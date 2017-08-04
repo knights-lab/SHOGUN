@@ -9,15 +9,17 @@ import numpy as np
 import pandas as pd
 import csv
 
-def get_coverage_of_microbes():
-    samples_lca_map = defaultdict(lambda: defaultdict(int))
-    with open(outf) as utree_f:
+def get_coverage_of_microbes(infile, database):
+    samples_begin_map = defaultdict(lambda: defaultdict(list))
+    samples_end_map = defaultdict(lambda: defaultdict(list))
+    with open(infile) as utree_f:
         csv_embalm = csv.reader(utree_f, delimiter='\t')
         # qname, lca, confidence, support
         for line in csv_embalm:
             if line[-1] is not None:
                 # TODO confidence/support filter
-                samples_lca_map['_'.join(line[0].split('_')[:-1])][line[-1]] += 1
+                samples_begin_map['_'.join(line[0].split('_')[:-1])][line[-1]].append(int(line[8]))
+                samples_end_map['_'.join(line[0].split('_')[:-1])][line[-1]].append(int(line[9]))
 
-    df = pd.DataFrame(samples_lca_map, dtype=np.int).fillna(0).astype(np.int)
+    df = pd.DataFrame(samples_end_map, dtype=np.int).fillna(0).astype(np.int)
     return df
