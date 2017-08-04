@@ -96,7 +96,7 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
             idx = row_names[row.name]
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
 
-    overlap = float(num_taxa)/row_names_found
+    overlap = float(row_names_found)/num_taxa
     if overlap < .5:
         logger.warning("Overlap of taxa and function %.2f" % overlap)
     else:
