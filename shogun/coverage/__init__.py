@@ -70,6 +70,10 @@ def get_coverage_of_microbes(infile, shear, level):
         unique_hits = taxa_hits[taxaname]
         hits = samples_begin_map[taxaname]
         coverages = zero_runs(hits)
+        if coverages[0][0] == 0:
+            if coverages[-1][-1] == hits.shape[0]:
+                temp = coverages[:, 1] - coverages[:, 0]
+                coverages = np.concatenate((coverages, np.array([0, temp[0] + temp[-1]])))
         max_uncovered_region = np.max(coverages[:, 1] - coverages[:, 0])
         percent_max_unconvered = max_uncovered_region/shear_df['genome_length_median'][taxaname]
         percent_uncovered = np.sum(hits == 0)/shear_df['genome_length_median'][taxaname]
