@@ -168,7 +168,7 @@ def normalize(input, output):
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 def coverage(input, database, output, level):
     # This is only the coverage script
-    _coverage(input, database, output, level)
+    _coverage(input, database, output, TAXAMAP[level])
 
 def _coverage(input, database, output, level):
     data_files = _load_metadata(database)
