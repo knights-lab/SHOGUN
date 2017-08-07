@@ -27,6 +27,7 @@ def get_coverage_of_microbes(infile, shear, level):
     shear_df = summarize_bayes_at_level(shear, level=level)
 
     samples_begin_map = dict()
+    taxa_hits = defaultdict(int)
 
     with open(infile) as utree_f:
         csv_embalm = csv.reader(utree_f, delimiter='\t')
@@ -44,6 +45,7 @@ def get_coverage_of_microbes(infile, shear, level):
                     if taxa_level != level:
                         taxaname = ';'.join(taxaname.split(";")[:level])
                     if taxaname in shear_df.index:
+                        taxa_hits[taxaname] += 1
                         indx = int(np.floor(begin/100.))
                         if not taxaname in samples_begin_map:
                             genome_length = shear_df['genome_length_median'][taxaname]
@@ -58,14 +60,20 @@ def get_coverage_of_microbes(infile, shear, level):
                     else:
                         logger.warning("The taxa %s not found." % taxaname)
 
-    xx = np.zeros((len(samples_begin_map), 4))
+    xx = np.zeros((len(samples_begin_map), 8))
     for i, taxaname in enumerate(sorted(samples_begin_map.keys())):
+        unique_hits = taxa_hits[taxaname]
         hits = samples_begin_map[taxaname]
         coverages = zero_runs(hits)
         max_uncovered_region = np.max(coverages[:, 1] - coverages[:, 0])
         percent_max_unconvered = max_uncovered_region/shear_df['genome_length_median'][taxaname]
         percent_uncovered = np.sum(hits == 0)/shear_df['genome_length_median'][taxaname]
-        xx[i] = np.array([max_uncovered_region, percent_max_unconvered, percent_uncovered, shear_df['genome_length_median'][taxaname]])
-
-    df = pd.DataFrame(xx, columns=['max_unconvered_region', 'percent_max_uncovered', 'percent_uncovered', 'median_genome_size'], index=sorted(samples_begin_map.keys()))
+        unique_counts = shear_df.iloc[:, level-1][taxaname]
+        expected_c = expected_coverage(unique_counts, unique_hits)
+        xx[i] = np.array([max_uncovered_region, percent_max_unconvered, percent_uncovered, shear_df['genome_length_median'][taxaname], unique_hits, unique_counts, 1-expected_c, percent_uncovered/(1-expected_c)])
+    df = pd.DataFrame(xx, columns=['max_unconvered_region', 'percent_max_uncovered', 'percent_uncovered', 'median_genome_size', 'hits_at_or_below', 'unique_counts', 'expected_uncovered', 'ratio_uncovered_over_expected'], index=sorted(samples_begin_map.keys()))
     return df
+
+def expected_coverage(length_of_genome, number_of_trials):
+    num = length_of_genome*(1-np.power((length_of_genome-1)/length_of_genome, number_of_trials))
+    return num/length_of_genome
