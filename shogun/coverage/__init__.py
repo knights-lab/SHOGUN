@@ -75,10 +75,10 @@ def get_coverage_of_microbes(infile, shear, level):
         percent_uncovered = np.sum(hits == 0)/shear_df['genome_length_median'][taxaname]
         unique_counts = shear_df.iloc[:, level-1][taxaname]
         expected_c = expected_coverage(unique_counts, unique_hits)
-        row = np.array([max_uncovered_region, percent_max_unconvered, percent_uncovered, shear_df['genome_length_median'][taxaname], unique_hits, unique_counts, 1-expected_c, percent_uncovered/(1-expected_c)])
+        row = np.array([max_uncovered_region, percent_max_unconvered, 1-percent_uncovered, shear_df['genome_length_median'][taxaname], unique_hits, unique_counts, expected_c, 1-percent_uncovered/(expected_c)])
         row[np.isnan(row)] = 0
         xx[i] = row
-    df = pd.DataFrame(xx, columns=['max_unconvered_region', 'percent_max_uncovered', 'percent_uncovered', 'median_genome_size', 'hits_at_or_below', 'unique_counts', 'expected_uncovered', 'ratio_uncovered_over_expected'], index=sorted(samples_begin_map.keys()))
+    df = pd.DataFrame(xx, columns=['max_uncovered_region', 'percent_max_uncovered_region', 'percent_of_genome_covered', 'median_genome_size', 'hits_in_clade', 'unique_counts_of_clade', 'expected_coverage', 'ratio_covered_over_expected'], index=sorted(samples_begin_map.keys()))
     logger.info("Completed the coverage analysis.")
     return df
 
