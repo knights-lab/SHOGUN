@@ -14,6 +14,7 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+from shogun import logger
 import scipy.sparse as ss
 
 
@@ -32,6 +33,9 @@ def run_command(cmd, shell=False, stdout=False, stderr=False):
             stdout = FNULL
         if not stderr:
             stderr = FNULL
+
+        logger.debug(' '.join(cmd))
+
         proc = subprocess.Popen(
             cmd,
             stdout=stdout,
