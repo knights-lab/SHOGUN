@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import csv
 
+from shogun import logger
 from shogun.redistribute import summarize_bayes_at_level, parse_bayes
 
 def zero_runs(a):
@@ -42,17 +43,20 @@ def get_coverage_of_microbes(infile, shear, level):
                 if taxa_level >= level:
                     if taxa_level != level:
                         taxaname = ';'.join(taxaname.split(";")[:level])
-                    indx = int(np.floor(begin/100.))
-                    if not taxaname in samples_begin_map:
-                        genome_length = shear_df['genome_length_median'][taxaname]
-                        samples_begin_map[taxaname] = np.zeros(genome_length)
-                    if indx == 0:
-                        samples_begin_map[taxaname][0] += 1
-                    elif indx >= shear_df['genome_length_median'][taxaname]:
-                        samples_begin_map[taxaname][-1] += 1
+                    if taxaname in shear_df.index:
+                        indx = int(np.floor(begin/100.))
+                        if not taxaname in samples_begin_map:
+                            genome_length = shear_df['genome_length_median'][taxaname]
+                            samples_begin_map[taxaname] = np.zeros(genome_length)
+                        if indx == 0:
+                            samples_begin_map[taxaname][0] += 1
+                        elif indx >= shear_df['genome_length_median'][taxaname]:
+                            samples_begin_map[taxaname][-1] += 1
+                        else:
+                            samples_begin_map[taxaname][indx] += 1
+                            samples_begin_map[taxaname][indx+1] += 1
                     else:
-                        samples_begin_map[taxaname][indx] += 1
-                        samples_begin_map[taxaname][indx+1] += 1
+                        logger.warning("The taxa %s not found." % taxaname)
 
     xx = np.zeros((len(samples_begin_map), 4))
     for i, taxaname in enumerate(sorted(samples_begin_map.keys())):
