@@ -29,10 +29,13 @@ def get_coverage_of_microbes(infile, shear, level):
     samples_begin_map = dict()
     taxa_hits = defaultdict(int)
 
+    logger.info("Started the coverage parsing.")
     with open(infile) as utree_f:
         csv_embalm = csv.reader(utree_f, delimiter='\t')
         # qname, lca, confidence, support
-        for line in csv_embalm:
+        for num, line in enumerate(csv_embalm):
+            if num % 1000 == 0:
+                logger.info("Parsed %d lines of b6." % num)
             if line[-1] is not None:
                 # TODO confidence/support filter
                 begin = int(line[8])
@@ -62,6 +65,8 @@ def get_coverage_of_microbes(infile, shear, level):
 
     xx = np.zeros((len(samples_begin_map), 8))
     for i, taxaname in enumerate(sorted(samples_begin_map.keys())):
+        if i % 1000 == 0:
+            logger.info("Calculated %d coverages." % i)
         unique_hits = taxa_hits[taxaname]
         hits = samples_begin_map[taxaname]
         coverages = zero_runs(hits)
@@ -72,6 +77,7 @@ def get_coverage_of_microbes(infile, shear, level):
         expected_c = expected_coverage(unique_counts, unique_hits)
         xx[i] = np.array([max_uncovered_region, percent_max_unconvered, percent_uncovered, shear_df['genome_length_median'][taxaname], unique_hits, unique_counts, 1-expected_c, percent_uncovered/(1-expected_c)])
     df = pd.DataFrame(xx, columns=['max_unconvered_region', 'percent_max_uncovered', 'percent_uncovered', 'median_genome_size', 'hits_at_or_below', 'unique_counts', 'expected_uncovered', 'ratio_uncovered_over_expected'], index=sorted(samples_begin_map.keys()))
+    logger.info("Completed the coverage analysis.")
     return df
 
 def expected_coverage(length_of_genome, number_of_trials):
