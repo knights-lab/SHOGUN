@@ -10,7 +10,7 @@ import pandas as pd
 import csv
 
 from shogun import logger
-from shogun.redistribute import summarize_bayes_at_level, parse_bayes
+from shogun.redistribute import summarize_bayes_at_level
 
 def zero_runs(a):
     # Stack Overflow:
@@ -73,13 +73,13 @@ def get_coverage_of_microbes(infile, shear, level):
         if coverages[0][0] == 0:
             if coverages[-1][-1] == hits.shape[0]:
                 temp = coverages[:, 1] - coverages[:, 0]
-                coverages = np.concatenate((coverages, np.array([0, temp[0] + temp[-1]])))
+                coverages = np.concatenate((coverages, np.atleast_2d(np.array([0, temp[0] + temp[-1]]))))
         max_uncovered_region = np.max(coverages[:, 1] - coverages[:, 0])
         percent_max_unconvered = max_uncovered_region/shear_df['genome_length_median'][taxaname]
-        percent_uncovered = np.sum(hits == 0)/shear_df['genome_length_median'][taxaname]
+        percent_covered = np.sum(hits > 0)/shear_df['genome_length_median'][taxaname]
         unique_counts = shear_df.iloc[:, level-1][taxaname]
         expected_c = expected_coverage(unique_counts, unique_hits)
-        row = np.array([max_uncovered_region, percent_max_unconvered, 1-percent_uncovered, shear_df['genome_length_median'][taxaname], unique_hits, unique_counts, expected_c, 1-percent_uncovered/(expected_c)])
+        row = np.array([max_uncovered_region, percent_max_unconvered, percent_covered, shear_df['genome_length_median'][taxaname], unique_hits, unique_counts, expected_c, percent_covered/(expected_c)])
         row[np.isnan(row)] = 0
         xx[i] = row
     df = pd.DataFrame(xx, columns=['max_uncovered_region', 'percent_max_uncovered_region', 'percent_of_genome_covered', 'median_genome_size', 'hits_in_clade', 'unique_counts_of_clade', 'expected_coverage', 'ratio_covered_over_expected'], index=sorted(samples_begin_map.keys()))
