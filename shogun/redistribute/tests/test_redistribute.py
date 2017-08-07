@@ -10,7 +10,7 @@ import os
 
 from shogun.redistribute import Taxonomy, parse_bayes, redistribute_taxatable
 
-class TestTaxonomy(unittest.TestCase):
+class TestRedistribute(unittest.TestCase):
     def setUp(self):
         pass
 

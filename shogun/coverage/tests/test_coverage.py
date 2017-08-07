@@ -9,7 +9,7 @@ import os
 import tempfile
 
 from shogun.coverage import get_coverage_of_microbes
-
+from shogun.redistribute import parse_bayes
 
 class TestCoverage(unittest.TestCase):
     def setUp(self):
@@ -20,11 +20,14 @@ class TestCoverage(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_coverage_report(self):
-        database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
-
+        bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.32.txt'))
+        df_bayes = parse_bayes(bayes)
+        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
         infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_results.b6'))
-        outdir = os.path.join(self.temp_dir.name)
-        self.assertTrue(get_coverage_of_microbes(infile, database))
+
+        self.assertTrue(get_coverage_of_microbes(infile, df_bayes, 6) is not None)
+        self.assertTrue(get_coverage_of_microbes(infile, df_bayes, 7) is not None)
+        self.assertTrue(get_coverage_of_microbes(infile, df_bayes, 8) is not None)
 
 if __name__ == '__main__':
     unittest.main()

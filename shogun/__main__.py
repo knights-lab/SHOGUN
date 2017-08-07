@@ -8,13 +8,13 @@ import os
 import logging
 from datetime import date
 from multiprocessing import cpu_count
-
 import click
 from yaml import load
 import pandas as pd
 
 from shogun import __version__, logger
 from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
+from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
 from shogun.utils import normalize_by_median_depth
@@ -161,26 +161,23 @@ def normalize(input, output):
     outdf.to_csv(output, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
 
 
-@cli.command(help="Strip low coverage microbes.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The output taxatable.")
+@cli.command(help="Show confidence of coverage of microbes.")
+@click.option('-i', '--input', type=click.Path(), required=True, help="The output BURST capitalist alignment.")
 @click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
-@click.option('-o', '--output', type=click.Path(), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
+@click.option('-o', '--output', type=click.Path(), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 def coverage(input, database, output, level):
-    samples_lca_map = defaultdict(lambda: defaultdict(int))
-    with open(outf) as utree_f:
-        csv_embalm = csv.reader(utree_f, delimiter='\t')
-        # qname, lca, confidence, support
-        for line in csv_embalm:
-            if line[-1] is not None:
-                # TODO confidence/support filter
-                samples_lca_map['_'.join(line[0].split('_')[:-1])][line[-1]] += 1
+    # This is only the coverage script
+    _coverage(input, database, output, level)
 
-    df = pd.DataFrame(samples_lca_map, dtype=np.int).fillna(0).astype(np.int)
-    return df
+def _coverage(input, database, output, level):
+    data_files = _load_metadata(database)
 
-def _coverage():
-    pass
+    shear = os.path.join(database, data_files['general']['shear'])
+
+    shear_df = parse_bayes(shear)
+    outdf = get_coverage_of_microbes(input, shear_df, level)
+    outdf.to_csv(output, sep='\t', float_format="%.5f",na_rep=0)
 
 def _load_metadata(database):
     metadata_file = os.path.join(database, 'metadata.yaml')
