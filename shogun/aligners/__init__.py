@@ -81,7 +81,7 @@ class EmbalmerAligner(Aligner):
         else:
             self.accelerator = False
         self.tree = Taxonomy(self.tax)
-        self.post_align = 'capitalist'
+        self.post_align = post_align
 
 
     def _post_align(self, outf):
