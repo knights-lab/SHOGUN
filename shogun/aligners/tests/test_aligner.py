@@ -32,6 +32,17 @@ class TestAligner(unittest.TestCase):
 
         self.assertTrue(aligner.align(infile, outdir) == 0)
 
+    def test_embalmer_post_align(self):
+        database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
+        aligner = EmbalmerAligner(database, threads=1, shell=False)
+        alignment_file = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_results.b6'))
+        df_capitalist = aligner._post_align(alignment_file)
+        aligner.post_align = 'taxonomy'
+        df_non_capitalist = aligner._post_align(alignment_file)
+        print(df_capitalist.head())
+        print(df_non_capitalist.head())
+
+
     def test_utree_db(self):
         self.assertTrue(UtreeAligner.check_database(
             pkg_resources.resource_filename('shogun.tests', os.path.join('data')))[0])

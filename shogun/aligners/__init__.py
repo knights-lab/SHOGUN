@@ -12,10 +12,11 @@ from cytoolz import valfilter
 import csv
 import numpy as np
 
-from shogun.wrappers import embalmer_align, embalmulate, utree_search_gg, bowtie2_align
+from shogun.wrappers import embalmer_align, utree_search_gg, bowtie2_align
 from shogun.utils.last_common_ancestor import build_lca_map
 from shogun.parsers import yield_alignments_from_sam_inf
 from shogun.redistribute import Taxonomy
+from shogun import logger
 
 
 class Aligner:
@@ -37,6 +38,7 @@ class Aligner:
         self.tax = os.path.join(database_dir, self.data_files['general']['taxonomy'])
         self.fasta = os.path.join(database_dir, self.data_files['general']['fasta'])
         self.outfile = None
+        logger.debug("Initiate Logger %s" % self._name)
 
     @classmethod
     def check_database(cls, dir):
@@ -53,16 +55,16 @@ class Aligner:
                 return False, '%s not found' % (os.path.join(data_files[cls._name] + value))
         return True, ''
 
-    def align(self):
+    def align(self, infile, outdir):
         raise NotImplementedError
 
-    def _post_align(self):
-        pass
+    def _post_align(self, outf):
+        raise NotImplementedError
 
 class EmbalmerAligner(Aligner):
     _name = 'embalmer'
 
-    def __init__(self, database_dir, **kwargs):
+    def __init__(self, database_dir, post_align='capitalist', **kwargs):
         super().__init__(database_dir,**kwargs)
 
         # Setup the embalmer database
@@ -73,6 +75,16 @@ class EmbalmerAligner(Aligner):
             self.accelerator = True
         else:
             self.accelerator = False
+        self.tree = Taxonomy(self.tax)
+        self.post_align = 'capitalist'
+
+
+    def _post_align(self, outf):
+        if self.post_align == 'capitalist':
+            return self._post_align_capitalist(outf)
+        else:
+            return self._post_align_taxonomy(outf)
+
 
     def align(self, infile, outdir):
         if not os.path.exists(outdir):
@@ -89,7 +101,24 @@ class EmbalmerAligner(Aligner):
         df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
-    def _post_align(self, outf):
+    def _post_align_capitalist(self, outf):
+        logger.debug("Beginning post align capitalist style with aligner %s" % self._name)
+        # This alignment parsing assumes capitalist output
+        samples_lca_map = defaultdict(lambda: defaultdict(int))
+        with open(outf) as emb_inf:
+            csv_embalm = csv.reader(emb_inf, delimiter='\t')
+            # qname, lca, confidence, support
+            for line  in csv_embalm:
+                tax = self.tree(line[1])
+                #TODO confidence/support filter
+                samples_lca_map['_'.join(line[0].split('_')[:-1])][tax] += 1
+
+        df = pd.DataFrame(samples_lca_map, dtype=np.int).fillna(0).astype(np.int)
+        return df
+
+
+    def _post_align_taxonomy(self, outf):
+        logger.debug("Beginning post align taxonomy style with aligner %s" % self._name)
         samples_lca_map = defaultdict(lambda: defaultdict(int))
         with open(outf) as utree_f:
             csv_embalm = csv.reader(utree_f, delimiter='\t')
@@ -128,6 +157,7 @@ class UtreeAligner(Aligner):
         return proc, out, err
 
     def _post_align(self, utree_out: str) -> pd.DataFrame:
+        logger.debug("Beginning post align with aligner %s" % self._name)
         samples_lca_map = defaultdict(Counter)
         with open(utree_out) as utree_f:
             csv_utree = csv.reader(utree_f, delimiter='\t')
@@ -153,7 +183,6 @@ class BowtieAligner(Aligner):
     def align(self, infile, outdir, alignments_to_report=16):
         outfile = os.path.join(outdir, 'bowtie2_results.sam')
 
-
         #TODO: pie chart and coverage
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
@@ -163,6 +192,7 @@ class BowtieAligner(Aligner):
         return proc, out, err
 
     def _post_align(self, sam_file: str) -> pd.DataFrame:
+        logger.debug("Beginning post align with aligner %s" % self._name)
         align_gen = yield_alignments_from_sam_inf(sam_file)
         lca_map = build_lca_map(align_gen, self.tree)
         samples_lca_map = defaultdict(Counter)
