@@ -54,17 +54,22 @@ ALIGNERS = {
 
 @cli.command(help="Run the SHOGUN aligner")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
-              help='The aligner to use.', show_default=True)
-@click.option('-i', '--input', type=click.Path(), required=True, help='The file containing the combined seqs.')
-@click.option('-d', '--database', type=click.Path(), default=os.getcwd(), help="The path to the database folder.")
-@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
+              help='The aligner to use [Note: default embalmer is capitalist, use embalmer-tax if you want to redistribute].', show_default=True)
+@click.option('-i', '--input', type=click.Path(exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
+@click.option('-d', '--database', type=click.Path(exists=True), default=os.getcwd(), help="The path to the database folder.")
+@click.option('-o', '--output', type=click.Path(writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions to (not required, can specify off).')
-@click.option('--function/--no-function', default=True, help='Run functional algorithms.')
+@click.option('--function/--no-function', default=True, help='Run functional algorithms. **This will normalize the taxatable by median depth.')
+@click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with embalmer post-align or not.')
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
-def align(ctx, aligner, input, database, output, level, function, threads):
+def align(ctx, aligner, input, database, output, level, function, capitalist, threads):
     if not os.path.exists(output):
         os.makedirs(output)
+
+    if not capitalist:
+        # Set to not run Embalmer post-align in capitalist mode
+        ALIGNERS['embalmer'] = lambda database, threads=threads: EmbalmerAligner(database, threads=threads, post_align='taxonomy')
 
     if aligner == 'all':
         redist_outs = []
@@ -89,10 +94,10 @@ def align(ctx, aligner, input, database, output, level, function, threads):
 
 
 @cli.command(help="Run the SHOGUN redistribution algorithm.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
-@click.option('-d', '--database', type=click.Path(), required=True, help="The path to the database folder.")
+@click.option('-i', '--input', type=click.Path(exists=True, allow_dash=True), required=True, help="The taxatable.")
+@click.option('-d', '--database', type=click.Path(exists=True), required=True, help="The path to the database folder.")
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse to.')
-@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
+@click.option('-o', '--output', type=click.Path(writable=True), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
 @click.pass_context
 def redistribute(ctx, input, database, level, output):
     _redistribute(database, level, output, input)
@@ -124,9 +129,9 @@ def _redistribute(database, level, outfile, redist_inf):
     return output_files, output_levels
 
 @cli.command(help="Run the SHOGUN functional algorithm.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The taxatable.")
-@click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
-@click.option('-o', '--output', type=click.Path(), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
+@click.option('-i', '--input', type=click.Path(exists=True, allow_dash=True), required=True, help="The taxatable.")
+@click.option('-d', '--database', type=click.Path(exists=True), required=True, help="The path to the folder containing the function database.")
+@click.option('-o', '--output', type=click.Path(writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
 def function(ctx, input, database, output, level):
@@ -153,8 +158,8 @@ def _function(inputs, database, output, levels):
             continue
 
 @cli.command(help="Normalize a taxatable by median depth.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The output taxatable.")
-@click.option('-o', '--output', type=click.Path(), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
+@click.option('-i', '--input', type=click.Path(exists=True, allow_dash=True), required=True, help="The output taxatable.")
+@click.option('-o', '--output', type=click.Path(writable=True, allow_dash=True), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
 def normalize(input, output):
     df = pd.read_csv(input, sep="\t", index_col=0)
     outdf = normalize_by_median_depth(df)
@@ -162,9 +167,9 @@ def normalize(input, output):
 
 
 @cli.command(help="Show confidence of coverage of microbes.")
-@click.option('-i', '--input', type=click.Path(), required=True, help="The output BURST capitalist alignment.")
-@click.option('-d', '--database', type=click.Path(), required=True, help="The path to the folder containing the function database.")
-@click.option('-o', '--output', type=click.Path(), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
+@click.option('-i', '--input', type=click.Path(exists=True, allow_dash=True), required=True, help="The output BURST capitalist alignment.")
+@click.option('-d', '--database', type=click.Path(exists=True), required=True, help="The path to the folder containing the function database.")
+@click.option('-o', '--output', type=click.Path(writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 def coverage(input, database, output, level):
     # This is only the coverage script
