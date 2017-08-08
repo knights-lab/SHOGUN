@@ -32,30 +32,27 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
         if not stderr:
             stderr = FNULL
 
-        proc = subprocess.Popen(
+        logger.debug(" ".join(cmd))
+        with subprocess.Popen(
             cmd,
             stdout=stdout,
             stderr=stderr,
             shell=shell,
             universal_newlines=True,
+            bufsize=1,
             cwd=os.getcwd(),
-        )
-
-        with proc.stdout:
+        ) as proc:
             log_subprocess_output(proc.stdout)
-
-        logger.debug(' '.join(cmd))
-        returncode, e = proc.communicate()
         logger.debug("Subprocess finished.")
 
-        if returncode != 0:
-            raise AssertionError("exit code is non zero: %d\n%s\%s" % (proc.returncode, out, err))
-        return returncode, "", ""
+        if proc.returncode != 0:
+            raise AssertionError("exit code is non zero: %d\n%s" % (proc.returncode, " ".join(cmd)))
+        return proc.returncode, "", ""
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
 
 def log_subprocess_output(pipe):
-    for line in iter(pipe.readline, b''):
+    for line in pipe:
         line = line.rstrip()
         if line:
             if not line.startswith('Search Progress'):
