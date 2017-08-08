@@ -46,7 +46,7 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
         with proc.stdout:
             log_subprocess_output(proc.stdout)
 
-        returncode = proc.wait()
+        returncode = proc.communicate()
 
         if returncode != 0:
             raise AssertionError("exit code is non zero: %d\n%s\%s" % (proc.returncode, out, err))

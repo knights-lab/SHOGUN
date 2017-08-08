@@ -103,6 +103,7 @@ def redistribute(ctx, input, database, level, output):
     _redistribute(database, level, output, input)
 
 def _redistribute(database, level, outfile, redist_inf):
+    logger.debug("Beginning redistribution for file: %s" % redist_inf)
     data_files = _load_metadata(database)
 
     shear = os.path.join(database, data_files['general']['shear'])
