@@ -16,7 +16,7 @@ import numpy as np
 import scipy.sparse as ss
 
 
-def run_command(cmd, shell=False, stdout=LoggerWriter(logger.debug), stderr=LoggerWriter(logger.info)):
+def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
     """
     Run prepared behave command in shell and return its output.
     :param cmd: Well-formed behave command to run.
@@ -43,15 +43,20 @@ def run_command(cmd, shell=False, stdout=LoggerWriter(logger.debug), stderr=Logg
             cwd=os.getcwd(),
         )
 
-        out, err = proc.communicate()
+        with proc.stdout:
+            log_subprocess_output(proc.stdout)
 
-        if proc.returncode != 0:
+        returncode = proc.wait()
+
+        if returncode != 0:
             raise AssertionError("exit code is non zero: %d\n%s\%s" % (proc.returncode, out, err))
-
-        return proc.returncode, out, err
+        return proc.returncode, "", ""
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
 
+def log_subprocess_output(pipe):
+    for line in iter(pipe.readline, b''):
+        logger.debug(line)
 
 def hash_file(filename):
     h = hashlib.sha1()
