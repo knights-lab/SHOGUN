@@ -48,10 +48,15 @@ class Aligner:
         SUFFICES = {
             'embalmer': ['.edx'],
             'utree': ['.ctr'],
-            'bowtie2': ['.1.bt2']
+            'bowtie2': ['*']
         }
         for value in SUFFICES[cls._name]:
-            if not os.path.exists(os.path.join(dir, data_files[cls._name] + value)):
+            if cls._name == "bowtie2":
+                from glob import glob
+                files = glob(os.path.join(data_files[cls._name] + value))
+                if len(files) == 0:
+                    return False, "%s not found" % ("Prefix not found: %s"  % os.path.join(data_files[cls._name]))
+            elif not os.path.exists(os.path.join(dir, data_files[cls._name] + value)):
                 return False, '%s not found' % (os.path.join(data_files[cls._name] + value))
         return True, ''
 
