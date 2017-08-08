@@ -7,13 +7,23 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 from .last_common_ancestor import build_lca_map
 from .normalize import normalize_by_median_depth
 from shogun import logger, LoggerWriter
-
 import subprocess
 import os
 import hashlib
 from collections import defaultdict
 import numpy as np
 import scipy.sparse as ss
+
+from contextlib import contextmanager
+from timeit import default_timer
+
+@contextmanager
+def elapsed_timer():
+    start = default_timer()
+    elapser = lambda: default_timer() - start
+    yield lambda: elapser()
+    end = default_timer()
+    elapser = lambda: end-start
 
 
 def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
@@ -33,17 +43,20 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
             stderr = FNULL
 
         logger.debug(" ".join(cmd))
-        with subprocess.Popen(
-            cmd,
-            stdout=stdout,
-            stderr=stderr,
-            shell=shell,
-            universal_newlines=True,
-            bufsize=1,
-            cwd=os.getcwd(),
-        ) as proc:
-            log_subprocess_output(proc.stdout)
+        with elapsed_timer() as elapsed:
+            with subprocess.Popen(
+                cmd,
+                stdout=stdout,
+                stderr=stderr,
+                shell=shell,
+                universal_newlines=True,
+                bufsize=1,
+                cwd=os.getcwd(),
+            ) as proc:
+                log_subprocess_output(proc.stdout)
+        logger.debug("%.2f seconds" % elapsed)
         logger.debug("Subprocess finished.")
+
 
         if proc.returncode != 0:
             raise AssertionError("exit code is non zero: %d\n%s" % (proc.returncode, " ".join(cmd)))
