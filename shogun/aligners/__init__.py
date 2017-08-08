@@ -53,11 +53,11 @@ class Aligner:
         for value in SUFFICES[cls._name]:
             if cls._name == "bowtie2":
                 from glob import glob
-                files = glob(os.path.join(data_files[cls._name] + value))
+                files = glob(os.path.abspath(os.path.join(dir, data_files[cls._name] + value)))
                 if len(files) == 0:
-                    return False, "%s not found" % ("Prefix not found: %s"  % os.path.join(data_files[cls._name]))
-            elif not os.path.exists(os.path.join(dir, data_files[cls._name] + value)):
-                return False, '%s not found' % (os.path.join(data_files[cls._name] + value))
+                    return False, "%s not found" % ("Prefix not found: %s"  % os.path.abspath(os.path.join(dir, data_files[cls._name])))
+            elif not os.path.exists(os.path.abspath(os.path.join(dir, data_files[cls._name] + value))):
+                return False, '%s not found' % (os.path.abspath(os.path.join(dir, data_files[cls._name] + value)))
         return True, ''
 
     def align(self, infile, outdir):
