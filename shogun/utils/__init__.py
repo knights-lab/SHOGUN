@@ -32,8 +32,6 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
         if not stderr:
             stderr = FNULL
 
-        logger.debug(' '.join(cmd))
-
         proc = subprocess.Popen(
             cmd,
             stdout=stdout,
@@ -46,11 +44,13 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
         with proc.stdout:
             log_subprocess_output(proc.stdout)
 
-        returncode, _, _ = proc.communicate()
+        logger.debug(' '.join(cmd))
+        returncode, e = proc.communicate()
+        logger.debug("Subprocess finished.")
 
         if returncode != 0:
             raise AssertionError("exit code is non zero: %d\n%s\%s" % (proc.returncode, out, err))
-        return proc.returncode, "", ""
+        return returncode, "", ""
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
 
