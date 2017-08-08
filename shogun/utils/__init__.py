@@ -34,7 +34,7 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
 
         logger.debug(" ".join(cmd))
         with subprocess.Popen(
-            " ".join(cmd),
+            cmd,
             stdout=stdout,
             stderr=stderr,
             shell=shell,
