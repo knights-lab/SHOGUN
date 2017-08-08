@@ -58,7 +58,7 @@ def log_subprocess_output(pipe):
     for line in iter(pipe.readline, b''):
         line = line.rstrip()
         if line:
-            if not line.startswith(b'Search Progress'):
+            if not line.startswith('Search Progress'):
                 logger.debug(line)
 
 def hash_file(filename):
