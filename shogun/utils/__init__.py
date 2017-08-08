@@ -56,7 +56,10 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
 
 def log_subprocess_output(pipe):
     for line in iter(pipe.readline, b''):
-        logger.debug(line)
+        line = line.rstrip()
+        if line:
+            if not line.startswith("Search progress"):
+                logger.debug(line)
 
 def hash_file(filename):
     h = hashlib.sha1()
