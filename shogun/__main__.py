@@ -54,6 +54,8 @@ ALIGNERS = {
 
 #TODO: Allow for shell=True
 #TODO: Turn off post-alignment
+#TODO: Fix redistribute bug
+# shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --aligner utree --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level off --threads 1
 @cli.command(help="Run the SHOGUN aligner")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use [Note: default embalmer is capitalist, use embalmer-tax if you want to redistribute].', show_default=True)
