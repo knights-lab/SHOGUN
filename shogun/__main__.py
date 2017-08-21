@@ -87,6 +87,7 @@ def align(ctx, aligner, input, database, output, level, function, capitalist, th
     else:
         aligner_cl = ALIGNERS[aligner](database, threads=threads)
         aligner_cl.align(input, output)
+        logger.debug(level)
         if level is not 'off':
             redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
             redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)

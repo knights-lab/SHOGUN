@@ -28,24 +28,24 @@ Now activate the environment.
 source activate shogun
 ```
 
-With the shogun environment activated, we can now run the following commands:
+With the shogun environment activated, we can now run the following to check the SHOGUN version number. This is linked to the Github commit string.
 
 ```
-# If you want to use bowtie2
-conda install -c bioconda bowtie2
-
-# SHOGUN
-pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
+shogun --version
+shogun, version v0.0.1+293.g6531389
 ```
 
-With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened.
-
-### Testing your install
-
-For testing, we are currently using the built in python unittests. In order to run the test suite, change directory into the root folder of the repository. Then run:
+To verify your installation, make sure to run the test suite. For testing, we are currently using the built in python unittests. In order to run the test suite, change directory into the root folder of the repository. Then run:
 
 ```
+cd /project/flatiron2/ben/projects/SHOGUN/SHOGUN
 python -m unittest discover shogun
+```
+
+After the testing is complete, we can try running our analysis. To do so, run the following command:
+
+```
+shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --aligner utree --database /project/flatiron2/analysis_SHOGUN/data/references/rep82_dusted --output ~/scratch_shogun --function --level species --threads 1
 ```
 
 ### SHOGUN help for Command-Line
