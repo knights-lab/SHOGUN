@@ -75,13 +75,13 @@ def align(ctx, aligner, input, database, output, level, function, capitalist, th
 
     if not capitalist:
         # Set to not run Embalmer post-align in capitalist mode
-        ALIGNERS['embalmer'] = lambda database, threads=threads: EmbalmerAligner(database, threads=threads, post_align='taxonomy')
+        ALIGNERS['embalmer'] = lambda database, threads=threads, shell=ctx.shell: EmbalmerAligner(database, shell=shell, threads=threads, post_align='taxonomy')
 
     if aligner == 'all':
         redist_outs = []
         redist_levels = []
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads)
+            aligner_cl = align(database, threads=threads, shell=ctx.shell)
             aligner_cl.align(input, output)
             if level is not 'off':
                 redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
