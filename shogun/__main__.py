@@ -142,7 +142,7 @@ def _redistribute(database, level, outfile, redist_inf):
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
 def function(ctx, input, database, output, level):
-    _function([input], database, output, [level])
+    _function([input], database, output, [level], save_median_taxatable=True)
 
 def _function(inputs, database, output, levels, save_median_taxatable=False):
     # Check if output exists, if not then make
