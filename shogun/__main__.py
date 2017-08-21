@@ -54,7 +54,6 @@ ALIGNERS = {
     'bowtie2': BowtieAligner
 }
 
-#TODO: Allow for shell=True
 #TODO: Turn off post-alignment
 #TODO: Fix redistribute bug
 # shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --aligner utree --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level off --threads 1
@@ -97,7 +96,7 @@ def align(ctx, aligner, input, database, output, level, function, capitalist, th
             redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
 
     if function:
-        _function(redist_outs, database, output, redist_levels)
+        _function(redist_outs, database, output, redist_levels, save_median_taxatable=True)
 
 
 @cli.command(help="Run the SHOGUN redistribution algorithm.")
@@ -145,7 +144,7 @@ def _redistribute(database, level, outfile, redist_inf):
 def function(ctx, input, database, output, level):
     _function([input], database, output, [level])
 
-def _function(inputs, database, output, levels):
+def _function(inputs, database, output, levels, save_median_taxatable=False):
     # Check if output exists, if not then make
     if not os.path.exists(output):
         os.makedirs(output)
@@ -161,7 +160,7 @@ def _function(inputs, database, output, levels):
         # Verify it is in a reasonable level
         if level in ['genus', 'species', 'strain']:
             logger.info("Starting functional prediction with input file %s at level %s" % (os.path.abspath(input), level))
-            function_run_and_save(input, func_db, output, TAXAMAP[level])
+            function_run_and_save(input, func_db, output, TAXAMAP[level], save_median_taxatable=save_median_taxatable)
         else:
             continue
 

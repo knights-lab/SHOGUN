@@ -22,7 +22,7 @@ from shogun import logger
 class Aligner:
     _name = None
 
-    def __init__(self, database_dir, threads=1, shell=False):
+    def __init__(self, database_dir, threads=1, post_align=True, shell=False):
         self.threads = threads
         self.shell = shell
         check, msg = self.check_database(database_dir)
@@ -39,6 +39,7 @@ class Aligner:
         self.fasta = os.path.join(database_dir, self.data_files['general']['fasta'])
         self.outfile = None
         logger.debug("Initiate Logger %s" % self._name)
+        self.post_align = post_align
 
     @classmethod
     def check_database(cls, dir):

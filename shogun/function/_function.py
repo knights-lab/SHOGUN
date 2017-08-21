@@ -18,7 +18,7 @@ from shogun.utils import normalize_by_median_depth
 
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 
-def function_run_and_save(input, func_db, output, level):
+def function_run_and_save(input, func_db, output, level, save_median_taxatable=True):
     prefix = ".".join(os.path.basename(input).split('.')[:-1])
 
     kegg_modules_df = func_db['modules']
@@ -29,7 +29,6 @@ def function_run_and_save(input, func_db, output, level):
     logger.debug("Level for summarization %d and starting summarizing KEGG Table at level with median." % level)
     if level < 8:
         kegg_table_csr, row_names = summarize_at_level(kegg_table_csr, row_names, kegg_ids, level)
-    logger.debug("Head of row names %s" % str(list(row_names.keys())[:3]))
     logger.debug("Number of rows %d" % len(list(row_names.keys())))
 
     if TAXA[level-1] not in prefix:
@@ -47,6 +46,8 @@ def function_run_and_save(input, func_db, output, level):
 
     # Normalizing for depth at median depth
     taxatable_df = normalize_by_median_depth(taxatable_df)
+    if save_median_taxatable:
+        taxatable_df.to_csv(os.path.join(output, "%s.normalized.txt" % prefix), sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
     logger.debug("Taxatable summarized shape %s" % str(taxatable_df.shape))
 
