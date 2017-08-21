@@ -52,6 +52,8 @@ ALIGNERS = {
     'bowtie2': BowtieAligner
 }
 
+#TODO: Allow for shell=True
+#TODO: Turn off post-alignment
 @cli.command(help="Run the SHOGUN aligner")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use [Note: default embalmer is capitalist, use embalmer-tax if you want to redistribute].', show_default=True)
@@ -196,6 +198,10 @@ def _load_metadata(database):
     else:
         logger.critical("Unable to load database at %s" % os.path.abspath(metadata_file))
         raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
+
+#TODO: Implement post alignment phase only
+def assign():
+    pass
 
 if __name__ == '__main__':
     cli()
