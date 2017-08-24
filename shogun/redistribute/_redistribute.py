@@ -9,6 +9,7 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 
+
 class Taxonomy:
     def __init__(self, filename: str):
         self.tax = self.parse_taxonomy(filename)
@@ -24,11 +25,14 @@ class Taxonomy:
 
 TAX_LEVELS = ['k', 'p', 'c', 'o', 'f', 'g', 's', 't']
 
+
 def tree(): return defaultdict(tree)
+
 
 def add_tree(t, path):
   for node in path.split(';'):
     t = t[node]
+
 
 def longest_path_tree(t, path):
     s = []
@@ -41,12 +45,14 @@ def longest_path_tree(t, path):
             break
     return ';'.join(s)
 
+
 def parse_bayes(filename: str) -> pd.DataFrame:
     columns = ["tax"] + TAX_LEVELS + ["genome_length"]
     df = pd.read_csv(filename, sep="\t", header=None, names=columns, index_col = 0)
     # Remove spaces in taxonomy for legacy reasons
     df.index = [_.replace(" ", "_") for _ in df.index]
     return df.sort_index()
+
 
 def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
     df = pd.read_csv(filename, sep="\t", index_col=0)
@@ -130,10 +136,12 @@ def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7):
         counts_bayes['genome_length_median'] = counts_bayes['genome_length']
     return counts_bayes
 
+
 def summarize_bayes_at_level(counts_bayes, leave_names=None, level=7):
     if not leave_names:
         leave_names = np.unique(np.array([';'.join(_.split(';')[:level]) for _ in counts_bayes.index]))
     return _summarize_bayes_at_level(counts_bayes, leave_names, level=level)
+
 
 def _filter_leaves_for_tax(leaf_counts_df, taxa):
      return np.array([_.startswith(taxa + ';') for _ in leaf_counts_df.index])
