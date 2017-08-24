@@ -3,15 +3,15 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
+from .config.settings import shogun_settings
+
+import sys
+import logging
 
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-from .config.settings import shogun_settings
-
-import sys
-import logging
 
 def _logging_setup():
     # Set up the logger
@@ -24,6 +24,7 @@ def _logging_setup():
     return root_logger
 
 logger = _logging_setup()
+
 
 class LoggerWriter:
     def __init__(self, level):

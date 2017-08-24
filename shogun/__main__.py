@@ -29,6 +29,7 @@ SETTINGS = dict()
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 TAXAMAP = dict(zip(TAXA, range(1, 9)))
 
+
 @click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP)
 @click.option('--log', type=click.Choice(('debug', 'info', 'warning', 'critical')), help="The log level to record.", default="warning")
 @click.option('--shell/--no-shell', default=False, help="Use the shell for Python subcommands (not recommended).")
@@ -54,8 +55,9 @@ ALIGNERS = {
     'bowtie2': BowtieAligner
 }
 
-#TODO: Turn off post-alignment
-#TODO: Fix redistribute bug
+
+# TODO: Turn off post-alignment
+# TODO: Fix redistribute bug
 # shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --aligner utree --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level off --threads 1
 @cli.command(help="Run the SHOGUN aligner")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
@@ -108,6 +110,7 @@ def align(ctx, aligner, input, database, output, level, function, capitalist, th
 def redistribute(ctx, input, database, level, output):
     _redistribute(database, level, output, input)
 
+
 def _redistribute(database, level, outfile, redist_inf):
     logger.debug("Beginning redistribution for file: %s" % redist_inf)
     data_files = _load_metadata(database)
@@ -135,14 +138,16 @@ def _redistribute(database, level, outfile, redist_inf):
 
     return output_files, output_levels
 
+
 @cli.command(help="Run the SHOGUN functional algorithm.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the function database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
-def function(ctx, input, database, output, level):
+def functional(ctx, input, database, output, level):
     _function([input], database, output, [level], save_median_taxatable=True)
+
 
 def _function(inputs, database, output, levels, save_median_taxatable=False):
     # Check if output exists, if not then make
@@ -164,6 +169,7 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
         else:
             continue
 
+
 @cli.command(help="Normalize a taxatable by median depth.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output taxatable.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True, allow_dash=True), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
@@ -182,6 +188,7 @@ def coverage(input, database, output, level):
     # This is only the coverage script
     _coverage(input, database, output, TAXAMAP[level])
 
+
 def _coverage(input, database, output, level):
     data_files = _load_metadata(database)
 
@@ -190,6 +197,7 @@ def _coverage(input, database, output, level):
     shear_df = parse_bayes(shear)
     outdf = get_coverage_of_microbes(input, shear_df, level)
     outdf.to_csv(output, sep='\t', float_format="%.5f",na_rep=0)
+
 
 def _load_metadata(database):
     metadata_file = os.path.join(database, 'metadata.yaml')
@@ -203,8 +211,9 @@ def _load_metadata(database):
         logger.critical("Unable to load database at %s" % os.path.abspath(metadata_file))
         raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
 
-#TODO: Implement post alignment phase only
-def assign():
+
+# TODO: Implement post alignment phase only
+def assign_taxonomy():
     pass
 
 if __name__ == '__main__':
