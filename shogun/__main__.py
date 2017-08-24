@@ -114,7 +114,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
         aligner_cl = ALIGNERS[aligner](database, threads=threads)
         aligner_cl.align(input, output)
         logger.debug(level)
-        if level is not 'off':
+        if level != 'off':
             redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
             redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
 
@@ -151,6 +151,8 @@ def _redistribute(database, level, outfile, redist_inf):
             df_output.to_csv(tmp_path, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
             output_files.append(tmp_path)
             output_levels.append(l)
+    elif level == 'off':
+        output_files = []
     else:
         df_output = redistribute_taxatable(redist_inf, shear_df, level=TAXAMAP[level])
         df_output.to_csv(outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
