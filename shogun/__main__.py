@@ -28,7 +28,7 @@ SHOGUN command-line interface\n
 SETTINGS = dict()
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 TAXAMAP = dict(zip(TAXA, range(1, 9)))
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], version_option_names=['-v', '--version'])
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 @click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP, context_settings=CONTEXT_SETTINGS)
