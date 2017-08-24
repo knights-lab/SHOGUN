@@ -11,6 +11,7 @@ import tempfile
 from shogun.coverage import get_coverage_of_microbes
 from shogun.redistribute import parse_bayes
 
+
 class TestCoverage(unittest.TestCase):
     def setUp(self):
         prefix = 'shogun-temp-dir-'

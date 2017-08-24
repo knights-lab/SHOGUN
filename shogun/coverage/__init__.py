@@ -12,6 +12,7 @@ import csv
 from shogun import logger
 from shogun.redistribute import summarize_bayes_at_level
 
+
 def zero_runs(a):
     # Stack Overflow:
     # https://stackoverflow.com/questions/24885092/finding-the-consecutive-zeros-in-a-numpy-array
@@ -21,6 +22,7 @@ def zero_runs(a):
     # Runs start and end where absdiff is 1.
     ranges = np.where(absdiff == 1)[0].reshape(-1, 2)
     return ranges
+
 
 def get_coverage_of_microbes(infile, shear, level):
     #Load in the shear df at level
@@ -85,6 +87,7 @@ def get_coverage_of_microbes(infile, shear, level):
     df = pd.DataFrame(xx, columns=['max_uncovered_region', 'percent_max_uncovered_region', 'percent_of_genome_covered', 'median_genome_size', 'hits_in_clade', 'unique_counts_of_clade', 'expected_coverage', 'ratio_covered_over_expected'], index=sorted(samples_begin_map.keys()))
     logger.info("Completed the coverage analysis.")
     return df
+
 
 def expected_coverage(length_of_genome, number_of_trials):
     num = length_of_genome*(1-np.power((length_of_genome-1)/length_of_genome, number_of_trials))

@@ -3,7 +3,6 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
-from .config.settings import shogun_settings
 
 import sys
 import logging
@@ -47,7 +46,6 @@ class LoggerWriter:
 
 __all__ = [
     'aligners',
-    'config',
     'function',
     'parsers',
     'scripts',

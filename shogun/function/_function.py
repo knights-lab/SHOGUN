@@ -18,6 +18,7 @@ from shogun.utils import normalize_by_median_depth
 
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 
+
 def function_run_and_save(input, func_db, output, level, save_median_taxatable=True):
     prefix = ".".join(os.path.basename(input).split('.')[:-1])
 
@@ -124,6 +125,7 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
 
     return out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage
 
+
 def parse_function_db(metadata: dict, database: str) -> dict:
     if not 'function' in metadata:
         return {}
@@ -145,6 +147,7 @@ def parse_function_db(metadata: dict, database: str) -> dict:
         #   row_names, column_names, csr = load_csr_matrix(npz)
         _strains = list(parse_kegg_table(files[1]))
         return dict(zip(('modules_file', 'file', 'names', 'kegg_ids', 'csr','modules'), files + _strains + [modules_df]))
+
 
 def _parse_modules(infile):
     modules_keggs = defaultdict(Counter)

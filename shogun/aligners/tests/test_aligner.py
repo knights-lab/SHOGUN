@@ -42,7 +42,6 @@ class TestAligner(unittest.TestCase):
         print(df_capitalist.head())
         print(df_non_capitalist.head())
 
-
     def test_utree_db(self):
         self.assertTrue(UtreeAligner.check_database(
             pkg_resources.resource_filename('shogun.tests', os.path.join('data')))[0])

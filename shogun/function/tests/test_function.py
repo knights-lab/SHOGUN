@@ -4,16 +4,16 @@ Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import unittest
-import pkg_resources
 import os
-from yaml import load
 import tempfile
+import unittest
 
-import pandas as pd
+import pkg_resources
+from yaml import load
 
-from shogun.function import parse_function_db, function_run_and_save
 from shogun.__main__ import _function
+from shogun.function import parse_function_db
+
 
 class TestFunctionCheck(unittest.TestCase):
     def setUp(self):
