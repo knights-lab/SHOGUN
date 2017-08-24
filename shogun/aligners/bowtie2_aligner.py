@@ -11,7 +11,9 @@ import pandas as pd
 from cytoolz import valfilter
 
 from shogun import logger
+from shogun.parsers import yield_alignments_from_sam_inf
 from shogun.redistribute import Taxonomy
+from shogun.utils import build_lca_map
 from shogun.wrappers import bowtie2_align
 from ._aligner import Aligner
 

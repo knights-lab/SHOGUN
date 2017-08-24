@@ -73,7 +73,7 @@ class TestAligner(unittest.TestCase):
         aligner = BowtieAligner(database, threads=1, shell=False)
         alignment_file = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'bowtie2_results.sam'))
         df = aligner._post_align(alignment_file)
-        print(df.head())
+        self.assertTrue(df.any())
 
 if __name__ == '__main__':
     unittest.main()
