@@ -13,17 +13,17 @@ import pandas as pd
 
 from shogun import logger
 from shogun.redistribute import Taxonomy
-from shogun.wrappers import embalmer_align
+from shogun.wrappers import burst_align
 from ._aligner import Aligner
 
 
-class EmbalmerAligner(Aligner):
-    _name = 'embalmer'
+class BurstAligner(Aligner):
+    _name = 'burst'
 
     def __init__(self, database_dir, capitalist=True, **kwargs):
         super().__init__(database_dir, **kwargs)
 
-        # Setup the embalmer database
+        # Setup the burst database
         prefix = self.data_files[self._name]
         self.database = os.path.join(self.database_dir, prefix)
 
@@ -44,15 +44,15 @@ class EmbalmerAligner(Aligner):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        self.outfile = os.path.join(outdir, 'embalmer_results.b6')
+        self.outfile = os.path.join(outdir, 'burst_results.b6')
 
         #TODO: pie chart and coverage
-        proc, out, err = embalmer_align(infile, self.outfile,
+        proc, out, err = burst_align(infile, self.outfile,
             self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell,
                                         taxa_ncbi=False, threads=self.threads)
         if self.post_align:
             df = self._post_align(self.outfile)
-            self.outfile = os.path.join(outdir, 'embalmer_taxatable.txt')
+            self.outfile = os.path.join(outdir, 'burst_taxatable.txt')
             df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 

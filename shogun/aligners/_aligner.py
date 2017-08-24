@@ -39,7 +39,7 @@ class Aligner:
             data_files = load(stream)
 
         SUFFICES = {
-            'embalmer': ['.edx'],
+            'burst': ['.edx'],
             'utree': ['.ctr'],
             'bowtie2': ['*']
         }

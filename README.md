@@ -88,8 +88,8 @@ Usage: shogun align [OPTIONS]
   Run the SHOGUN aligner
 
 Options:
-  -a, --aligner [all|bowtie2|embalmer|utree]
-                                  The aligner to use.  [default: embalmer]
+  -a, --aligner [all|bowtie2|burst|utree]
+                                  The aligner to use.  [default: burst]
   -i, --input PATH                The file containing the combined seqs.
                                   [required]
   -d, --database PATH             The database file.

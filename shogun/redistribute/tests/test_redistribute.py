@@ -29,7 +29,7 @@ class TestRedistribute(unittest.TestCase):
     def test_taxatable(self):
         bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.32.txt'))
         df_bayes = parse_bayes(bayes)
-        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
+        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'burst_taxatable.txt'))
         taxatable_df_5 = redistribute_taxatable(taxatable, df_bayes, level=5)
         taxatable_df_6 = redistribute_taxatable(taxatable, df_bayes, level=6)
         taxatable_df_7 = redistribute_taxatable(taxatable, df_bayes, level=7)

@@ -23,8 +23,8 @@ class TestCoverage(unittest.TestCase):
     def test_coverage_report(self):
         bayes = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'sheared_bayes.32.txt'))
         df_bayes = parse_bayes(bayes)
-        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
-        infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_results.b6'))
+        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'burst_taxatable.txt'))
+        infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'burst_results.b6'))
 
         self.assertTrue(get_coverage_of_microbes(infile, df_bayes, 6) is not None)
         self.assertTrue(get_coverage_of_microbes(infile, df_bayes, 7) is not None)

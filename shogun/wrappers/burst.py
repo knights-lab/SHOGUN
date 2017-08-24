@@ -9,13 +9,13 @@ import os
 from shogun.utils import run_command
 
 
-def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.98, tax=False,
+def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, pct_id=.98, tax=False,
                    accelerator=False, taxacut=5, shell=False, taxa_ncbi=False):
     """
 
     :param input_fp:
     :param output_fp:
-    :param embalmer_db_prefix:
+    :param burst_db_prefix:
     :param accelerator:
     :param tax:
     :param threads:
@@ -30,7 +30,7 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
     cmd = [
         'emb15',
         '--queries', input_fp,
-        '--references', embalmer_db_prefix + '.edx',
+        '--references', burst_db_prefix + '.edx',
         '--output', output_fp,
         '--threads', str(threads),
         '--mode', 'CAPITALIST',
@@ -52,7 +52,7 @@ def embalmer_align(input_fp, output_fp, embalmer_db_prefix, threads=1, pct_id=.9
     return run_command(cmd, shell=shell)
 
 
-def embalmer_build(infile, outfile_prefix, accelerator=False, shell=False, clustradius=None, shear=None):
+def burst_build(infile, outfile_prefix, accelerator=False, shell=False, clustradius=None, shear=None):
     cmd = [
         'emb15',
         '--references', infile,
@@ -78,8 +78,8 @@ def embalmulate(infile, outdir, shell=False):
     cmd = [
         'embalmulate',
         infile,
-        os.path.join(outdir, 'embalmer_otutable.txt'),
-        os.path.join(outdir, 'embalmer_taxatable.txt'),
+        os.path.join(outdir, 'burst_otutable.txt'),
+        os.path.join(outdir, 'burst_taxatable.txt'),
         'GGtrim'
     ]
 

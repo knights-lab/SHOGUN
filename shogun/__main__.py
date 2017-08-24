@@ -13,7 +13,7 @@ from yaml import load
 import pandas as pd
 
 from shogun import __version__, logger
-from shogun.aligners import EmbalmerAligner, UtreeAligner, BowtieAligner
+from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
@@ -30,7 +30,7 @@ TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'st
 TAXAMAP = dict(zip(TAXA, range(1, 9)))
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 ALIGNERS = {
-    'embalmer': EmbalmerAligner,
+    'burst': BurstAligner,
     'utree': UtreeAligner,
     'bowtie2': BowtieAligner
 }
@@ -55,7 +55,7 @@ def cli(ctx, log, shell):
 
 
 @cli.command(help="Run the SHOGUN aligner")
-@click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
+@click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'burst', 'utree']), default='burst',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
@@ -63,8 +63,6 @@ def cli(ctx, log, shell):
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
 def align(ctx, aligner, input, database, output, threads):
-    print(ctx.obj['shell'])
-    print()
     if not os.path.exists(output):
         os.makedirs(output)
 
@@ -78,14 +76,14 @@ def align(ctx, aligner, input, database, output, threads):
 
 
 @cli.command(help="Run the SHOGUN pipeline, including taxonomic and functional profiling.")
-@click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
-              help='The aligner to use [Note: default embalmer is capitalist, use embalmer-tax if you want to redistribute].', show_default=True)
+@click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'burst', 'utree']), default='burst',
+              help='The aligner to use [Note: default burst is capitalist, use burst-tax if you want to redistribute].', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions to (not required, can specify off).')
 @click.option('--function/--no-function', default=True, help='Run functional algorithms. **This will normalize the taxatable by median depth.')
-@click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with embalmer post-align or not.')
+@click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
 def pipeline(ctx, aligner, input, database, output, level, function, capitalist, threads):
@@ -93,8 +91,8 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
         os.makedirs(output)
 
     if not capitalist:
-        # Set to not run Embalmer post-align in capitalist mode
-        ALIGNERS['embalmer'] = lambda database, threads=threads, shell=ctx.shell: EmbalmerAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False)
+        # Set to not run Burst post-align in capitalist mode
+        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.shell: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False)
 
     redist_outs = []
     redist_levels = []
@@ -233,7 +231,7 @@ def _load_metadata(database):
 
 
 @cli.command(help="Run the SHOGUN assign taxonomy on alignment file")
-@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'embalmer', 'embalmer-tax', 'utree']), default='embalmer',
+@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'burst', 'burst-tax', 'utree']), default='burst',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
@@ -244,7 +242,7 @@ def assign_taxonomy(ctx, aligner, input, database, output, threads):
         os.makedirs(output)
 
     aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'])
-    if aligner == 'embalmer-tax':
+    if aligner == 'burst-tax':
         df = aligner_cl._post_align_taxonomy(input)
     else:
         df = aligner_cl._post_align(input)

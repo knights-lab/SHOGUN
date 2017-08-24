@@ -31,7 +31,7 @@ class TestFunctionCheck(unittest.TestCase):
         self.assertTrue(results is not None)
 
     def test_function(self):
-        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'embalmer_taxatable.txt'))
+        taxatable = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'burst_taxatable.txt'))
         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
 
         outdir = os.path.join(self.temp_dir.name)
