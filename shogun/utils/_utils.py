@@ -29,6 +29,8 @@ def elapsed_timer():
 def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
     """
     Run prepared behave command in shell and return its output.
+    :param stderr:
+    :param stdout:
     :param cmd: Well-formed behave command to run.
     :param shell: Force subprocess to use shell, not recommended
     :return:
@@ -36,11 +38,11 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
 
     try:
         cmd = [str(i) for i in cmd]
-        FNULL = open(os.devnull, 'w')
+
         if not stdout:
-            stdout = FNULL
+            stdout = open(os.devnull, 'w')
         if not stderr:
-            stderr = FNULL
+            stderr = open(os.devnull, 'w')
 
         logger.debug(" ".join(cmd))
         with elapsed_timer() as elapsed:
@@ -56,7 +58,6 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
                 log_subprocess_output(proc.stdout)
         logger.debug("%.2f seconds" % elapsed())
         logger.debug("Subprocess finished.")
-
 
         if proc.returncode != 0:
             raise AssertionError("exit code is non zero: %d\n%s" % (proc.returncode, " ".join(cmd)))
