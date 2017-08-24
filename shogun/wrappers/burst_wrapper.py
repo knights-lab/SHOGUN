@@ -28,7 +28,7 @@ def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, pct_id=.98, tax
     #TODO: Look up SOP
 
     cmd = [
-        'emb15',
+        'burst15',
         '--queries', input_fp,
         '--references', burst_db_prefix + '.edx',
         '--output', output_fp,

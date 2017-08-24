@@ -3,6 +3,6 @@ general:
   fasta: genomes.small.fna
   shear: sheared_bayes.fixed.txt
 function: function/ko
-embalmer: embalmer/genomes.small
+burst: burst/genomes.small
 bowtie2: bowtie2/genomes.small
 utree: utree/genomes.small
