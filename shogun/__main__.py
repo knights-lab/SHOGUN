@@ -243,7 +243,7 @@ def _load_metadata(database):
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
 @click.pass_context
-def align(ctx, aligner, input, database, output, threads):
+def assign_taxonomy(ctx, aligner, input, database, output, threads):
     if not os.path.exists(output):
         os.makedirs(output)
 
