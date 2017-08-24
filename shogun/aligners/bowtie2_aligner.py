@@ -11,9 +11,9 @@ import pandas as pd
 from cytoolz import valfilter
 
 from shogun import logger
-from shogun.aligners import Aligner
 from shogun.redistribute import Taxonomy
 from shogun.wrappers import bowtie2_align
+from ._aligner import Aligner
 
 
 class BowtieAligner(Aligner):

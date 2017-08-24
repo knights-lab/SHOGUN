@@ -11,7 +11,7 @@ from collections import defaultdict, Counter
 import pandas as pd
 
 from shogun import logger
-from shogun.aligners import Aligner
+from ._aligner import Aligner
 
 
 class UtreeAligner(Aligner):
