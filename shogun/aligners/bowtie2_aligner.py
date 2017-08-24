@@ -36,7 +36,7 @@ class BowtieAligner(Aligner):
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
         if self.post_align:
             df = self._post_align(outfile)
-            self.outfile = os.path.join(outdir, 'bowtie2_taxon_counts.txt')
+            self.outfile = os.path.join(outdir, 'taxatable.bowtie2.txt')
             df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
