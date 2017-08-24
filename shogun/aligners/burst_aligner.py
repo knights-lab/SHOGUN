@@ -20,7 +20,7 @@ from ._aligner import Aligner
 class EmbalmerAligner(Aligner):
     _name = 'embalmer'
 
-    def __init__(self, database_dir, post_align='capitalist', **kwargs):
+    def __init__(self, database_dir, capitalist=True, **kwargs):
         super().__init__(database_dir, **kwargs)
 
         # Setup the embalmer database
@@ -32,10 +32,10 @@ class EmbalmerAligner(Aligner):
         else:
             self.accelerator = False
         self.tree = Taxonomy(self.tax)
-        self.post_align = post_align
+        self.capitalist = capitalist
 
     def _post_align(self, outf):
-        if self.post_align == 'capitalist':
+        if self.capitalist:
             return self._post_align_capitalist(outf)
         else:
             return self._post_align_taxonomy(outf)

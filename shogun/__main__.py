@@ -29,6 +29,11 @@ SETTINGS = dict()
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 TAXAMAP = dict(zip(TAXA, range(1, 9)))
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+ALIGNERS = {
+    'embalmer': EmbalmerAligner,
+    'utree': UtreeAligner,
+    'bowtie2': BowtieAligner
+}
 
 
 @click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP, context_settings=CONTEXT_SETTINGS)
@@ -37,7 +42,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, log, shell):
-    ctx.obj = {'log': log}
+    ctx.obj = {'log': log, 'shell': shell}
 
     if log == 'debug':
         logger.setLevel(logging.DEBUG)
@@ -47,14 +52,6 @@ def cli(ctx, log, shell):
         logger.setLevel(logging.WARNING)
     else:
         logger.setLevel(logging.CRITICAL)
-    ctx.obj = shell
-
-
-ALIGNERS = {
-    'embalmer': EmbalmerAligner,
-    'utree': UtreeAligner,
-    'bowtie2': BowtieAligner
-}
 
 
 @cli.command(help="Run the SHOGUN aligner")
@@ -66,16 +63,17 @@ ALIGNERS = {
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
 def align(ctx, aligner, input, database, output, threads):
-    print(ctx)
+    print(ctx.obj['shell'])
+    print()
     if not os.path.exists(output):
         os.makedirs(output)
 
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.shell)
+            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.obj['shell'])
             aligner_cl.align(input, output)
     else:
-        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.shell)
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.obj['shell'])
         aligner_cl.align(input, output)
 
 
@@ -96,13 +94,13 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
 
     if not capitalist:
         # Set to not run Embalmer post-align in capitalist mode
-        ALIGNERS['embalmer'] = lambda database, threads=threads, shell=ctx.shell: EmbalmerAligner(database, shell=shell, threads=threads, post_align='taxonomy')
+        ALIGNERS['embalmer'] = lambda database, threads=threads, shell=ctx.shell: EmbalmerAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False)
 
     redist_outs = []
     redist_levels = []
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads, shell=ctx.shell)
+            aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'])
             aligner_cl.align(input, output)
             if level is not 'off':
                 redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
@@ -218,7 +216,7 @@ def _coverage(input, database, output, level):
 
     shear_df = parse_bayes(shear)
     outdf = get_coverage_of_microbes(input, shear_df, level)
-    outdf.to_csv(output, sep='\t', float_format="%.5f",na_rep=0)
+    outdf.to_csv(output, sep='\t', float_format="%.5f", na_rep=0)
 
 
 def _load_metadata(database):
@@ -245,7 +243,7 @@ def assign_taxonomy(ctx, aligner, input, database, output, threads):
     if not os.path.exists(output):
         os.makedirs(output)
 
-    aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.shell)
+    aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'])
     if aligner == 'embalmer-tax':
         df = aligner_cl._post_align_taxonomy(input)
     else:
@@ -254,4 +252,4 @@ def assign_taxonomy(ctx, aligner, input, database, output, threads):
 
 
 if __name__ == '__main__':
-    cli()
+    cli(obj={})
