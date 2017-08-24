@@ -99,9 +99,9 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
         # Set to not run Embalmer post-align in capitalist mode
         ALIGNERS['embalmer'] = lambda database, threads=threads, shell=ctx.shell: EmbalmerAligner(database, shell=shell, threads=threads, post_align='taxonomy')
 
+    redist_outs = []
+    redist_levels = []
     if aligner == 'all':
-        redist_outs = []
-        redist_levels = []
         for align in ALIGNERS.values():
             aligner_cl = align(database, threads=threads, shell=ctx.shell)
             aligner_cl.align(input, output)
@@ -118,7 +118,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
             redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
             redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
 
-    if function and level is not 'off':
+    if function and level != 'off':
         _function(redist_outs, database, output, redist_levels, save_median_taxatable=True)
 
 
