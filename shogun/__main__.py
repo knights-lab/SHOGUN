@@ -28,17 +28,16 @@ SHOGUN command-line interface\n
 SETTINGS = dict()
 TAXA = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
 TAXAMAP = dict(zip(TAXA, range(1, 9)))
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'], version_option_names=['-v', '--version'])
 
 
-@click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP)
+@click.group(invoke_without_command=False, help=ROOT_COMMAND_HELP, context_settings=CONTEXT_SETTINGS)
 @click.option('--log', type=click.Choice(('debug', 'info', 'warning', 'critical')), help="The log level to record.", default="warning")
 @click.option('--shell/--no-shell', default=False, help="Use the shell for Python subcommands (not recommended).")
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, log, shell):
     ctx.obj = {'log': log}
-    ctx['help_option_names'] = ['-h', '--help']
-    ctx['version_option_names'] = ['-v', '--version']
 
     if log == 'debug':
         logger.setLevel(logging.DEBUG)
