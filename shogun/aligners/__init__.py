@@ -63,4 +63,4 @@ class Aligner:
         raise NotImplementedError
 
 
-__all__ = ["BowtieAligner", "UtreeAligner", "EmbalmerAligner"]
+__all__ = ["Aligner", "BowtieAligner", "UtreeAligner", "EmbalmerAligner"]

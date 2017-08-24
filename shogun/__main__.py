@@ -176,7 +176,7 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
 def normalize(input, output):
     df = pd.read_csv(input, sep="\t", index_col=0)
     outdf = normalize_by_median_depth(df)
-    outdf.to_csv(output, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+    outdf.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
 @cli.command(help="Show confidence of coverage of microbes.")
