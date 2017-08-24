@@ -43,6 +43,7 @@ class TestBowtie(unittest.TestCase):
 
         for file in os.listdir(self.temp_dir.name):
             # self.assertTrue(self.checksums[hash_file(os.path.join(self.temp_dir.name, file))] == file)
+            continue
 
 if __name__ == '__main__':
     unittest.main()
