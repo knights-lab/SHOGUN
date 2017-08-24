@@ -47,7 +47,7 @@ def cli(ctx, log, shell):
         logger.setLevel(logging.WARNING)
     else:
         logger.setLevel(logging.CRITICAL)
-    ctx.shell = shell
+    ctx.obj = shell
 
 
 ALIGNERS = {
@@ -66,6 +66,7 @@ ALIGNERS = {
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
 def align(ctx, aligner, input, database, output, threads):
+    print(ctx)
     if not os.path.exists(output):
         os.makedirs(output)
 
@@ -78,9 +79,6 @@ def align(ctx, aligner, input, database, output, threads):
         aligner_cl.align(input, output)
 
 
-# TODO: Fix redistribute bug
-# shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --aligner utree --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level off --threads 1
-# TODO: Can't turn 'off' redistribute
 @cli.command(help="Run the SHOGUN pipeline, including taxonomic and functional profiling.")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use [Note: default embalmer is capitalist, use embalmer-tax if you want to redistribute].', show_default=True)
