@@ -56,10 +56,31 @@ ALIGNERS = {
 }
 
 
-# TODO: Turn off post-alignment
+@cli.command(help="Run the SHOGUN aligner")
+@click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
+              help='The aligner to use.', show_default=True)
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
+@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
+@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
+@click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
+@click.pass_context
+def align(ctx, aligner, input, database, output, threads):
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    if aligner == 'all':
+        for align in ALIGNERS.values():
+            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.shell)
+            aligner_cl.align(input, output)
+    else:
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.shell)
+        aligner_cl.align(input, output)
+
+
 # TODO: Fix redistribute bug
 # shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --aligner utree --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level off --threads 1
-@cli.command(help="Run the SHOGUN aligner")
+# TODO: Can't turn 'off' redistribute
+@cli.command(help="Run the SHOGUN pipeline, including taxonomic and functional profiling.")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'embalmer', 'utree']), default='embalmer',
               help='The aligner to use [Note: default embalmer is capitalist, use embalmer-tax if you want to redistribute].', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
@@ -70,7 +91,7 @@ ALIGNERS = {
 @click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with embalmer post-align or not.')
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.pass_context
-def align(ctx, aligner, input, database, output, level, function, capitalist, threads):
+def pipeline(ctx, aligner, input, database, output, level, function, capitalist, threads):
     if not os.path.exists(output):
         os.makedirs(output)
 
@@ -97,7 +118,7 @@ def align(ctx, aligner, input, database, output, level, function, capitalist, th
             redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
             redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
 
-    if function:
+    if function and level is not 'off':
         _function(redist_outs, database, output, redist_levels, save_median_taxatable=True)
 
 
@@ -212,9 +233,24 @@ def _load_metadata(database):
         raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
 
 
-# TODO: Implement post alignment phase only
-def assign_taxonomy():
-    pass
+@cli.command(help="Run the SHOGUN assign taxonomy on alignment file")
+@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'embalmer', 'embalmer-tax', 'utree']), default='embalmer',
+              help='The aligner to use.', show_default=True)
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
+@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
+@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
+@click.pass_context
+def align(ctx, aligner, input, database, output, threads):
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.shell)
+    if aligner == 'embalmer-tax':
+        df = aligner_cl._post_align_taxonomy(input)
+    else:
+        df = aligner_cl._post_align(input)
+    df.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
+
 
 if __name__ == '__main__':
     cli()

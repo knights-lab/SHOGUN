@@ -34,9 +34,10 @@ class UtreeAligner(Aligner):
         #TODO: pie chart and coverage
         proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, shell=self.shell)
 
-        df = self._post_align(outfile)
-        self.outfile = os.path.join(outdir, 'utree_taxon_counts.txt')
-        df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+        if self.post_align:
+            df = self._post_align(outfile)
+            self.outfile = os.path.join(outdir, 'utree_taxon_counts.txt')
+            df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
     def _post_align(self, utree_out: str) -> pd.DataFrame:
