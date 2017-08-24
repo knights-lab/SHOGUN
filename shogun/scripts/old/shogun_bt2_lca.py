@@ -12,7 +12,7 @@ import pandas as pd
 from cytoolz import valmap, valfilter
 
 from shogun.utils.last_common_ancestor import build_lca_map
-from shogun.wrappers.bowtie import bowtie2_align
+from shogun.wrappers.bowtie2_wrapper import bowtie2_align
 
 from dojo.taxonomy import NCBITree
 

@@ -12,7 +12,7 @@ import tempfile
 
 
 from shogun.utils import hash_file, read_checksums
-from shogun.wrappers.bowtie import bowtie2_align, bowtie2_build
+from shogun.wrappers.bowtie2_wrapper import bowtie2_align, bowtie2_build
 
 
 class TestBowtie(unittest.TestCase):

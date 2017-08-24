@@ -12,7 +12,7 @@ import tempfile
 
 from shogun.utils import hash_file, read_checksums
 #TODO: Implement utree rank flexible testing
-from shogun.wrappers.utree import utree_build, utree_build_gg, utree_compress, utree_search, utree_search_gg
+from shogun.wrappers.utree_wrapper import utree_build, utree_build_gg, utree_compress, utree_search, utree_search_gg
 
 
 class TestUtree(unittest.TestCase):

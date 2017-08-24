@@ -11,7 +11,7 @@ import os
 import tempfile
 
 from shogun.utils import hash_file, read_checksums
-from shogun.wrappers.burst import burst_align, burst_build, embalmulate
+from shogun.wrappers.burst_wrapper import burst_align, burst_build, embalmulate
 
 
 class TestBurst(unittest.TestCase):
