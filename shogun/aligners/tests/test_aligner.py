@@ -39,8 +39,7 @@ class TestAligner(unittest.TestCase):
         df_capitalist = aligner._post_align(alignment_file)
         aligner.post_align = 'taxonomy'
         df_non_capitalist = aligner._post_align(alignment_file)
-        print(df_capitalist.head())
-        print(df_non_capitalist.head())
+        self.assertTrue(df_non_capitalist.any().any())
 
     def test_utree_db(self):
         self.assertTrue(UtreeAligner.check_database(
@@ -73,7 +72,7 @@ class TestAligner(unittest.TestCase):
         aligner = BowtieAligner(database, threads=1, shell=False)
         alignment_file = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'results', 'bowtie2_results.sam'))
         df = aligner._post_align(alignment_file)
-        self.assertTrue(df.any())
+        self.assertTrue(df.any().any())
 
 if __name__ == '__main__':
     unittest.main()
