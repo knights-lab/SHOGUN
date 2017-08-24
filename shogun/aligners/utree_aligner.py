@@ -11,6 +11,7 @@ from collections import defaultdict, Counter
 import pandas as pd
 
 from shogun import logger
+from shogun.wrappers import utree_search_gg
 from ._aligner import Aligner
 
 
