@@ -124,6 +124,9 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), help='The output file', show_default=True)
 @click.pass_context
 def redistribute(ctx, input, database, level, output):
+    if not os.path.exists(os.path.dirname(output)):
+        os.makedirs(os.path.dirname(output))
+
     _redistribute(database, level, output, input)
 
 
@@ -190,8 +193,11 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
 
 @cli.command(help="Normalize a taxatable by median depth.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output taxatable.")
-@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True, allow_dash=True), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
+@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
 def normalize(input, output):
+    if not os.path.exists(os.path.dirname(output)):
+        os.makedirs(os.path.dirname(output))
+
     df = pd.read_csv(input, sep="\t", index_col=0)
     outdf = normalize_by_median_depth(df)
     outdf.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
@@ -203,6 +209,9 @@ def normalize(input, output):
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 def coverage(input, database, output, level):
+    if not os.path.exists(os.path.dirname(output)):
+        os.makedirs(os.path.dirname(output))
+
     # This is only the coverage script
     _coverage(input, database, output, TAXAMAP[level])
 
@@ -238,8 +247,8 @@ def _load_metadata(database):
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
 @click.pass_context
 def assign_taxonomy(ctx, aligner, input, database, output):
-    if not os.path.exists(output):
-        os.makedirs(output)
+    if not os.path.exists(os.path.dirname(output)):
+        os.makedirs(os.path.dirname(output))
 
     aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
     if aligner == 'burst-tax':
