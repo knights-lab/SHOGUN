@@ -241,7 +241,7 @@ def assign_taxonomy(ctx, aligner, input, database, output):
     if not os.path.exists(output):
         os.makedirs(output)
 
-    aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'])
+    aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
     if aligner == 'burst-tax':
         df = aligner_cl._post_align_taxonomy(input)
     else:
