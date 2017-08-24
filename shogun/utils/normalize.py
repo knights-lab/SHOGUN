@@ -5,6 +5,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 """
 from shogun import logger
 
+
 def normalize_by_median_depth(df):
     logger.debug("Normalizing to median depth")
     return df.div(df.sum(axis=0).div(df.sum(axis=0).median()), axis=1).round().astype(int)
