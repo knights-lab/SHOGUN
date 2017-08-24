@@ -54,7 +54,7 @@ def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, pct_id=.98, tax
 
 def burst_build(infile, outfile_prefix, accelerator=False, shell=False, clustradius=None, shear=None):
     cmd = [
-        'emb15',
+        'burst15',
         '--references', infile,
         '--output', outfile_prefix + ".edb",
         '--npenalize',
