@@ -19,15 +19,15 @@ def utree_build(input_fasta, input_fasta_labels, output_uncompressed_tree, threa
     return run_command(cmd, shell=shell)
 
 
-def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=1, overlap=16, shell=False):
-    # usage: utree-buildGG input_fasta.fa labels.map output.ubt [threads]
+def utree_build_gg(input_fasta, input_fasta_labels, output_uncompressed_tree, threads=1, complevel=2, shell=False):
+    # [v2.0 SigNature Edition] usage: utree-buildGG input_fasta.fa labels.map output.ubt threads{0=auto} [complevel]
     cmd = [
         'utree-build_gg',
         input_fasta,
         input_fasta_labels,
         output_uncompressed_tree,
         threads,
-        overlap
+        complevel
     ]
     return run_command(cmd, shell=shell)
 
@@ -49,17 +49,18 @@ def utree_search(input_compressed_tree, input_fasta_to_search, output, shell=Fal
         input_compressed_tree,
         input_fasta_to_search,
         output
-    ]
+]
     return run_command(cmd, shell=shell)
 
 
-def utree_search_gg(input_compressed_tree, input_fasta_to_search, output, shell=False):
-    # usage: xtree-searchGG compTreeGG.ctr fastaToSearch.fa output.txt
+def utree_search_gg(input_compressed_tree, input_fasta_to_search, output, threads=1, shell=False):
+    # [v1.5a] usage: xtree-searchGG compTree.ctr fastaToSearch.fa output.txt [threads] [RC]
     cmd = [
         'utree-search_gg',
         input_compressed_tree,
         input_fasta_to_search,
         output,
+        threads,
         'RC'
     ]
     return run_command(cmd, shell=shell)

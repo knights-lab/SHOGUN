@@ -32,7 +32,7 @@ class UtreeAligner(Aligner):
         outfile = os.path.join(outdir, 'alignment.utree.tsv')
 
         #TODO: pie chart and coverage
-        proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, shell=self.shell)
+        proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, threads=self.threads, shell=self.shell)
 
         if self.post_align:
             df = self._post_align(outfile)
