@@ -9,6 +9,8 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 
+from shogun import logger
+
 
 class Taxonomy:
     def __init__(self, filename: str):
@@ -86,6 +88,9 @@ def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
         leave_filter = _filter_leaves_for_tax(leaf_counts_df, tmp_name)
         num_leaves = np.sum(leave_filter)
         if num_leaves == 0 or num_leaves is None:
+            if row.name == "":
+                logger.debug("Conflict found for sequence at the kingdom level, skipping.")
+                continue
             # Filter back row names until in counts_bayes
             blank = ['k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__', 't__']
             for i, _ in enumerate(row.name.split(';')):
@@ -144,4 +149,4 @@ def summarize_bayes_at_level(counts_bayes, leave_names=None, level=7):
 
 
 def _filter_leaves_for_tax(leaf_counts_df, taxa):
-     return np.array([_.startswith(taxa + ';') for _ in leaf_counts_df.index])
+    return np.array([_.startswith(taxa + ';') for _ in leaf_counts_df.index])
