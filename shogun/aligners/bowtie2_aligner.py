@@ -29,7 +29,7 @@ class BowtieAligner(Aligner):
         self.tree = Taxonomy(self.tax)
 
     def align(self, infile, outdir, alignments_to_report=16):
-        outfile = os.path.join(outdir, 'bowtie2_results.sam')
+        outfile = os.path.join(outdir, 'alignment.bowtie2.sam')
 
         #TODO: pie chart and coverage
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
@@ -37,7 +37,7 @@ class BowtieAligner(Aligner):
         if self.post_align:
             df = self._post_align(outfile)
             self.outfile = os.path.join(outdir, 'bowtie2_taxon_counts.txt')
-            df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+            df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
     def _post_align(self, sam_file: str) -> pd.DataFrame:

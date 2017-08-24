@@ -44,7 +44,7 @@ class BurstAligner(Aligner):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        self.outfile = os.path.join(outdir, 'burst_results.b6')
+        self.outfile = os.path.join(outdir, 'alignment.burst.b6')
 
         #TODO: pie chart and coverage
         proc, out, err = burst_align(infile, self.outfile,
@@ -52,7 +52,10 @@ class BurstAligner(Aligner):
                                         taxa_ncbi=False, threads=self.threads)
         if self.post_align:
             df = self._post_align(self.outfile)
-            self.outfile = os.path.join(outdir, 'burst_taxatable.txt')
+            if self.capitalist:
+                self.outfile = os.path.join(outdir, 'taxatable.burst.capitalist.txt')
+            else:
+                self.outfile = os.path.join(outdir, 'taxatable.burst.flexible.txt')
             df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 

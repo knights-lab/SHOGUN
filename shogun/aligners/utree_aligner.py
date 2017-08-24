@@ -29,14 +29,14 @@ class UtreeAligner(Aligner):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        outfile = os.path.join(outdir, 'utree_results.tsv')
+        outfile = os.path.join(outdir, 'alignment.utree.tsv')
 
         #TODO: pie chart and coverage
         proc, out, err = utree_search_gg(self.compressed_tree, infile, outfile, shell=self.shell)
 
         if self.post_align:
             df = self._post_align(outfile)
-            self.outfile = os.path.join(outdir, 'utree_taxon_counts.txt')
+            self.outfile = os.path.join(outdir, 'taxatable.utree.txt')
             df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
