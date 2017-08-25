@@ -101,7 +101,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
             aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'])
             aligner_cl.align(input, output)
             if level is not 'off':
-                redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
+                redist_out = os.path.join(output, "taxatable.%s.%s.txt" % (aligner_cl._name, level))
                 _redist_outs, _redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
                 redist_outs.extend(_redist_outs)
                 redist_levels.extend(_redist_levels)
