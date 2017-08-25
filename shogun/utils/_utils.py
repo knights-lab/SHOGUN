@@ -47,7 +47,7 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
         logger.debug(" ".join(cmd))
         with elapsed_timer() as elapsed:
             with subprocess.Popen(
-                cmd,
+                " ".join(cmd) if shell else cmd,
                 stdout=stdout,
                 stderr=stderr,
                 shell=shell,
