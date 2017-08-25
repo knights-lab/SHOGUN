@@ -50,8 +50,9 @@ class UtreeAligner(Aligner):
             for line  in csv_utree:
                 #TODO confidence/support filter
                 taxonomy = split_utree_taxonomy(line[1])
-                samples_lca_map['_'.join(line[0].split('_')[:-1])].update(taxonomy)
+                samples_lca_map['_'.join(line[0].split('_')[:-1])].update([taxonomy])
         df = pd.DataFrame(samples_lca_map, dtype=int)
+        import ipdb; ipdb.set_trace()
         return df
 
 def split_utree_taxonomy(tax):
@@ -62,7 +63,6 @@ def split_utree_taxonomy(tax):
         else:
             break
     return ";".join(output)
-
 
 
 def itersplit(s, sep=None):
