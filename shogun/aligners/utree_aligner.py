@@ -56,7 +56,7 @@ class UtreeAligner(Aligner):
 
 def split_utree_taxonomy(tax):
     output = []
-    for _ in itersplit(tax, ';'):
+    for _ in itersplit(tax, sep=';'):
         if len(_) > 3:
             output.append(_)
         else:
