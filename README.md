@@ -135,10 +135,10 @@ Usage: shogun coverage [OPTIONS]
   Show confidence of coverage of microbes.
 
 Options:
-  -i, --input PATH                The output BURST capitalist alignment.
+  -i, --input PATH                The output BURST alignment.
                                   [required]
   -d, --database PATH             The path to the folder containing the
-                                  function database.  [required]
+                                   database.  [required]
   -o, --output PATH               The coverage table.  [default: /mnt/c/Users/
                                   bhill/code/SHOGUN/coverage-170828.txt]
   -l, --level [genus|species|strain]
