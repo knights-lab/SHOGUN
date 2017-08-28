@@ -60,7 +60,7 @@ python -m unittest discover shogun
 
 # Documentation
 
-### SHOGUN help for Command-Line
+#### SHOGUN help for Command-Line
 SHOGUN is a command line application. It is meant to be run with a single command. The helpful for the command is below.
 
 ```
@@ -108,7 +108,7 @@ Options:
   -h, --help                      Show this message and exit.
 ```
 
-### assign_taxonomy
+#### assign_taxonomy
 
 ```
 Usage: shogun assign_taxonomy [OPTIONS]
@@ -127,7 +127,7 @@ Options:
 ```
 
 
-### coverage
+#### coverage
 
 ```
 Usage: shogun coverage [OPTIONS]
@@ -146,7 +146,7 @@ Options:
   -h, --help                      Show this message and exit.
 ```
 
-### functional
+#### functional
 
 This command assigns function at a certain taxonomic level. Lower level KEGG IDs are assigned to higher level KEGG IDs through plurality voting. Note that plasmids are not included the KEGG ID annotation.
 
@@ -181,7 +181,7 @@ Options:
   -h, --help         Show this message and exit.
 ```
 
-### pipeline
+#### pipeline
 
 ```
 Usage: shogun pipeline [OPTIONS]
