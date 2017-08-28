@@ -25,7 +25,7 @@ conda env create --file environment.yml
 Next, you need the tools UTree, Bowtie2 and BURST on your path. These are contained in the lab SOP.
 
 ```
-export PATH="/export/scratch/ben/shogun_bin$PATH"
+export PATH="/export/scratch/ben/shogun_bin:$PATH"
 ```
 
 Now activate the environment.
