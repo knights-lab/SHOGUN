@@ -1,4 +1,4 @@
-Shallow shotgun sequencing tutorial
+SHOGUN installation tutorial
 =======
 
 ## Installation

@@ -54,7 +54,7 @@ def cli(ctx, log, shell):
         logger.setLevel(logging.CRITICAL)
 
 
-@cli.command(help="Run the SHOGUN aligner")
+@cli.command(help="Run a SHOGUN alignment algorithm.")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'burst', 'utree']), default='burst',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
@@ -117,7 +117,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
         _function(redist_outs, database, output, redist_levels, save_median_taxatable=True)
 
 
-@cli.command(help="Run the SHOGUN redistribution algorithm.")
+@cli.command(help="Run the SHOGUN redistribution algorithm on a taxonomic profile.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the database folder.")
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse to.')
@@ -160,7 +160,7 @@ def _redistribute(database, level, outfile, redist_inf):
     return output_files, output_levels
 
 
-@cli.command(help="Run the SHOGUN functional algorithm.")
+@cli.command(help="Run the SHOGUN functional algorithm on a taxonomic profile.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the function database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
@@ -191,7 +191,7 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
             continue
 
 
-@cli.command(help="Normalize a taxatable by median depth.")
+@cli.command(help="Normalize a taxonomic profile by median depth.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output taxatable.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
 def normalize(input, output):
@@ -239,7 +239,7 @@ def _load_metadata(database):
         raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
 
 
-@cli.command(help="Run the SHOGUN assign taxonomy on alignment file")
+@cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
 @click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'burst', 'burst-tax', 'utree']), default='burst',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
