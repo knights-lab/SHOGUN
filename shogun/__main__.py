@@ -240,7 +240,7 @@ def _load_metadata(database):
 
 
 @cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
-@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'burst', 'burst-tax', 'utree']), default='burst',
+@click.option('-a', '--aligner', type=click.Choice(['auto', 'bowtie2', 'burst', 'burst-tax', 'utree']), default='auto',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The alignment output file.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
@@ -249,6 +249,15 @@ def _load_metadata(database):
 def assign_taxonomy(ctx, aligner, input, database, output):
     if not os.path.exists(os.path.dirname(output)):
         os.makedirs(os.path.dirname(output))
+
+    # Sniff aligner based on file extension
+    if aligner == 'auto':
+        file_ending = "input".split(".")[-1]
+        sniffer_dict = dict(zip(["b6", "sam", "tsv", "txt"], ["burst", "bowtie2", "utree", "utree"]))
+        if file_ending in sniffer_dict:
+            aligner = sniffer_dict[file_ending]
+        else:
+            logger.warning("File ending %s not found, assuming burst" % file_ending)
 
     aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
     if aligner == 'burst-tax':
