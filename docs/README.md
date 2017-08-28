@@ -65,3 +65,5 @@ Can you run SHOGUN to answer the following questions?
 2. What is the expected coverage of each taxonomy at the strain level?
 3. What is the most abundant KEGG ID and the coverage of each module?
 4. What is the variance between the profiles of each taxonomic profilers utree, burst, and bowtie2?
+5. Can you get bash tab completion working from ```bin/shogun-complete.sh```?
+6. Do any of the tests fail, and can you upload any issues to the issues page?
