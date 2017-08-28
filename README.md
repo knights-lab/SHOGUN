@@ -118,7 +118,7 @@ Usage: shogun assign_taxonomy [OPTIONS]
 Options:
   -a, --aligner [bowtie2|burst|burst-tax|utree]
                                   The aligner to use.  [default: burst]
-  -i, --input PATH                The file containing the combined seqs.
+  -i, --input PATH                The output alignment file.
                                   [required]
   -d, --database PATH             The path to the database folder.
   -o, --output PATH               The coverage table.  [default: /mnt/c/Users/

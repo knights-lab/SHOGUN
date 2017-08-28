@@ -242,7 +242,7 @@ def _load_metadata(database):
 @cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
 @click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'burst', 'burst-tax', 'utree']), default='burst',
               help='The aligner to use.', show_default=True)
-@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The alignment output file.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
 @click.pass_context
