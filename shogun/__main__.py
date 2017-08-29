@@ -252,12 +252,13 @@ def assign_taxonomy(ctx, aligner, input, database, output):
 
     # Sniff aligner based on file extension
     if aligner == 'auto':
-        file_ending = "input".split(".")[-1]
+        file_ending = input.split(".")[-1]
         sniffer_dict = dict(zip(["b6", "sam", "tsv", "txt"], ["burst", "bowtie2", "utree", "utree"]))
         if file_ending in sniffer_dict:
             aligner = sniffer_dict[file_ending]
         else:
             logger.warning("File ending %s not found, assuming burst" % file_ending)
+            aligner = "burst"
 
     aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
     if aligner == 'burst-tax':
