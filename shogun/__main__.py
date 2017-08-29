@@ -54,7 +54,7 @@ def cli(ctx, log, shell):
         logger.setLevel(logging.CRITICAL)
 
 
-@cli.command(help="Run the SHOGUN aligner")
+@cli.command(help="Run a SHOGUN alignment algorithm.")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'burst', 'utree']), default='burst',
               help='The aligner to use.', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
@@ -101,7 +101,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
             aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'])
             aligner_cl.align(input, output)
             if level is not 'off':
-                redist_out = os.path.join(output, "%s_taxatable.%s.txt" % (aligner_cl._name, level))
+                redist_out = os.path.join(output, "taxatable.%s.%s.txt" % (aligner_cl._name, level))
                 _redist_outs, _redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
                 redist_outs.extend(_redist_outs)
                 redist_levels.extend(_redist_levels)
@@ -117,7 +117,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
         _function(redist_outs, database, output, redist_levels, save_median_taxatable=True)
 
 
-@cli.command(help="Run the SHOGUN redistribution algorithm.")
+@cli.command(help="Run the SHOGUN redistribution algorithm on a taxonomic profile.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the database folder.")
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all']), default='strain', help='The level to collapse to.')
@@ -160,9 +160,9 @@ def _redistribute(database, level, outfile, redist_inf):
     return output_files, output_levels
 
 
-@cli.command(help="Run the SHOGUN functional algorithm.")
+@cli.command(help="Run the SHOGUN functional algorithm on a taxonomic profile.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
-@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the function database.")
+@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 @click.pass_context
@@ -191,7 +191,7 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
             continue
 
 
-@cli.command(help="Normalize a taxatable by median depth.")
+@cli.command(help="Normalize a taxonomic profile by median depth.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output taxatable.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The taxatable output normalized by median depth.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.normalized-%y%m%d.txt')), show_default=True)
 def normalize(input, output):
@@ -204,8 +204,8 @@ def normalize(input, output):
 
 
 @cli.command(help="Show confidence of coverage of microbes.")
-@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST capitalist alignment.")
-@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the function database.")
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST alignment.")
+@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 def coverage(input, database, output, level):
@@ -239,16 +239,25 @@ def _load_metadata(database):
         raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
 
 
-@cli.command(help="Run the SHOGUN assign taxonomy on alignment file")
-@click.option('-a', '--aligner', type=click.Choice(['bowtie2', 'burst', 'burst-tax', 'utree']), default='burst',
+@cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
+@click.option('-a', '--aligner', type=click.Choice(['auto', 'bowtie2', 'burst', 'burst-tax', 'utree']), default='auto',
               help='The aligner to use.', show_default=True)
-@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The alignment output file.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
 @click.pass_context
 def assign_taxonomy(ctx, aligner, input, database, output):
     if not os.path.exists(os.path.dirname(output)):
         os.makedirs(os.path.dirname(output))
+
+    # Sniff aligner based on file extension
+    if aligner == 'auto':
+        file_ending = "input".split(".")[-1]
+        sniffer_dict = dict(zip(["b6", "sam", "tsv", "txt"], ["burst", "bowtie2", "utree", "utree"]))
+        if file_ending in sniffer_dict:
+            aligner = sniffer_dict[file_ending]
+        else:
+            logger.warning("File ending %s not found, assuming burst" % file_ending)
 
     aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
     if aligner == 'burst-tax':

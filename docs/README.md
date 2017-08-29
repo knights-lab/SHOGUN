@@ -1,7 +1,14 @@
-Shallow shotgun sequencing tutorial
+SHOGUN installation tutorial
 =======
 
-## Installation
+### Upgrading
+
+To upgrade, simply run the following command with your environment active.
+```
+TMPDIR=/dev/shm pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
+```
+
+### Installation
 These installation instructions are streamlined for Linux and macOS systems. The tool SHOGUN is installable on Windows with a few minor tweaks to this tutorial. This package requires anaconda, which is a system agnostic package and virtual environment manager. Follow the installation instructions for your system at <http://conda.pydata.org/miniconda.html>.
 
 Once anaconda is installed, get the environment file:
@@ -15,10 +22,10 @@ Then install the requirements into the environment 'shogun':
 conda env create --file environment.yml
 ```
 
-Next, you need the tools UTree and BURST on your path. These are contained in the lab SOP.
+Next, you need the tools UTree, Bowtie2 and BURST on your path. These are contained in the lab SOP.
 
 ```
-export PATH="/project/flatiron2/sop:$PATH"
+export PATH="/export/scratch/ben/shogun_bin:$PATH"
 ```
 
 Now activate the environment.
@@ -45,5 +52,18 @@ python -m unittest discover shogun
 After the testing is complete, we can try running our analysis. To do so, run the following command:
 
 ```
-shogun --log debug align --input ./shogun/tests/data/combined_seqs.fna --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level strain
+shogun --log debug pipeline --input ./shogun/tests/data/combined_seqs.fna --database /project/flatiron2/analysis_SHOGUN/data/references/rep82 --output ~/scratch_shogun --level strain
 ```
+
+If everything up to the testing is working, below is the location of an example shallow shotgun file.
+```
+/home/grad00/hillm096/combined_seqs.fna
+```
+
+Can you run SHOGUN to answer the following questions?
+1. What is the most abundant genus, species, and strain taxonomy?
+2. What is the expected coverage of each taxonomy at the strain level?
+3. What is the most abundant KEGG ID and the coverage of each module?
+4. What is the variance between the profiles of each taxonomic profilers utree, burst, and bowtie2?
+5. Can you get bash tab completion working from ```bin/shogun-complete.sh```?
+6. Do any of the tests fail, and can you upload any issues to the issues page?
