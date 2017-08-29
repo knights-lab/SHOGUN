@@ -128,17 +128,15 @@ def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
 
 
 def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7):
-    if level <= 8:
-        counts_bayes['summary_taxa'] = [';'.join(_.split(';')[:level]) for _ in counts_bayes.index]
-        _counts_bayes = counts_bayes.groupby('summary_taxa').sum()
-        _counts_bayes['genome_length_median'] = counts_bayes.groupby('summary_taxa')['genome_length'].median().astype(int)
-        counts_bayes = _counts_bayes
-        counts = counts_bayes.iloc[:, level-1:8].sum(axis=1)
-        counts_bayes.iloc[:, level-1] = counts
-        counts_bayes = counts_bayes.drop(counts_bayes.columns[level:8], axis=1)
-        counts_bayes = counts_bayes.loc[leave_names]
-    else:
-        counts_bayes['genome_length_median'] = counts_bayes['genome_length']
+    # Something odd happened here    
+    counts_bayes['summary_taxa'] = [';'.join(_.split(';')[:level]) for _ in counts_bayes.index]
+    _counts_bayes = counts_bayes.groupby('summary_taxa').sum()
+    _counts_bayes['genome_length_median'] = counts_bayes.groupby('summary_taxa')['genome_length'].median().astype(int)
+    counts_bayes = _counts_bayes
+    counts = counts_bayes.iloc[:, level-1:8].sum(axis=1)
+    counts_bayes.iloc[:, level-1] = counts
+    counts_bayes = counts_bayes.drop(counts_bayes.columns[level:8], axis=1)
+    counts_bayes = counts_bayes.loc[leave_names]
     return counts_bayes
 
 
