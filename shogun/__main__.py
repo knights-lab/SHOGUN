@@ -92,7 +92,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
 
     if not capitalist:
         # Set to not run Burst post-align in capitalist mode
-        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.shell: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False)
+        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False)
 
     redist_outs = []
     redist_levels = []
@@ -253,7 +253,7 @@ def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
 
     if not capitalist:
         # Set to not run Burst post-align in capitalist mode
-        ALIGNERS['burst'] = lambda database, shell=ctx.shell: BurstAligner(database, shell=ctx.obj['shell'], capitalist=False)
+        ALIGNERS['burst'] = lambda database, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], capitalist=False)
 
     # Sniff aligner based on file extension
     if aligner == 'auto':
