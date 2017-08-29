@@ -242,13 +242,18 @@ def _load_metadata(database):
 @cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
 @click.option('-a', '--aligner', type=click.Choice(['auto', 'bowtie2', 'burst', 'burst-tax', 'utree']), default='auto',
               help='The aligner to use.', show_default=True)
+@click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The alignment output file.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
 @click.pass_context
-def assign_taxonomy(ctx, aligner, input, database, output):
+def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
     if not os.path.exists(os.path.dirname(output)):
         os.makedirs(os.path.dirname(output))
+
+    if not capitalist:
+        # Set to not run Burst post-align in capitalist mode
+        ALIGNERS['burst'] = lambda database, shell=ctx.shell: BurstAligner(database, shell=ctx.obj['shell'], capitalist=False)
 
     # Sniff aligner based on file extension
     if aligner == 'auto':
@@ -261,10 +266,8 @@ def assign_taxonomy(ctx, aligner, input, database, output):
             aligner = "burst"
 
     aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
-    if aligner == 'burst-tax':
-        df = aligner_cl._post_align_taxonomy(input)
-    else:
-        df = aligner_cl._post_align(input)
+
+    df = aligner_cl._post_align(input)
     df.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
