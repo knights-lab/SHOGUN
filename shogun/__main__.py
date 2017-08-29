@@ -106,7 +106,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
                 redist_outs.extend(_redist_outs)
                 redist_levels.extend(_redist_levels)
     else:
-        aligner_cl = ALIGNERS[aligner](database, threads=threads)
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'])
         aligner_cl.align(input, output)
         logger.debug(level)
         if level != 'off':
