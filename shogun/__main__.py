@@ -61,17 +61,18 @@ def cli(ctx, log, shell):
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
+@click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
 @click.pass_context
-def align(ctx, aligner, input, database, output, threads):
+def align(ctx, aligner, input, database, output, threads, percent_id):
     if not os.path.exists(output):
         os.makedirs(output)
 
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.obj['shell'])
+            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.obj['shell'], percent_id=percent_id)
             aligner_cl.align(input, output)
     else:
-        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.obj['shell'])
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.obj['shell'], percent_id=percent_id)
         aligner_cl.align(input, output)
 
 
@@ -85,14 +86,15 @@ def align(ctx, aligner, input, database, output, threads):
 @click.option('--function/--no-function', default=True, help='Run functional algorithms. **This will normalize the taxatable by median depth.')
 @click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
+@click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
 @click.pass_context
-def pipeline(ctx, aligner, input, database, output, level, function, capitalist, threads):
+def pipeline(ctx, aligner, input, database, output, level, function, capitalist, threads, percent_id):
     if not os.path.exists(output):
         os.makedirs(output)
 
     if not capitalist:
         # Set to not run Burst post-align in capitalist mode
-        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False)
+        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False, percent_id=percent_id)
 
     redist_outs = []
     redist_levels = []
@@ -106,7 +108,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
                 redist_outs.extend(_redist_outs)
                 redist_levels.extend(_redist_levels)
     else:
-        aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'])
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'], percent_id=percent_id)
         aligner_cl.align(input, output)
         logger.debug(level)
         if level != 'off':

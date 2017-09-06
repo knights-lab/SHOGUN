@@ -49,7 +49,7 @@ class BurstAligner(Aligner):
         #TODO: pie chart and coverage
         proc, out, err = burst_align(infile, self.outfile,
             self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell,
-                                        taxa_ncbi=False, threads=self.threads)
+                                        taxa_ncbi=False, threads=self.threads, percent_id=self.percent_id)
         if self.post_align:
             df = self._post_align(self.outfile)
             if self.capitalist:

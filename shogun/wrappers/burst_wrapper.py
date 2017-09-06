@@ -9,7 +9,7 @@ import os
 from shogun.utils import run_command
 
 
-def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, pct_id=.98, tax=False,
+def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, percent_id=.98, tax=False,
                    accelerator=False, taxacut=5, shell=False, taxa_ncbi=False):
     """
 
@@ -34,7 +34,7 @@ def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, pct_id=.98, tax
         '--output', output_fp,
         '--threads', str(threads),
         '--mode', 'CAPITALIST',
-        '--id', str(pct_id),
+        '--id', str(percent_id),
         '--npenalize',
         '--skipambig',
         '--forwardreverse'

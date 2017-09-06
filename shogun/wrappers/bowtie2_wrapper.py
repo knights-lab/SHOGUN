@@ -7,7 +7,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 from shogun.utils import run_command
 
 
-def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_threads=1, shell=False):
+def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_threads=1, shell=False, percent_id=.98):
     """
     Search a bowtie2 index with multiple alignment.
     :param infile: the query FASTA file
@@ -26,7 +26,7 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_thread
            '--mp', '"1,1"',
            '--rdg', '"0,1"',
            '--rfg', '"0,1"',
-           '--score-min', '"L,0,-0.02"',
+           '--score-min', format_pct_id(percent_id),
            '-f', infile,
            '--very-sensitive',
            '-k', str(alignments_to_report),
@@ -45,3 +45,7 @@ def bowtie2_build(infile, outfile, shell=False):
     """
     cmd = ['bowtie2-build', '-f', infile, outfile]
     return run_command(cmd, shell=shell)
+
+
+def format_pct_id(percent_id):
+    return '"L,0,-{:03.2f}"'.format(1-float(percent_id))

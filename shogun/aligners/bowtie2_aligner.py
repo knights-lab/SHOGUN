@@ -33,7 +33,7 @@ class BowtieAligner(Aligner):
 
         #TODO: pie chart and coverage
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
-                             num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell)
+                             num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell, percent_id=self.percent_id)
         if self.post_align:
             df = self._post_align(outfile)
             self.outfile = os.path.join(outdir, 'taxatable.bowtie2.txt')

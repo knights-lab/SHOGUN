@@ -14,7 +14,7 @@ from shogun import logger
 class Aligner:
     _name = None
 
-    def __init__(self, database_dir, threads=1, post_align=True, shell=False):
+    def __init__(self, database_dir, threads=1, post_align=True, shell=False, percent_id=.98):
         self.threads = threads
         self.shell = shell
         check, msg = self.check_database(database_dir)
@@ -32,6 +32,7 @@ class Aligner:
         self.outfile = None
         logger.debug("Initiate Logger %s" % self._name)
         self.post_align = post_align
+        self.percent_id = percent_id
 
     @classmethod
     def check_database(cls, dir):
