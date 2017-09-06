@@ -95,7 +95,7 @@ def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
             blank = ['k__', 'p__', 'c__', 'o__', 'f__', 'g__', 's__', 't__']
             for i, _ in enumerate(row.name.split(';')):
                 blank[i] = _
-            tmp_counts_bayes_row = _summarize_bayes_at_level(counts_bayes, row.name, level=row.name.count(';') + 1)
+            tmp_counts_bayes_row = _summarize_bayes_at_level(counts_bayes, row.name, level=row.name.count(';') + 1, drop_level=level)
             tmp_counts_bayes_row.name = ';'.join(blank[:level])
             row.name = tmp_counts_bayes_row.name
             leaf_counts_df = leaf_counts_df.append(row[:-1])
@@ -127,15 +127,22 @@ def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
     return leaf_counts_df
 
 
-def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7):
-    # Something odd happened here    
+def _summarize_bayes_at_level(counts_bayes: pd.DataFrame, leave_names, level=7, drop_level=False):
+    # Something odd happened here
     counts_bayes['summary_taxa'] = [';'.join(_.split(';')[:level]) for _ in counts_bayes.index]
     _counts_bayes = counts_bayes.groupby('summary_taxa').sum()
     _counts_bayes['genome_length_median'] = counts_bayes.groupby('summary_taxa')['genome_length'].median().astype(int)
     counts_bayes = _counts_bayes
-    counts = counts_bayes.iloc[:, level-1:8].sum(axis=1)
-    counts_bayes.iloc[:, level-1] = counts
-    counts_bayes = counts_bayes.drop(counts_bayes.columns[level:8], axis=1)
+    if drop_level:
+        counts = counts_bayes.iloc[:, drop_level-1:8].sum(axis=1)
+        counts_bayes.iloc[:, drop_level-1] = counts
+    else:
+        counts = counts_bayes.iloc[:, level-1:8].sum(axis=1)
+        counts_bayes.iloc[:, level-1] = counts
+    if drop_level:
+        counts_bayes = counts_bayes.drop(counts_bayes.columns[drop_level:8], axis=1)
+    else:
+        counts_bayes = counts_bayes.drop(counts_bayes.columns[level:8], axis=1)
     counts_bayes = counts_bayes.loc[leave_names]
     return counts_bayes
 
