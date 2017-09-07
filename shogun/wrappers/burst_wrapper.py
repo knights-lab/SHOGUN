@@ -9,6 +9,39 @@ import os
 from shogun.utils import run_command
 
 
+def burst_align_best(input_fp, output_fp, burst_db_prefix, accelerator=False, threads=1, shell=False):
+    """
+    :param input_fp:
+    :param output_fp:
+    :param burst_db_prefix:
+    :param accelerator:
+    :param tax:
+    :param threads:
+    :param pct_id:
+    :param shell:
+    :param taxa_ncbi:
+    :return:
+    """
+
+    #TODO: Look up SOP
+
+    cmd = [
+        'burst15',
+        '--queries', input_fp,
+        '--references', burst_db_prefix + '.edx',
+        '--output', output_fp,
+        '--threads', str(threads),
+        '--mode', 'BEST',
+        '--npenalize',
+        '--forwardreverse'
+    ]
+
+    if accelerator:
+        cmd += ['--accelerator', accelerator]
+
+    return run_command(cmd, shell=shell)
+
+
 def burst_align(input_fp, output_fp, burst_db_prefix, threads=1, percent_id=.98, tax=False,
                    accelerator=False, taxacut=5, shell=False, taxa_ncbi=False):
     """
@@ -72,7 +105,6 @@ def burst_build(infile, outfile_prefix, accelerator=False, shell=False, clustrad
         cmd += ['--clustradius', str(clustradius)]
 
     return run_command(cmd, shell=shell)
-
 
 def embalmulate(infile, outdir, shell=False):
     cmd = [

@@ -13,7 +13,7 @@ from yaml import load
 import pandas as pd
 
 from shogun import __version__, logger
-from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner
+from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlignerBest
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db
 from shogun.redistribute import redistribute_taxatable, parse_bayes
@@ -272,6 +272,20 @@ def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
     df = aligner_cl._post_align(input)
     df.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
+
+@cli.command(help="Run a SHOGUN alignment algorithm.")
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
+@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
+@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
+@click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
+@click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
+@click.pass_context
+def filter(ctx, input, database, output, threads, percent_id):
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    aligner_cl = BurstAlignerBest(database, threads=threads, post_align=True, shell=ctx.obj['shell'], percent_id=percent_id)
+    aligner_cl.align(input, output)
 
 if __name__ == '__main__':
     cli(obj={})

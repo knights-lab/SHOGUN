@@ -120,3 +120,22 @@ def load_csr_matrix(filename):
     args = (loader['data'], loader['indices'], loader['indptr'])
     matrix = ss.csr_matrix(args, shape=loader['shape'])
     return loader['rownames'], loader['columnnames'], matrix
+
+
+def read_fasta(fh):
+    """
+    :return: tuples of (title, seq)
+    """
+    title = None
+    data = None
+    for line in fh:
+        if line[0] == ">":
+            if title:
+                yield (title.strip(), data)
+            title = line[1:]
+            data = ''
+        else:
+            data += line.strip()
+    if not title:
+        yield None
+    yield (title.strip(), data)
