@@ -273,7 +273,7 @@ def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
     df.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
-@cli.command(help="Run a SHOGUN alignment algorithm.")
+@cli.command(help="Filter out contaminate reads.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
