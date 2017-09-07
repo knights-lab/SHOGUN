@@ -42,7 +42,8 @@ class Aligner:
         SUFFICES = {
             'burst': ['.edx'],
             'utree': ['.ctr'],
-            'bowtie2': ['*']
+            'bowtie2': ['*'],
+            'burst_best': ['.edx']
         }
         for value in SUFFICES[cls._name]:
             if cls._name == "bowtie2":
