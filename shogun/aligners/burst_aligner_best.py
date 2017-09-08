@@ -16,14 +16,17 @@ from shogun import logger
 class BurstAlignerBest(BurstAligner):
     _name = 'burst_best'
 
-    def align(self, infile, outdir):
+    def align(self, infile, outdir, align=True):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
         self.outfile = os.path.join(outdir, 'alignment.burst.best.b6')
 
         #TODO: pie chart and coverage
-        proc, out, err = burst_align_best(infile, self.outfile, self.database, accelerator=self.accelerator, shell=self.shell, threads=self.threads)
+        if align:
+            proc, out, err = burst_align_best(infile, self.outfile, self.database, accelerator=self.accelerator, shell=self.shell, threads=self.threads)
+        else:
+            proc, out, err = (None, None, None)
         if self.post_align:
             alignments = self._post_align(self.outfile)
             post_filtered = os.path.join(outdir, 'combined_seqs.filtered.fna')
@@ -47,7 +50,7 @@ class BurstAlignerBest(BurstAligner):
             for row in alignment_gen:
                 alignment_score = float(row[2])
                 if alignment_score > self.percent_id:
-                    alignments.add([row[0]])
+                    alignments.add(row[0])
                     i += 1
         logger.info("Human hits filter: %d" % i)
         return alignments
