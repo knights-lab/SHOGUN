@@ -24,7 +24,7 @@ class BurstAlignerBest(BurstAligner):
 
         #TODO: pie chart and coverage
         if align:
-            proc, out, err = burst_align_best(infile, self.outfile, self.database, accelerator=self.accelerator, shell=self.shell, threads=self.threads)
+            proc, out, err = burst_align_best(infile, self.outfile, self.database, accelerator=self.accelerator, shell=self.shell, threads=self.threads, percent_id=self.percent_id)
         else:
             proc, out, err = (None, None, None)
         if self.post_align:
