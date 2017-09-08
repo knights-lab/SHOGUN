@@ -36,7 +36,8 @@ class BurstAlignerBest(BurstAligner):
                 with open(post_filtered, 'w') as outf_post_filtered:
                     with open(post_unfiltered, 'w') as outf_post_unfiltered:
                         for title, seq in fasta_gen:
-                            if title in alignments:
+                            stripped_title = title.split()[0]
+                            if stripped_title in alignments:
                                 outf_post_filtered.write(">%s\n%s\n" % (title, seq))
                             else:
                                 outf_post_unfiltered.write(">%s\n%s\n" % (title, seq))
