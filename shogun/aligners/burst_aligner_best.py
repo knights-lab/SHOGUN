@@ -14,7 +14,7 @@ from shogun import logger
 
 
 class BurstAlignerBest(BurstAligner):
-    _name = 'burst_best'
+    _name = 'filter'
 
     def align(self, infile, outdir, align=True):
         if not os.path.exists(outdir):
@@ -49,7 +49,7 @@ class BurstAlignerBest(BurstAligner):
             alignment_gen = csv.reader(alignment_file, delimiter="\t")
             for row in alignment_gen:
                 alignment_score = float(row[2])
-                if alignment_score > self.percent_id:
+                if alignment_score >= self.percent_id:
                     alignments.add(row[0])
                     i += 1
         logger.info("Human hits filter: %d" % i)

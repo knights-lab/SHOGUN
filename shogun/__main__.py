@@ -279,14 +279,14 @@ def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
-@click.option('-a', '--post_align_only', type=click.BOOL, default=True, show_default=True, help="Only run post align filtering. <Input file must be in output folder named: alignment.burst.best.b6>")
+@click.option('-a', '--alignment', type=click.BOOL, default=True, show_default=True, help="Run alignment. If FALSE then alignment files must be named <output_folder>/alignment.filter.b6.")
 @click.pass_context
-def filter(ctx, input, database, output, threads, percent_id, post_align_only):
+def filter(ctx, input, database, output, threads, percent_id, alignment):
     if not os.path.exists(output):
         os.makedirs(output)
 
     aligner_cl = BurstAlignerBest(database, threads=threads, post_align=True, shell=ctx.obj['shell'], percent_id=percent_id)
-    aligner_cl.align(input, output, align=post_align_only)
+    aligner_cl.align(input, output, align=alignment)
 
 if __name__ == '__main__':
     cli(obj={})
