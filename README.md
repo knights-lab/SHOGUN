@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/51028464.svg)](https://zenodo.org/badge/latestdoi/51028464)
+
 Shallow shotgun sequencing
 =======
 Shallow seq pipeline for optimal shotgun data usage
