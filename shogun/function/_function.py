@@ -154,7 +154,7 @@ def _parse_modules(infile):
     with open(infile) as inf:
         csv_inf = csv.reader(inf, delimiter="\t")
         for row in csv_inf:
-            modules_keggs[row[0]].update([row[-1][:7]])
+            modules_keggs[row[0].rstrip()].update([row[-1][:7]])
     return pd.DataFrame(modules_keggs).fillna(0.0).astype(int)
 
 

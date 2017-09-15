@@ -100,7 +100,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
     redist_levels = []
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'])
+            aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'], percent_id=percent_id)
             aligner_cl.align(input, output)
             if level is not 'off':
                 redist_out = os.path.join(output, "taxatable.%s.%s.txt" % (aligner_cl._name, level))
@@ -205,14 +205,17 @@ def normalize(input, output):
     outdf.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
-@cli.command(help="Show confidence of coverage of microbes.")
-@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST alignment.")
+@cli.command(help="Show confidence of coverage of microbes, must a be b6 file.")
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST alignment (b6).")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
 def coverage(input, database, output, level):
     if not os.path.exists(os.path.dirname(output)):
         os.makedirs(os.path.dirname(output))
+
+    if not input.endswith(".b6"):
+        raise "Input %s must be a b6 file." % input
 
     # This is only the coverage script
     _coverage(input, database, output, TAXAMAP[level])
