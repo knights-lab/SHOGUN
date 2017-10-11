@@ -5,26 +5,20 @@ Shallow shotgun sequencing
 Shallow seq pipeline for optimal shotgun data usage
 
 ## Installation
-These installation instructions are streamlined for Linux and macOS systems. The tool SHOGUN is installable on Windows with a few minor tweaks to this tutorial. This package requires anaconda, which is a system agnostic package and virtual environment manager. Follow the installation instructions for your system at <http://conda.pydata.org/miniconda.html>.
+These installation instructions are streamlined for Linux systems at this time. The tool SHOGUN is installable on Windows and macOS manually via the development installation. This package requires anaconda, which is a system agnostic package and virtual environment manager. Follow the installation instructions for your system at <http://conda.pydata.org/miniconda.html>.
 
-Once anaconda is installed, get the environment file:
-
+### The CONDA way (personal install)
+1. Follow steps 1 and 2 of https://bioconda.github.io/ (including installing MiniConda 3.6 if you don't have miniconda)
+2. Do this in a terminal:
 ```
-wget https://raw.githubusercontent.com/knights-lab/SHOGUN/master/environment.yml
+conda create -n shogun -c knights-lab shogun
+source activate shogun
+```
+3. To update to the newest version of shogun at anytime you can via:
+```
+pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
 ```
 
-Then install the requirements into the environment 'shogun':
-```
-conda env create -f environment.yml
-```
-
-Next, you need the tools UTree and BURST on your path.
-
-#### BURST
-TODO: Pending installation instructions...
-
-#### UTree
-TODO: Pending installation instructions...
 
 ### Development Installation
 
