@@ -9,7 +9,7 @@ import os
 from shogun.utils import run_command
 
 
-def burst_align_best(input_fp, output_fp, burst_db_prefix, accelerator=False, threads=1, shell=False, percent_id=.98):
+def burst_align_any(input_fp, output_fp, burst_db_prefix, accelerator=False, threads=1, shell=False, percent_id=.98):
     """
     :param input_fp:
     :param output_fp:
@@ -31,7 +31,7 @@ def burst_align_best(input_fp, output_fp, burst_db_prefix, accelerator=False, th
         '--references', burst_db_prefix + '.edx',
         '--output', output_fp,
         '--threads', str(threads),
-        '--mode', 'BEST',
+        '--mode', 'ANY',
         '--npenalize',
         '--id', str(percent_id),
         '--forwardreverse'
