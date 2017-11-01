@@ -172,6 +172,25 @@ def functional(ctx, input, database, output, level):
     _function([input], database, output, [level], save_median_taxatable=True)
 
 
+@cli.command(help="Run the SHOGUN functional algorithm on a taxonomic profile.")
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
+@click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
+@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
+@click.pass_context
+def summarize_function(ctx, input, database, output):
+    # Check if output exists, if not then make
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    # Load the datafiles to locate function db
+    data_files = _load_metadata(database)
+
+    # Load the functional db
+    logger.info("Loading the functional database and converting.")
+    func_db = parse_function_db(data_files, database)
+
+
+
 def _function(inputs, database, output, levels, save_median_taxatable=False):
     # Check if output exists, if not then make
     if not os.path.exists(output):
