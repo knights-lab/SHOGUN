@@ -60,10 +60,11 @@ def cli(ctx, log, shell):
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
+@click.option('-x', '--taxa_cut', type=click.FLOAT, default=.8, show_default=True, help="The percent agreement for taxacut.")
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
 @click.pass_context
-def align(ctx, aligner, input, database, output, threads, percent_id):
+def align(ctx, aligner, input, database, output, taxa_cut, threads, percent_id):
     if not os.path.exists(output):
         os.makedirs(output)
 
@@ -78,29 +79,30 @@ def align(ctx, aligner, input, database, output, threads, percent_id):
 
 @cli.command(help="Run the SHOGUN pipeline, including taxonomic and functional profiling.")
 @click.option('-a', '--aligner', type=click.Choice(['all', 'bowtie2', 'burst', 'utree']), default='burst',
-              help='The aligner to use [Note: default burst is capitalist, use burst-tax if you want to redistribute].', show_default=True)
+              help='The aligner to use [Note: default burst is capitalist]', show_default=True)
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The file containing the combined seqs.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions to (not required, can specify off).')
 @click.option('--function/--no-function', default=True, help='Run functional algorithms. **This will normalize the taxatable by median depth.')
-@click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
+@click.option('--taxonomy/--no-taxonomy', default=True, help='Run capitalist with burst post-align or not.')
+@click.option('-x', '--taxa_cut', type=click.FLOAT, default=.8, show_default=True, help="The percent agreement for taxacut.")
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
 @click.pass_context
-def pipeline(ctx, aligner, input, database, output, level, function, capitalist, threads, percent_id):
+def pipeline(ctx, aligner, input, database, output, level, function, capitalist, taxa_cut, threads, percent_id):
     if not os.path.exists(output):
         os.makedirs(output)
 
     if not capitalist:
         # Set to not run Burst post-align in capitalist mode
-        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, capitalist=False, percent_id=percent_id)
+        ALIGNERS['burst'] = lambda database, threads=threads, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], threads=threads, taxa_cut=taxacute, capitalist=False, percent_id=percent_id)
 
     redist_outs = []
     redist_levels = []
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'], percent_id=percent_id)
+            aligner_cl = align(database, threads=threads, shell=ctx.obj['shell'], percent_id=percent_id, taxa_cut=taxa_cut)
             aligner_cl.align(input, output)
             if level is not 'off':
                 redist_out = os.path.join(output, "taxatable.%s.%s.txt" % (aligner_cl._name, level))
@@ -108,7 +110,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
                 redist_outs.extend(_redist_outs)
                 redist_levels.extend(_redist_levels)
     else:
-        aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'], percent_id=percent_id)
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, shell=ctx.obj['shell'], percent_id=percent_id, taxa_cut=taxa_cut)
         aligner_cl.align(input, output)
         logger.debug(level)
         if level != 'off':
@@ -178,7 +180,7 @@ def functional(ctx, input, database, output, level):
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.pass_context
 def summarize_functional(ctx, input, database, output):
-    prefix = ".".join(os.path.basename(input).split('.')[:-1]).replace("kegg.", "")
+    prefix = ".".join(os.path.basename(input).split('.')[:-1]).replace(".kegg", "")
 
 
     # Check if output exists, if not then make
@@ -281,7 +283,7 @@ def _load_metadata(database):
 
 
 @cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
-@click.option('-a', '--aligner', type=click.Choice(['auto', 'bowtie2', 'burst', 'burst-tax', 'utree']), default='auto',
+@click.option('-a', '--aligner', type=click.Choice(['auto', 'bowtie2', 'burst', 'utree']), default='auto',
               help='The aligner to use.', show_default=True)
 @click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The alignment output file.')
