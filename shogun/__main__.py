@@ -70,10 +70,10 @@ def align(ctx, aligner, input, database, output, taxacut, threads, percent_id):
 
     if aligner == 'all':
         for align in ALIGNERS.values():
-            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.obj['shell'], percent_id=percent_id)
+            aligner_cl = align(database, threads=threads, post_align=False, shell=ctx.obj['shell'], percent_id=percent_id, taxacut=taxacut)
             aligner_cl.align(input, output)
     else:
-        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.obj['shell'], percent_id=percent_id)
+        aligner_cl = ALIGNERS[aligner](database, threads=threads, post_align=False, shell=ctx.obj['shell'], percent_id=percent_id, taxacut=taxacut)
         aligner_cl.align(input, output)
 
 
