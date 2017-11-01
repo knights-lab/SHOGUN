@@ -15,7 +15,7 @@ import pandas as pd
 from shogun import __version__, logger
 from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlignerBest
 from shogun.coverage import get_coverage_of_microbes
-from shogun.function import function_run_and_save, parse_function_db
+from shogun.function import function_run_and_save, parse_function_db, summarize_kegg_table
 from shogun.redistribute import redistribute_taxatable, parse_bayes
 from shogun.utils import normalize_by_median_depth
 
@@ -177,7 +177,10 @@ def functional(ctx, input, database, output, level):
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
 @click.pass_context
-def summarize_function(ctx, input, database, output):
+def summarize_functional(ctx, input, database, output):
+    prefix = ".".join(os.path.basename(input).split('.')[:-1]).replace("kegg.", "")
+
+
     # Check if output exists, if not then make
     if not os.path.exists(output):
         os.makedirs(output)
@@ -188,6 +191,20 @@ def summarize_function(ctx, input, database, output):
     # Load the functional db
     logger.info("Loading the functional database and converting.")
     func_db = parse_function_db(data_files, database)
+    kegg_df = pd.read_csv(input, sep="\t", index_col=0)
+
+    out_kegg_modules_df, out_kegg_modules_coverage = summarize_kegg_table(kegg_df, func_db['modules'])
+    out_kegg_pathways_df, out_kegg_pathways_coverage = summarize_kegg_table(kegg_df, func_db['pathways'])
+
+    out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",
+                               na_rep=0, index_label="#MODULE ID")
+    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modules.coverage.txt" % prefix), sep='\t',
+                                     float_format="%f", na_rep=0, index_label="#MODULE ID")
+    out_kegg_pathways_df.to_csv(os.path.join(output, "%s.kegg.pathways.txt" % prefix), sep='\t', float_format="%d",
+                                na_rep=0, index_label="#PATHWAY ID")
+    out_kegg_pathways_coverage.to_csv(os.path.join(output, "%s.kegg.pathways.coverage.txt" % prefix), sep='\t',
+                                      float_format="%f", na_rep=0, index_label="#PATHWAY ID")
+
 
 
 

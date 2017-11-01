@@ -68,7 +68,6 @@ def function_run_and_save(input, func_db, output, level, save_median_taxatable=T
     out_kegg_pathways_coverage.to_csv(os.path.join(output, "%s.kegg.pathways.coverage.txt" % prefix), sep='\t',
                                       float_format="%f", na_rep=0, index_label="#PATHWAY ID")
 
-
 def summarize_at_level(csr, names, kegg_ids, level):
     s = pd.DataFrame(sorted(names, key=names.get), columns=["names"])
     s['group'] = [";".join(_.split(';')[:level]) for _ in s['names']]
@@ -90,8 +89,7 @@ def summarize_at_level(csr, names, kegg_ids, level):
             indptr.append(len(indices))
     return csr_matrix((data, indices, np.array(indptr)), dtype=np.int8), row_names
 
-
-def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df, kegg_pathways_df):
+def _create_kegg_table(taxatable_df, row_names, column_names, kegg_table_csr):
     num_taxa_kegg, num_kegg_ids = kegg_table_csr.shape
     # pd.DataFrame(kegg_table_csr.todense(), index=sorted(row_names, key=row_names.get), columns=sorted(column_names, key=column_names.get), dtype=np.int).to_csv("/project/flatiron2/ben/kegg_species.csv")
     logger.debug("Kegg table for functional prediction shape %s" % (str(kegg_table_csr.shape)))
@@ -118,37 +116,32 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
 
     out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns,
                                      columns=sorted(column_names, key=column_names.get), dtype=np.int).T
-
-    filtered_kegg_modules_ids = out_kegg_table_df.reindex(kegg_modules_df.columns, fill_value=0.)
-    # kegg modules df
-    out_kegg_modules_df = kegg_modules_df.dot(filtered_kegg_modules_ids)
-
-    out_kegg_modules_coverage = ((kegg_modules_df).dot(filtered_kegg_modules_ids > 0).fillna(0)).div(
-        kegg_pathways_df.sum(axis=1), axis=0)
-
-    # kegg pathways df
-    filtered_kegg_pathways_ids = out_kegg_table_df.reindex(kegg_pathways_df.columns, fill_value=0.)
-
-    out_kegg_pathways_df = kegg_pathways_df.dot(filtered_kegg_pathways_ids)
-
-    out_kegg_pathways_coverage = ((kegg_pathways_df).dot(filtered_kegg_pathways_ids > 0).fillna(0)).div(
-        kegg_pathways_df.sum(axis=1), axis=0)
-
-    # Filter out zeros
-    out_kegg_modules_df = out_kegg_modules_df[(out_kegg_modules_df.T != 0).any()]
-
     # Filter out zeros
     out_kegg_table_df = out_kegg_table_df[(out_kegg_table_df.T != 0).any()]
 
-    # Filter out zeros
-    out_kegg_pathways_df = out_kegg_pathways_df[(out_kegg_pathways_df.T != 0).any()]
+    return out_kegg_table_df
+
+def summarize_kegg_table(kegg_table, summary_table):
+    filtered_kegg_ids = kegg_table.reindex(summary_table.columns, fill_value=0.)
+
+    # kegg modules df
+    df_summary = summary_table.dot(filtered_kegg_ids)
+
+    df_coverage = ((summary_table).dot(filtered_kegg_ids > 0).fillna(0)).div(
+        summary_table.sum(axis=1), axis=0)
 
     # Filter out zeros
-    out_kegg_pathways_coverage = out_kegg_pathways_coverage[(out_kegg_pathways_coverage.T != 0).any()]
+    df_summary = df_summary[(df_summary.T != 0).any()]
 
     # Filter out zeros
-    out_kegg_modules_coverage = out_kegg_modules_coverage[(out_kegg_modules_coverage.T != 0).any()]
+    df_coverage = df_coverage[(df_coverage.T != 0).any()]
+    return df_summary, df_coverage
 
+
+def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df, kegg_pathways_df):
+    out_kegg_table_df = _create_kegg_table(taxatable_df, row_names, column_names, kegg_table_csr)
+    out_kegg_modules_df, out_kegg_modules_coverage = summarize_kegg_table(out_kegg_table_df, kegg_modules_df)
+    out_kegg_pathways_df, out_kegg_pathways_coverage = summarize_kegg_table(out_kegg_table_df, kegg_pathways_df)
     return out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage, out_kegg_pathways_df, out_kegg_pathways_coverage
 
 
