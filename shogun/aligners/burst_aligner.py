@@ -33,10 +33,10 @@ class BurstAligner(Aligner):
             self.accelerator = False
         self.tree = Taxonomy(self.tax)
         self.capitalist = capitalist
-        self.taxa_cut = taxa_cut
+        self.taxa_cut = self.parse_taxacut(taxa_cut)
 
     @staticmethod
-    def parse_taxacut(cls, f):
+    def parse_taxacut(f):
         return int(1/(1-f))
 
     def _post_align(self, outf):
