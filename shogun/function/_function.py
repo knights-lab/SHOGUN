@@ -33,8 +33,8 @@ def function_run_and_save(input, func_db, output, level, save_median_taxatable=T
         kegg_table_csr, row_names = summarize_at_level(kegg_table_csr, row_names, kegg_ids, level)
     logger.debug("Number of rows %d" % len(list(row_names.keys())))
 
-    if TAXA[level-1] not in prefix:
-        prefix += "." + TAXA[level-1]
+    if TAXA[level - 1] not in prefix:
+        prefix += "." + TAXA[level - 1]
 
     logger.info("Reading in taxatable for functional prediction at %s." % os.path.abspath(input))
     taxatable_df = pd.read_csv(input, sep="\t", index_col=0)
@@ -44,24 +44,29 @@ def function_run_and_save(input, func_db, output, level, save_median_taxatable=T
     taxatable_df['summary'] = [';'.join(_.split(';')[:level]).replace(' ', '_') for _ in taxatable_df.index]
     # Drop names above
     taxatable_df = taxatable_df[[_.count(';') + 1 >= level for _ in taxatable_df['summary']]]
-    taxatable_df = taxatable_df.groupby('summary').sum()
+    taxatable_df = taxatable_df.groupby('summary').sum().fillna(0.)
 
     # Normalizing for depth at median depth
     taxatable_df = normalize_by_median_depth(taxatable_df)
     if save_median_taxatable:
-        taxatable_df.to_csv(os.path.join(output, "%s.normalized.txt" % prefix), sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
+        taxatable_df.to_csv(os.path.join(output, "%s.normalized.txt" % prefix), sep='\t', float_format="%d", na_rep=0,
+                            index_label="#OTU ID")
 
     logger.debug("Taxatable summarized shape %s" % str(taxatable_df.shape))
 
     logger.info("Starting functional prediction.")
-    out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage, out_kegg_pathways_df, out_kegg_pathways_coverage = _do_function(taxatable_df, row_names, kegg_ids, kegg_table_csr, kegg_modules_df, kegg_pathways_df)
-    out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#KEGG ID")
-    out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",na_rep=0, index_label="#MODULE ID")
-    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modules.coverage.txt" % prefix), sep='\t', float_format="%f", na_rep=0, index_label="#PATHWAY ID")
-    out_kegg_pathways_df.to_csv(os.path.join(output, "%s.kegg.pathways.txt" % prefix), sep='\t', float_format="%d",
+    out_kegg_table_df, out_kegg_modules_df, out_kegg_modules_coverage, out_kegg_pathways_df, out_kegg_pathways_coverage = _do_function(
+        taxatable_df, row_names, kegg_ids, kegg_table_csr, kegg_modules_df, kegg_pathways_df)
+    out_kegg_table_df.to_csv(os.path.join(output, "%s.kegg.txt" % prefix), sep='\t', float_format="%d", na_rep=0,
+                             index_label="#KEGG ID")
+    out_kegg_modules_df.to_csv(os.path.join(output, "%s.kegg.modules.txt" % prefix), sep='\t', float_format="%d",
                                na_rep=0, index_label="#MODULE ID")
+    out_kegg_modules_coverage.to_csv(os.path.join(output, "%s.kegg.modules.coverage.txt" % prefix), sep='\t',
+                                     float_format="%f", na_rep=0, index_label="#MODULE ID")
+    out_kegg_pathways_df.to_csv(os.path.join(output, "%s.kegg.pathways.txt" % prefix), sep='\t', float_format="%d",
+                                na_rep=0, index_label="#PATHWAY ID")
     out_kegg_pathways_coverage.to_csv(os.path.join(output, "%s.kegg.pathways.coverage.txt" % prefix), sep='\t',
-                                     float_format="%f", na_rep=0, index_label="#PATHWAY ID")
+                                      float_format="%f", na_rep=0, index_label="#PATHWAY ID")
 
 
 def summarize_at_level(csr, names, kegg_ids, level):
@@ -88,7 +93,7 @@ def summarize_at_level(csr, names, kegg_ids, level):
 
 def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_modules_df, kegg_pathways_df):
     num_taxa_kegg, num_kegg_ids = kegg_table_csr.shape
-    #pd.DataFrame(kegg_table_csr.todense(), index=sorted(row_names, key=row_names.get), columns=sorted(column_names, key=column_names.get), dtype=np.int).to_csv("/project/flatiron2/ben/kegg_species.csv")
+    # pd.DataFrame(kegg_table_csr.todense(), index=sorted(row_names, key=row_names.get), columns=sorted(column_names, key=column_names.get), dtype=np.int).to_csv("/project/flatiron2/ben/kegg_species.csv")
     logger.debug("Kegg table for functional prediction shape %s" % (str(kegg_table_csr.shape)))
     num_taxa, num_samples = taxatable_df.shape
     logger.debug("Taxatable for functional prediction shape %s" % (str(taxatable_df.shape)))
@@ -103,7 +108,7 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
             idx = row_names[row.name]
             kegg_table += np.outer(row, kegg_table_csr.getrow(idx).todense())
 
-    overlap = float(row_names_found)/num_taxa
+    overlap = float(row_names_found) / num_taxa
     if overlap < .5:
         logger.warning("Overlap of taxa and function %.2f" % overlap)
     else:
@@ -111,18 +116,23 @@ def _do_function(taxatable_df, row_names, column_names, kegg_table_csr, kegg_mod
 
     logger.debug("Row names found in taxatable %d" % row_names_found)
 
-    out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns, columns=sorted(column_names, key=column_names.get), dtype=np.int).T
+    out_kegg_table_df = pd.DataFrame(kegg_table, index=taxatable_df.columns,
+                                     columns=sorted(column_names, key=column_names.get), dtype=np.int).T
 
-    filtered_kegg_ids = out_kegg_table_df.loc[kegg_modules_df.columns].fillna(0)
+    filtered_kegg_modules_ids = out_kegg_table_df.reindex(kegg_modules_df.columns, fill_value=0.)
     # kegg modules df
-    out_kegg_modules_df = kegg_modules_df.dot(filtered_kegg_ids)
+    out_kegg_modules_df = kegg_modules_df.dot(filtered_kegg_modules_ids)
 
-    out_kegg_modules_coverage = ((kegg_modules_df).dot(filtered_kegg_ids > 0).fillna(0)).div(kegg_pathways_df.sum(axis=1), axis=0)
+    out_kegg_modules_coverage = ((kegg_modules_df).dot(filtered_kegg_modules_ids > 0).fillna(0)).div(
+        kegg_pathways_df.sum(axis=1), axis=0)
 
     # kegg pathways df
-    out_kegg_pathways_df = kegg_pathways_df.dot(filtered_kegg_ids)
+    filtered_kegg_pathways_ids = out_kegg_table_df.reindex(kegg_pathways_df.columns, fill_value=0.)
 
-    out_kegg_pathways_coverage = ((kegg_pathways_df).dot(filtered_kegg_ids > 0).fillna(0)).div(kegg_pathways_df.sum(axis=1), axis=0)
+    out_kegg_pathways_df = kegg_pathways_df.dot(filtered_kegg_pathways_ids)
+
+    out_kegg_pathways_coverage = ((kegg_pathways_df).dot(filtered_kegg_pathways_ids > 0).fillna(0)).div(
+        kegg_pathways_df.sum(axis=1), axis=0)
 
     # Filter out zeros
     out_kegg_modules_df = out_kegg_modules_df[(out_kegg_modules_df.T != 0).any()]
@@ -155,15 +165,16 @@ def parse_function_db(metadata: dict, database: str) -> dict:
 
         modules_df = _parse_modules(files[0])
         pathway_df = _parse_pathways(files[2])
-        #TODO: Implement the save csr, this works but requires write permissions to db folder
-        #npz = os.path.join(database, metadata['function']) + "-strain2ko.npz"
+        # TODO: Implement the save csr, this works but requires write permissions to db folder
+        # npz = os.path.join(database, metadata['function']) + "-strain2ko.npz"
         # if not npz in file_set:
         #    row_names, column_names, csr = _parse_kegg_table(files[1])
         #    save_csr_matrix(npz, csr, row_names, column_names)
         # else:
         #   row_names, column_names, csr = load_csr_matrix(npz)
         _strains = list(parse_kegg_table(files[1]))
-        return dict(zip(('modules_file', 'file', 'names', 'kegg_ids', 'csr', 'modules', 'pathways'), files + _strains + [modules_df, pathway_df], ))
+        return dict(zip(('modules_file', 'file', 'pathways_file', 'names', 'kegg_ids', 'csr', 'modules', 'pathways'),
+                        files + _strains + [modules_df, pathway_df], ))
 
 
 def _parse_modules(infile):
@@ -174,13 +185,14 @@ def _parse_modules(infile):
             modules_keggs[row[0].rstrip()].update([row[-1][:7]])
     return pd.DataFrame(modules_keggs).fillna(0.0).astype(int)
 
+
 def _parse_pathways(infile):
     pathways_keggs = defaultdict(Counter)
     with open(infile) as inf:
         csv_inf = csv.reader(inf, delimiter="\t")
         for row in csv_inf:
-            if (row[1] == 'Enzyme') and (row[4] != ''):
-                pathways_keggs[row[0].rstrip()].update(row[4])
+            if (row[1] == 'Enzymes') and (row[4] != ''):
+                pathways_keggs[row[0].rstrip()].update([row[4]])
     return pd.DataFrame(pathways_keggs).fillna(0.0).astype(int)
 
 
