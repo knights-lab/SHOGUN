@@ -20,7 +20,7 @@ from ._aligner import Aligner
 class BurstAligner(Aligner):
     _name = 'burst'
 
-    def __init__(self, database_dir, taxa_cut=.8, capitalist=True, **kwargs):
+    def __init__(self, database_dir, taxacut=.8, capitalist=True, **kwargs):
         super().__init__(database_dir, **kwargs)
 
         # Setup the burst database
@@ -33,7 +33,7 @@ class BurstAligner(Aligner):
             self.accelerator = False
         self.tree = Taxonomy(self.tax)
         self.capitalist = capitalist
-        self.taxa_cut = self.parse_taxacut(taxa_cut)
+        self.taxacut = self.parse_taxacut(taxacut)
 
     @staticmethod
     def parse_taxacut(f):
@@ -54,7 +54,7 @@ class BurstAligner(Aligner):
         #TODO: pie chart and coverage
         proc, out, err = burst_align(infile, self.outfile,
             self.database, tax=self.tax, accelerator=self.accelerator, shell=self.shell,
-                                        taxa_ncbi=False, threads=self.threads, percent_id=self.percent_id, taxacut=self.taxa_cut)
+                                        taxa_ncbi=False, threads=self.threads, percent_id=self.percent_id, taxacut=self.taxacut)
         if self.post_align:
             df = self._post_align(self.outfile)
             if self.capitalist:
