@@ -85,7 +85,7 @@ def align(ctx, aligner, input, database, output, taxacut, threads, percent_id):
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output folder directory', show_default=True)
 @click.option('-l', '--level', type=click.Choice(TAXA + ['all', 'off']), default='strain', help='The level to collapse taxatables and functions to (not required, can specify off).')
 @click.option('--function/--no-function', default=True, help='Run functional algorithms. **This will normalize the taxatable by median depth.')
-@click.option('--taxonomy/--no-taxonomy', default=True, help='Run capitalist with burst post-align or not.')
+@click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
 @click.option('-x', '--taxacut', type=click.FLOAT, default=.8, show_default=True, help="The percent agreement for taxacut.")
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
