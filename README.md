@@ -14,39 +14,29 @@ These installation instructions are streamlined for Linux systems at this time. 
 conda create -n shogun -c knights-lab shogun
 source activate shogun
 ```
-3. To update to the newest version of shogun at anytime you can via:
-```
-pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
-```
-
 
 ### Development Installation
 
-Once anaconda is installed, create an environment:
-```
-conda create -n shogun python=3
-```
 
-Now activate the environment.
-
+1. Do this in a terminal:
 ```
-# OSX, Linux
+conda create -n shogun -c knights-lab shogun
 source activate shogun
 ```
 
-With the shogun environment activated, install the developmental SHOGUN toolchain.
-
+2.
+Remove SHOGUN and install via the github master branch. This will keep all the conda dependencies installed.
 ```
-# If you want to use bowtie2
-conda install -c bioconda bowtie2
-
-# SHOGUN
+conda uninstall shogun
 pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
 ```
 
-With the flags provided to pip, copying and pasting any of these commands will redo the installation if a failure happened.
+Optional: You can reinstall to the newest git version of SHOGUN at anytime via the command:
+```
+pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
+```
 
-### Testing your install
+### Testing your installation
 
 For testing, we are currently using the built in python unittests. In order to run the test suite, change directory into the root folder of the repository. Then run:
 
@@ -222,4 +212,21 @@ Options:
   -o, --output PATH               The output file  [default: /mnt/c/Users/bhil
                                   l/code/SHOGUN/taxatable-170828.txt]
   -h, --help                      Show this message and exit.
+```
+
+#### summarize_functional
+This command will take in a kegg table and output a summarized KEGG pathway and module table.
+
+```
+Usage: shogun summarize_functional [OPTIONS]
+
+  Run the SHOGUN functional algorithm on a taxonomic profile.
+
+Options:
+  -i, --input PATH     The taxatable.  [required]
+  -d, --database PATH  The path to the folder containing the database.
+                       [required]
+  -o, --output PATH    The output file  [default:
+                       /home/grad00/hillm096/results-171106]
+  -h, --help           Show this message and exit.
 ```
