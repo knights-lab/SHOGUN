@@ -8,8 +8,7 @@ conda create -n shogun -c knights-lab shogun
 source activate shogun
 ```
 
-2.
-Remove SHOGUN and install via the github master branch. This will keep all the conda dependencies installed.
+2. Remove SHOGUN and install via the github master branch. This will keep all the conda dependencies installed.
 ```
 conda uninstall shogun
 pip install git+https://github.com/knights-lab/SHOGUN.git --no-cache-dir --upgrade
