@@ -4,11 +4,28 @@ Shallow shotgun sequencing
 =======
 Shallow seq pipeline for optimal shotgun data usage
 
+
+![alt-tag](docs/shogun_schematic.png)
+
+Schematic overview of the shallow-shotgun computational pipeline SHOGUN. For every step in the SHOGUN pipeline, the user must supply the pre-formatted SHOGUN database folder. To run every step shown here in a single command, the user can select the pipeline subcommand. Otherwise, the analysis modules can be run independently. 
+
+a. *filter* - The input quality-controlled reads are aligned against the contaminate database using BURST to filter out all reads that hit human associated genome content.
+
+b. *align* - The input contaminate filtered reads are aligned against the reference database. The user has the option to select one or all of the three alignment tools BURST, Bowtie2, or UTree.
+
+c. *assign_taxonomy* - Given the data artifacts from a SHOGUN alignment tool, output a Biological Observation Matrix ![(BIOM)](http://biom-format.org/) format taxatable with the rows being rank-flexible taxonomies, the columns are samples, and the entries are counts for each given taxonomy per sample. The alignment tool BURST has two run modes, taxonomy and capitalist. If the capitalist mode is enabled, a rank-specific BIOM file is output instead. 
+
+d. *coverage* - The output from BURST can be utilized to analyze the coverage of each taxonomy across all samples in your alignment file. This can useful for reducing the number of false positive taxonomies.
+
+e. *redistribute* - The rank-flexible taxatable is summarized into a rank-specific taxatable. This summarizes both up and down the taxonomic tree.
+
+f. *normalize* - Each sample in the taxatable is normalized to the median depth of all the samples.
+
 ## Installation
 These installation instructions are streamlined for Linux systems at this time. The tool SHOGUN is installable on Windows and macOS manually via the development installation. This package requires anaconda, which is a system agnostic package and virtual environment manager. Follow the installation instructions for your system at <http://conda.pydata.org/miniconda.html>.
 
 ### The CONDA way (personal install)
-1. Follow steps 1 and 2 of https://bioconda.github.io/ (including installing MiniConda 3.6 if you don't have miniconda)
+1. Follow steps 1 and 2 of <https://bioconda.github.io/> (including installing MiniConda 3.6 if you don't have miniconda)
 2. Do this in a terminal:
 ```
 conda create -n shogun -c knights-lab shogun
