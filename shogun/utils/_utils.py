@@ -26,7 +26,7 @@ def elapsed_timer():
     elapser = lambda: end-start
 
 
-def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
+def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     Run prepared behave command in shell and return its output.
     :param stderr:
@@ -56,11 +56,15 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
                 cwd=os.getcwd(),
             ) as proc:
                 log_subprocess_output(proc.stdout)
+                returncode = proc.returncode
+                if returncode != 0:
+                    if not returncode:
+                        returncode = 1
+                    raise AssertionError("exit code is non zero: %d\n%s\n%s" % (returncode, " ".join(cmd), "\n".join(proc.stderr)))
         logger.debug("%.2f seconds" % elapsed())
         logger.debug("Subprocess finished.")
 
-        if proc.returncode != 0:
-            raise AssertionError("exit code is non zero: %d\n%s" % (proc.returncode, " ".join(cmd)))
+
         return proc.returncode, "", ""
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
@@ -72,6 +76,7 @@ def log_subprocess_output(pipe):
         if line:
             if not line.startswith('Search Progress'):
                 logger.debug(line)
+                #import ipdb; ipdb.set_trace()
 
 
 def hash_file(filename):
