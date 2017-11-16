@@ -76,7 +76,6 @@ def log_subprocess_output(pipe):
         if line:
             if not line.startswith('Search Progress'):
                 logger.debug(line)
-                #import ipdb; ipdb.set_trace()
 
 
 def hash_file(filename):
