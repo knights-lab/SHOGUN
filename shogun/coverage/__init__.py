@@ -10,7 +10,7 @@ import pandas as pd
 import csv
 
 from shogun import logger
-from shogun.redistribute import summarize_bayes_at_level
+from shogun.redistribute import summarize_bayes_at_level, Taxonomy
 
 
 def zero_runs(a):
@@ -24,46 +24,43 @@ def zero_runs(a):
     return ranges
 
 
-def get_coverage_of_microbes(infile, shear, level):
+def get_coverage_of_microbes(infile, shear, level, parse_taxonomy_from_row=lambda row: row[-1]):
     #Load in the shear df at level
     shear_df = summarize_bayes_at_level(shear, level=level)
 
     samples_begin_map = dict()
     taxa_hits = defaultdict(int)
 
+
     logger.info("Started the coverage parsing.")
     with open(infile) as utree_f:
         csv_embalm = csv.reader(utree_f, delimiter='\t')
         # qname, lca, confidence, support
         for num, line in enumerate(csv_embalm):
-            if num % 1000 == 0:
+            if num % 10000 == 0:
                 logger.info("Parsed %d lines of b6." % num)
-            if line[-1] is not None:
-                # TODO confidence/support filter
-                begin = int(line[8])
-                # samplename = '_'.join(line[0].split('_')[:-1])
-                # if not samplename in samples_begin_map:
-                #     samples_begin_map[samplename] = dict()
-                taxaname = line[-1]
-                taxa_level = taxaname.count(';') + 1
-                if taxa_level >= level:
-                    if taxa_level != level:
-                        taxaname = ';'.join(taxaname.split(";")[:level])
-                    if taxaname in shear_df.index:
-                        taxa_hits[taxaname] += 1
-                        indx = int(np.floor(begin/100.))
-                        if not taxaname in samples_begin_map:
-                            genome_length = shear_df['genome_length_median'][taxaname]
-                            samples_begin_map[taxaname] = np.zeros(genome_length)
-                        if indx == 0:
-                            samples_begin_map[taxaname][0] += 1
-                        elif indx >= shear_df['genome_length_median'][taxaname]:
-                            samples_begin_map[taxaname][-1] += 1
-                        else:
-                            samples_begin_map[taxaname][indx] += 1
-                            samples_begin_map[taxaname][indx+1] += 1
+            # TODO confidence/support filter
+            begin = int(line[8])
+            taxaname = parse_taxonomy_from_row(line)
+            taxa_level = taxaname.count(';') + 1
+            if taxa_level >= level:
+                if taxa_level != level:
+                    taxaname = ';'.join(taxaname.split(";")[:level])
+                if taxaname in shear_df.index:
+                    taxa_hits[taxaname] += 1
+                    indx = int(np.floor(begin/100.))
+                    if not taxaname in samples_begin_map:
+                        genome_length = shear_df['genome_length_median'][taxaname]
+                        samples_begin_map[taxaname] = np.zeros(genome_length)
+                    if indx == 0:
+                        samples_begin_map[taxaname][0] += 1
+                    elif indx >= shear_df['genome_length_median'][taxaname]:
+                        samples_begin_map[taxaname][-1] += 1
                     else:
-                        logger.warning("The taxa %s not found." % taxaname)
+                        samples_begin_map[taxaname][indx] += 1
+                        samples_begin_map[taxaname][indx+1] += 1
+                else:
+                    logger.warning("The taxa %s not found." % taxaname)
 
     xx = np.zeros((len(samples_begin_map), 8))
     for i, taxaname in enumerate(sorted(samples_begin_map.keys())):

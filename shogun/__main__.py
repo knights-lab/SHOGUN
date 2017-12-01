@@ -16,7 +16,7 @@ from shogun import __version__, logger
 from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlignerBest
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db, summarize_kegg_table
-from shogun.redistribute import redistribute_taxatable, parse_bayes
+from shogun.redistribute import redistribute_taxatable, parse_bayes, Taxonomy
 from shogun.utils import normalize_by_median_depth
 
 ROOT_COMMAND_HELP = """\
@@ -248,7 +248,8 @@ def normalize(input, output):
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
 @click.option('-l', '--level', type=click.Choice(['genus', 'species', 'strain']), default='strain', help='The level to collapse to.')
-def coverage(input, database, output, level):
+@click.option('-t', '--taxonomy', type=click.Choice(['mapping', 'taxonomy']), default='taxonomy', help='Parse the taxonomy from mapping file (mapping) or from the taxonomy column (taxonomy) in the b6.')
+def coverage(input, database, output, level, taxonomy):
     if not os.path.exists(os.path.dirname(output)):
         os.makedirs(os.path.dirname(output))
 
@@ -256,16 +257,22 @@ def coverage(input, database, output, level):
         raise "Input %s must be a b6 file." % input
 
     # This is only the coverage script
-    _coverage(input, database, output, TAXAMAP[level])
+    _coverage(input, database, output, TAXAMAP[level], taxonomy)
 
 
-def _coverage(input, database, output, level):
+def _coverage(input, database, output, level, taxonomy):
     data_files = _load_metadata(database)
 
     shear = os.path.join(database, data_files['general']['shear'])
 
+    if taxonomy == 'mapping':
+        taxatree = Taxonomy(os.path.join(database, data_files['general']['taxonomy']))
+        parse_taxonomy_from_row = lambda row: taxatree(row[1])
+    else:
+        parse_taxonomy_from_row = lambda row: row[-1]
+
     shear_df = parse_bayes(shear)
-    outdf = get_coverage_of_microbes(input, shear_df, level)
+    outdf = get_coverage_of_microbes(input, shear_df, level, parse_taxonomy_from_row=parse_taxonomy_from_row)
     outdf.to_csv(output, sep='\t', float_format="%.5f", na_rep=0)
 
 

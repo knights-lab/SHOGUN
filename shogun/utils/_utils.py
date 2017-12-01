@@ -59,8 +59,8 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
         logger.debug("%.2f seconds" % elapsed())
         logger.debug("Subprocess finished.")
 
-        if proc.returncode != 0:
-            raise AssertionError("exit code is non zero: %d\n%s" % (proc.returncode, " ".join(cmd)))
+        #if proc.returncode != 0:
+            #raise AssertionError("exit code is non zero: %d\n%s" % (proc.returncode, " ".join(cmd)))
         return proc.returncode, "", ""
     except subprocess.CalledProcessError as e:
         raise AssertionError("Called Process Error: %s" % e)
