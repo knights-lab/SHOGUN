@@ -56,6 +56,7 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDO
                 cwd=os.getcwd(),
             ) as proc:
                 log_subprocess_output(proc.stdout)
+
         logger.debug("%.2f seconds" % elapsed())
         logger.debug("Subprocess finished.")
 
