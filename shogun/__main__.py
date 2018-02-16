@@ -17,7 +17,7 @@ from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlig
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db, summarize_kegg_table
 from shogun.redistribute import redistribute_taxatable, parse_bayes, Taxonomy
-from shogun.utils import normalize_by_median_depth
+from shogun.utils import normalize_by_median_depth, convert_to_relative_abundance
 
 ROOT_COMMAND_HELP = """\
 SHOGUN command-line interface\n
@@ -89,8 +89,9 @@ def align(ctx, aligner, input, database, output, taxacut, threads, percent_id):
 @click.option('-x', '--taxacut', type=click.FLOAT, default=.8, show_default=True, help="The percent agreement for taxacut.")
 @click.option('-t', '--threads', type=click.INT, default=cpu_count(), help="Number of threads to use.")
 @click.option('-p', '--percent_id', type=click.FLOAT, default=.98, show_default=True, help="The percent id to align to.")
+@click.option('--ra/--no-ra', default=True, help="Convert tables to relative abundance.")
 @click.pass_context
-def pipeline(ctx, aligner, input, database, output, level, function, capitalist, taxacut, threads, percent_id):
+def pipeline(ctx, aligner, input, database, output, level, function, capitalist, taxacut, threads, percent_id, ra):
     if not os.path.exists(output):
         os.makedirs(output)
 
@@ -106,7 +107,7 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
             aligner_cl.align(input, output)
             if level is not 'off':
                 redist_out = os.path.join(output, "taxatable.%s.%s.txt" % (aligner_cl._name, level))
-                _redist_outs, _redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
+                _redist_outs, _redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile, relative_abundance=ra)
                 redist_outs.extend(_redist_outs)
                 redist_levels.extend(_redist_levels)
     else:
@@ -115,10 +116,13 @@ def pipeline(ctx, aligner, input, database, output, level, function, capitalist,
         logger.debug(level)
         if level != 'off':
             redist_out = os.path.join(output, "taxatable.%s.txt" % (level))
-            redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile)
+            redist_outs, redist_levels = _redistribute(database, level, redist_out, aligner_cl.outfile, relative_abundance=ra)
 
     if function and level != 'off':
         _function(redist_outs, database, output, redist_levels, save_median_taxatable=True)
+
+    if ra:
+        _convert_files_to_relative_abundances(redist_outs)
 
 
 @cli.command(help="Run the SHOGUN redistribution algorithm on a taxonomic profile.")
@@ -134,7 +138,7 @@ def redistribute(ctx, input, database, level, output):
     _redistribute(database, level, output, input)
 
 
-def _redistribute(database, level, outfile, redist_inf):
+def _redistribute(database, level, outfile, redist_inf, relative_abundance=False):
     logger.debug("Beginning redistribution for file: %s" % redist_inf)
     data_files = _load_metadata(database)
 
@@ -162,6 +166,18 @@ def _redistribute(database, level, outfile, redist_inf):
         output_levels.append(level)
 
     return output_files, output_levels
+
+def _convert_files_to_relative_abundances(files: list) -> list:
+    outpath = os.path.dirname(files[0])
+    outfiles = []
+    for file in files:
+        base = os.path.basename(file).split(".")[0]
+        outfile = os.path.join(outpath, "%s.ra.txt" % base)
+        df = pd.read_csv(input, sep="\t", index_col=0)
+        outdf = convert_to_relative_abundance(df)
+        outdf.to_csv(outfile, sep='\t', float_format="%.5f", na_rep=0, index_label="#OTU ID")
+        outfiles.append(outfile)
+    return outfiles
 
 
 @cli.command(help="Run the SHOGUN functional algorithm on a taxonomic profile.")
@@ -207,9 +223,6 @@ def summarize_functional(ctx, input, database, output):
     out_kegg_pathways_coverage.to_csv(os.path.join(output, "%s.kegg.pathways.coverage.txt" % prefix), sep='\t',
                                       float_format="%f", na_rep=0, index_label="#PATHWAY ID")
 
-
-
-
 def _function(inputs, database, output, levels, save_median_taxatable=False):
     # Check if output exists, if not then make
     if not os.path.exists(output):
@@ -229,6 +242,17 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
             function_run_and_save(input, func_db, output, TAXAMAP[level], save_median_taxatable=save_median_taxatable)
         else:
             continue
+
+@cli.command(help="Normalize a taxonomic profile using relative abundance.")
+@click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output taxatable.")
+@click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The count taxatable output as relative abundance.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.ra-%y%m%d.txt')), show_default=True)
+def convert(input, output):
+    if not os.path.exists(os.path.dirname(output)):
+        os.makedirs(os.path.dirname(output))
+
+    df = pd.read_csv(input, sep="\t", index_col=0)
+    outdf = convert_to_relative_abundance(df)
+    outdf.to_csv(output, sep='\t', float_format="%.5f", na_rep=0, index_label="#OTU ID")
 
 
 @cli.command(help="Normalize a taxonomic profile by median depth.")
