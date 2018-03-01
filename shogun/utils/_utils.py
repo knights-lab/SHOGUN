@@ -11,6 +11,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from timeit import default_timer
 
+import pandas as pd
 import numpy as np
 import scipy.sparse as ss
 
@@ -140,3 +141,13 @@ def read_fasta(fh):
     if not title:
         yield None
     yield (title.strip(), data)
+
+
+def convert_to_relative_abundance(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Takes in a count matrix and returns it as a relative abundance matrix
+
+    :param df: input count matrix (features x samples)
+    :return: relative abundance (features x samples)
+    """
+    return df.apply(lambda col: col/col.sum(), axis=0)
