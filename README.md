@@ -250,9 +250,9 @@ Options:
 
 ## Database creation.
 To create a BURST database for SHOGUN, follow instructions on the BURST github page to create an acx and edx file with the same base filename, then create a file called "metadata.yaml" in the same folder, with an entry `burst: <basename>`, as in this example:
-(https://github.com/knights-lab/SHOGUN/blob/master/shogun/tests/data/metadata.yaml)[https://github.com/knights-lab/SHOGUN/blob/master/shogun/tests/data/metadata.yaml]
+[https://github.com/knights-lab/SHOGUN/blob/master/shogun/tests/data/metadata.yaml](https://github.com/knights-lab/SHOGUN/blob/master/shogun/tests/data/metadata.yaml)
 
-You will need a taxonomy file formatted as in the `genomes.small.tax` file (here)[https://github.com/knights-lab/SHOGUN/tree/master/shogun/tests/data] to provide taxonomy. Add an entry to the yaml file with a key `general:` and a sub-key `taxonomy: <taxonomy file name>`. A bowtie2 database base filename and Utree database filename may be added as follows:
+You will need a taxonomy file formatted as in the `genomes.small.tax` file [here](https://github.com/knights-lab/SHOGUN/tree/master/shogun/tests/data) to provide taxonomy. Add an entry to the yaml file with a key `general:` and a sub-key `taxonomy: <taxonomy file name>`. A bowtie2 database base filename and Utree database filename may be added as follows:
 ```
 general:
   taxonomy: genomes.small.tax
@@ -264,7 +264,7 @@ bowtie2: bowtie2/genomes.small
 utree: utree/genomes.small
 ```
 
-A functional database is optional. Examples are shown (here)[https://github.com/knights-lab/SHOGUN/tree/master/shogun/tests/data/function].
+A functional database is optional. Examples are shown [here](https://github.com/knights-lab/SHOGUN/tree/master/shogun/tests/data/function).
 
 All database files for BURST, Bowtie2, and Utree should be in the same parent folder. Once the folder is created and the `metadata.yaml` file is populated as in the above example, the new database may be used in SHOGUN as follows:
 
