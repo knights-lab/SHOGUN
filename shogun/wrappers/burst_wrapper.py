@@ -106,14 +106,3 @@ def burst_build(infile, outfile_prefix, accelerator=False, shell=False, clustrad
         cmd += ['--clustradius', str(clustradius)]
 
     return run_command(cmd, shell=shell)
-
-def embalmulate(infile, outdir, shell=False):
-    cmd = [
-        'embalmulate',
-        infile,
-        os.path.join(outdir, 'burst_otutable.txt'),
-        os.path.join(outdir, 'burst_taxatable.txt'),
-        'GGtrim'
-    ]
-
-    return run_command(cmd, shell=shell)

@@ -35,15 +35,14 @@ class TestBowtie(unittest.TestCase):
         infile = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'combined_seqs.fna'))
         outfile = os.path.join(self.temp_dir.name, 'sims.sam')
         self.assertTrue(bowtie2_align(infile, outfile, database)[0] == 0)
+        self.assertTrue(os.path.isfile(outfile) and os.path.getsize(outfile) > 0)
 
     def test_bowtie2_build(self):
         fasta = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.fna'))
         outfile = os.path.join(self.temp_dir.name, 'genomes.small')
-        bowtie2_build(fasta, outfile, shell=False)
-
-        for file in os.listdir(self.temp_dir.name):
-            # self.assertTrue(self.checksums[hash_file(os.path.join(self.temp_dir.name, file))] == file)
-            continue
+        # Test if system exit call is non-zero
+        self.assertTrue(bowtie2_build(fasta, outfile, shell=False)[0] == 0)
+        #TODO: Proper database file sniffing
 
 if __name__ == '__main__':
     unittest.main()
