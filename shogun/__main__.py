@@ -171,9 +171,9 @@ def _convert_files_to_relative_abundances(files: list) -> list:
     outpath = os.path.dirname(files[0])
     outfiles = []
     for file in files:
-        base = os.path.basename(file).split(".")[0]
+        base = ".".join(os.path.basename(file).split(".")[:-1])
         outfile = os.path.join(outpath, "%s.ra.txt" % base)
-        df = pd.read_csv(input, sep="\t", index_col=0)
+        df = pd.read_csv(file, sep="\t", index_col=0)
         outdf = convert_to_relative_abundance(df)
         outdf.to_csv(outfile, sep='\t', float_format="%.5f", na_rep=0, index_label="#OTU ID")
         outfiles.append(outfile)

@@ -1,0 +1,126 @@
+#PATHWAY ID	sample1	sample2	sample3
+1.-.-	0.028571	0.000000	0.028571
+1.1.1  With NAD+ or NADP+ as acceptor	0.104418	0.008032	0.096386
+1.1.2  With a cytochrome as acceptor	0.142857	0.000000	0.142857
+1.1.3  With oxygen as acceptor	0.076923	0.000000	0.076923
+1.1.98  With other, known, acceptors	0.500000	0.000000	0.500000
+1.1.99  With other acceptors	0.090909	0.000000	0.090909
+1.10.3  With oxygen as acceptor	0.166667	0.000000	0.000000
+1.11.1  Peroxidases	0.137931	0.000000	0.137931
+1.13.12  With incorporation of one atom of oxygen (internal monooxygenases or internal mixed-function oxidases)	0.285714	0.000000	0.285714
+1.14.15  With reduced iron-sulfur protein as one donor, and incorporation of one atom of oxygen into the other donor	0.111111	0.000000	0.111111
+1.14.99  Miscellaneous	0.050000	0.000000	0.050000
+1.15.1  Acting on superoxide as acceptor (only sub-subclass identified to date)	0.200000	0.000000	0.200000
+1.16.1  With NAD+ or NADP+ as acceptor	0.200000	0.000000	0.200000
+1.16.3  With oxygen as acceptor	0.333333	0.000000	0.333333
+1.17.1  With NAD+ or NADP+ as acceptor	0.090909	0.000000	0.090909
+1.17.4  With a disulfide as acceptor	0.285714	0.000000	0.142857
+1.17.7  With an iron-sulfur protein as acceptor	1.000000	0.000000	1.000000
+1.18.1  With NAD+ or NADP+ as acceptor	0.142857	0.000000	0.142857
+1.2.1  With NAD+ or NADP+ as acceptor	0.128571	0.014286	0.128571
+1.2.4  With a disulfide as acceptor	0.625000	0.000000	0.250000
+1.2.5  With a quinone or similar compound as acceptor	1.000000	0.000000	1.000000
+1.2.7  With an iron-sulfur protein as acceptor	0.041667	0.000000	0.041667
+1.3.1  With NAD+ or NADP+ as acceptor	0.054795	0.000000	0.027397
+1.3.3  With oxygen as acceptor	0.222222	0.000000	0.111111
+1.3.5  With a quinone or related compound as acceptor	0.166667	0.000000	0.166667
+1.3.8  With a flavin as acceptor	0.250000	0.000000	0.250000
+1.3.99  With other acceptors	0.218750	0.000000	0.218750
+1.4.1  With NAD+ or NADP+ as acceptor	0.352941	0.000000	0.294118
+1.4.3  With oxygen as acceptor	0.066667	0.000000	0.066667
+1.4.4  With a disulfide as acceptor	0.333333	0.000000	0.333333
+1.5.1  With NAD+ or NADP+ as acceptor	0.138889	0.000000	0.111111
+1.5.99  With other acceptors	0.166667	0.000000	0.166667
+1.6.1  With NAD+ or NADP+ as acceptor	0.250000	0.000000	0.250000
+1.6.5  With a quinone or similar compound as acceptor	0.067416	0.000000	0.000000
+1.6.99  With other acceptors	0.024390	0.000000	0.024390
+1.8.1  With NAD+ or NADP+ as acceptor	0.363636	0.000000	0.181818
+1.8.4  With a disulfide as acceptor	0.375000	0.000000	0.375000
+1.8.7  With an iron-sulfur protein as acceptor	1.000000	0.000000	1.000000
+1.9.3  With oxygen as acceptor	0.250000	0.000000	0.250000
+2.-.-	0.125000	0.000000	0.125000
+2.1.1  Methyltransferases	0.124528	0.000000	0.109434
+2.1.2  Hydroxymethyl-, formyl- and related transferases	0.500000	0.000000	0.428571
+2.1.3  Carboxy- and carbamoyltransferases	0.166667	0.000000	0.166667
+2.10.1  Molybdenumtransferases or tungstentransferases with sulfide groups as acceptors	0.500000	0.000000	0.500000
+2.2.1  Transketolases and transaldolases	0.545455	0.000000	0.545455
+2.3.1  Transferring groups other than aminoacyl groups	0.090535	0.000000	0.049383
+2.3.3  Acyl groups converted into alkyl groups on transfer	0.266667	0.000000	0.266667
+2.4.1  Hexosyltransferases	0.053571	0.000000	0.047619
+2.4.2  Pentosyltransferases	0.228571	0.000000	0.228571
+2.4.99  Transferring other glycosyl groups	0.172414	0.000000	0.034483
+2.5.1  Transferring alkyl or aryl groups, other than methyl groups (only sub-subclass identified to date)	0.259259	0.000000	0.175926
+2.6.-  Transferring nitrogenous groups	0.333333	0.000000	0.333333
+2.6.1  Transaminases	0.109890	0.000000	0.087912
+2.7.1  Phosphotransferases with an alcohol group as acceptor	0.095960	0.000000	0.075758
+2.7.11  Protein-serine/threonine kinases	0.010067	0.000000	0.010067
+2.7.13  Protein-histidine kinases	0.072917	0.000000	0.062500
+2.7.2  Phosphotransferases with a carboxy group as acceptor	0.235294	0.000000	0.235294
+2.7.3  Phosphotransferases with a nitrogenous group as acceptor	0.250000	0.000000	0.000000
+2.7.4  Phosphotransferases with a phosphate group as acceptor	0.307692	0.000000	0.230769
+2.7.6  Diphosphotransferases	0.500000	0.000000	0.375000
+2.7.7  Nucleotidyltransferases	0.198758	0.000000	0.155280
+2.7.8  Transferases for other substituted phosphate groups	0.138889	0.000000	0.111111
+2.8.1  Sulfurtransferases	0.625000	0.000000	0.625000
+2.8.3  CoA-transferases	0.090909	0.000000	0.090909
+3.1.1  Carboxylic-ester hydrolases	0.028846	0.000000	0.028846
+3.1.11  Exodeoxyribonucleases producing 5-phosphomonoesters	0.428571	0.000000	0.214286
+3.1.13  Exoribonucleases producing 5-phosphomonoesters	0.200000	0.000000	0.200000
+3.1.2  Thioester hydrolases	0.028571	0.000000	0.028571
+3.1.21  Endodeoxyribonucleases producing 5-phosphomonoesters	0.444444	0.000000	0.333333
+3.1.22  Endodeoxyribonucleases producing 3-phosphomonoesters	0.333333	0.000000	0.333333
+3.1.26  Endoribonucleases producing 5-phosphomonoesters	0.200000	0.000000	0.120000
+3.1.3  Phosphoric-monoester hydrolases	0.055901	0.000000	0.049689
+3.1.4  Phosphoric-diester hydrolases	0.020000	0.000000	0.020000
+3.1.5  Triphosphoric-monoester hydrolases	1.000000	0.000000	1.000000
+3.2.1  Glycosidases, i.e. enzymes that hydrolyse O- and S-glycosyl compounds	0.038760	0.000000	0.031008
+3.2.2  Hydrolysing N-glycosyl compounds	0.400000	0.000000	0.333333
+3.3.1  Thioether and trialkylsulfonium hydrolases	1.000000	0.000000	1.000000
+3.4.11  Aminopeptidases	0.190476	0.000000	0.190476
+3.4.13  Dipeptidases	0.200000	0.000000	0.200000
+3.4.15  Peptidyl-dipeptidases	0.333333	0.000000	0.333333
+3.4.16  Serine-type carboxypeptidases	0.285714	0.000000	0.142857
+3.4.21  Serine endopeptidases	0.104478	0.000000	0.044776
+3.4.22  Cysteine endopeptidases	0.012821	0.000000	0.012821
+3.4.23  Aspartic endopeptidases	0.071429	0.000000	0.071429
+3.4.24  Metalloendopeptidases	0.040000	0.000000	0.000000
+3.5.1  In linear amides	0.121495	0.000000	0.112150
+3.5.4  In cyclic amidines	0.264706	0.000000	0.205882
+3.6.1  In phosphorus-containing anhydrides	0.121212	0.000000	0.121212
+3.6.3  Acting on acid anhydrides to catalyse transmembrane movement of substances	0.224138	0.017241	0.155172
+3.6.4  Acting on acid anhydrides to facilitate cellular and subcellular movement	0.112245	0.000000	0.091837
+3.7.1  In ketonic substances	0.050000	0.000000	0.050000
+4.1.1  Carboxy-lyases	0.120482	0.000000	0.084337
+4.1.2  Aldehyde-lyases	0.095238	0.000000	0.071429
+4.1.3  Oxo-acid-lyases	0.240000	0.000000	0.240000
+4.1.99  Other carbon-carbon lyases	0.071429	0.000000	0.071429
+4.2.1  Hydro-lyases	0.189781	0.000000	0.167883
+4.2.3  Acting on phosphates	0.040000	0.000000	0.026667
+4.2.99  Other carbon-oxygen lyases	0.187500	0.000000	0.187500
+4.3.1  Ammonia-lyases	0.200000	0.000000	0.200000
+4.3.2  Amidine-lyases	0.666667	0.000000	0.666667
+4.4.1  Carbon-sulfur lyases (only sub-subclass identified to date)	0.111111	0.000000	0.111111
+4.6.1  Phosphorus-oxygen lyases (only sub-subclass identified to date)	0.074074	0.000000	0.074074
+4.99.1  Sole sub-subclass for lyases that do not belong in the other subclasses	0.100000	0.000000	0.100000
+5.1.1  Acting on amino acids and derivatives	0.375000	0.000000	0.375000
+5.1.2  Acting on hydroxy acids and derivatives	0.333333	0.000000	0.333333
+5.1.3  Acting on carbohydrates and derivatives	0.093750	0.000000	0.093750
+5.2.1  cis-trans Isomerases (only sub-subclass identified to date)	0.066667	0.000000	0.066667
+5.3.1  Interconverting aldoses and ketoses, and related compounds	0.218750	0.000000	0.156250
+5.3.3  Transposing C=C bonds	0.055556	0.000000	0.055556
+5.3.4  Transposing S-S bonds	0.100000	0.000000	0.000000
+5.4.2  Phosphotransferases (phosphomutases)	0.294118	0.000000	0.294118
+5.4.3  Transferring amino groups	0.333333	0.000000	0.333333
+5.4.4  Transferring hydroxy groups	0.200000	0.000000	0.200000
+5.4.99  Transferring other groups	0.177419	0.000000	0.161290
+5.5.1  Intramolecular lyases (only sub-subclass identified to date)	0.058824	0.000000	0.058824
+5.99.1  Sole sub-subclass for isomerases that do not belong in the other subclasses	0.272727	0.090909	0.272727
+6.1.1  Ligases forming aminoacyl-tRNA and related compounds	0.571429	0.000000	0.485714
+6.2.1  Acid-thiol ligases	0.115385	0.000000	0.057692
+6.3.1  Acid-D-ammonia (or amine) ligases (amide synthases)	0.111111	0.000000	0.111111
+6.3.2  Acid-D-amino-acid ligases (peptide synthases)	0.046296	0.000000	0.041667
+6.3.3  Cyclo-ligases	0.333333	0.000000	0.166667
+6.3.4  Other carbon-nitrogen ligases	0.370370	0.000000	0.296296
+6.3.5  Carbon-nitrogen ligases with glutamine as amido-N-donor	0.454545	0.000000	0.272727
+6.4.1  Ligases that form carbon-carbon bonds (only sub-subclass identified to date)	0.136364	0.000000	0.000000
+6.5.1  Ligases that form phosphoric-ester bonds (only sub-subclass identified to date)	0.090909	0.000000	0.090909
