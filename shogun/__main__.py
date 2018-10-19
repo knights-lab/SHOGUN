@@ -190,7 +190,7 @@ def functional(ctx, input, database, output, level):
     _function([input], database, output, [level], save_median_taxatable=True)
 
 
-@cli.command(help="Run the SHOGUN functional algorithm on a taxonomic profile.")
+@cli.command(name='summarize_functional', help="Run the SHOGUN functional algorithm on a taxonomic profile.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The taxatable.")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), default=os.path.join(os.getcwd(), date.today().strftime('results-%y%m%d')), help='The output file', show_default=True)
