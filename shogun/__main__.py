@@ -313,7 +313,7 @@ def _load_metadata(database):
         raise Exception("Unable to load database at %s" % os.path.abspath(metadata_file))
 
 
-@cli.command(help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
+@cli.command(name='assign_taxonomy', help="Run the SHOGUN taxonomic profile algorithm on an alignment output.")
 @click.option('-a', '--aligner', type=click.Choice(['auto', 'bowtie2', 'burst', 'utree']), default='auto',
               help='The aligner to use.', show_default=True)
 @click.option('--capitalist/--no-capitalist', default=True, help='Run capitalist with burst post-align or not.')
