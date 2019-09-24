@@ -17,12 +17,9 @@ import os
 NCBI_TAXONOMY_LINK = "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
 T2GG_LINK = "https://github.com/knights-lab/BURST/raw/master/embalmlets/bin/t2gg"
 
-if __name__ == "__main__":
-    assf = sys.argv[1]
-    outdir = sys.argv[2]
-    dbname = sys.argv[3]
-    dbpath = os.path.join(outdir,dbname + '.fna') # full path
-    taxpath = os.path.join(outdir,dbname + '.tax') # full path
+# downloads fasta-formatted gene-split genomes
+# and taxonomy file
+def download_genomes(assemblypath, dbpath, taxpath):
     donelist = set()  # list of completed accessions
     
     # make dir or load partial db
@@ -53,13 +50,13 @@ if __name__ == "__main__":
         os.system('wget ' + NCBI_TAXONOMY_LINK)
         os.system('tar xvzf taxdump.tar.gz nodes.dmp names.dmp delnodes.dmp merged.dmp')
         print("Extracting taxid 2 taxonomy map using taxonkit")
-        os.system("cut -f 6 " + assf + " > taxids.txt")
+        os.system("cut -f 6 " + assemblypath + " > taxids.txt")
         print('Creating taxonomy lineage file with taxonkit')
         os.system("./taxonkit --data-dir . lineage -t taxids.txt > taxonkit_output.txt")
         os.system("parse_taxonkit_output.py taxonkit_output.txt tid2gg.txt")
-        #to_remove = ['names.dmp','nodes.dmp','delnodes.dmp','merged.dmp','tid2gg.bin','taxdump.tar.gz']
     else:
         print("tid2gg.txt found, skipping creation")
+    to_remove = ['names.dmp','nodes.dmp','delnodes.dmp','merged.dmp','taxids.txt','taxonkit_output.txt','taxdump.tar.gz']
         
     ncbi2tax = {} # ncbi taxon ID:taxonomy (output of t2gg)
     acc2tax = {} # refseq accession:taxonomy
@@ -74,7 +71,7 @@ if __name__ == "__main__":
             
     # loop through assembly file, gather ftp link and taxonomy
     print("Loading ftp links and taxonomies for assemblies")
-    with open(assf,'r') as f:
+    with open(assemblypath,'r') as f:
         for line in f:
             words = line.strip().split('\t')
             acc = words[0]
@@ -126,8 +123,45 @@ if __name__ == "__main__":
                         seq += line.strip()
             f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
             os.remove(filename)
-    f.flush() # force write of current genome to output file
-    sys.stdout.write('\n')
+        f.flush() # force write of current genome to output file
+        sys.stdout.write('\n')
         
-    #    for f in to_remove:
-    #        os.remove(f)
+    for ff in to_remove:
+        if os.path.exists(ff):
+            os.remove(ff)
+
+# create the gene ontology (taxonomy format) file from sequence headers
+# def create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
+
+# build the db using requested tool
+# def build_db(dbpath,taxpath,aligner='burst'):
+
+# perform shearing/mapping operation
+# def make_sheared_bayes_file(dbpath,shearedbayespath,aligner='burst'):
+    
+# create yaml file
+# def make_db_yaml_file(dbpath,taxpath,genepath):
+
+
+if __name__ == "__main__":
+    assemblypath = sys.argv[1]
+    outdir = sys.argv[2]
+    dbname = sys.argv[3]
+    dbpath = os.path.join(outdir,dbname + '.fna') # full path
+    taxpath = os.path.join(outdir,dbname + '.tax') # full path
+
+    # download the raw CDS from genomes
+    download_genomes(assemblypath,dbpath,taxpath)
+
+    # create the gene ontology (taxonomy format) file from sequence headers
+    # create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None)
+
+    # build the db using requested tool
+    # build_db(dbpath,taxpath,aligner='burst')
+
+    # perform shearing/mapping operation
+    # make_sheared_bayes_file(dbpath,shearedbayespath,aligner='burst')
+    
+    # create yaml file
+    # make_db_yaml_file(dbpath,taxpath,genepath)
+    
