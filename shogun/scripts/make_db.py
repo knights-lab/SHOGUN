@@ -32,13 +32,17 @@ if __name__ == "__main__":
     
     # install t2gg and make the taxonid:taxonomy map (unless exists)
     if not os.path.exists('tid2gg.txt'):
+        print("Downloading and extracting taxonkit")
+        os.system('wget https://github.com/shenwei356/taxonkit/releases/download/v0.5.0/taxonkit_linux_amd64.tar.gz')
+        os.system('tar xvzf taxonkit_linux_amd64.tar.gz')
+        os.system('chmod a+x taxonkit')
         print("Downloading and extracting taxdump.tar.gz")
         os.system('wget ' + NCBI_TAXONOMY_LINK)
         os.system('tar xvzf taxdump.tar.gz nodes.dmp names.dmp delnodes.dmp merged.dmp')
         print("Extracting taxid 2 taxonomy map using taxonkit")
         os.system("cut -f 6 " + assf + " > taxids.txt")
         print('Creating taxonomy lineage file with taxonkit')
-        os.system("taxonkit --data-dir . lineage -t taxids.txt > taxonkit_output.txt")
+        os.system("./taxonkit --data-dir . lineage -t taxids.txt > taxonkit_output.txt")
         os.system("parse_taxonkit_output.py taxonkit_output.txt tid2gg.txt")
         #to_remove = ['names.dmp','nodes.dmp','delnodes.dmp','merged.dmp','tid2gg.bin','taxdump.tar.gz']
     else:
@@ -96,7 +100,7 @@ if __name__ == "__main__":
                             f.write(header + '\n' + seq + '\n')
                             seq = ''
                         header = line[:line.index(' ')] # before whitespace is header
-                        comments = line.strip()[line.index(' '):] # comments after whitespace
+                        comments = line.strip()[(line.index(' ')+1):] # comments after whitespace
                         header = header[:header.rfind('_')] # drop "_1" at end
                         header = header[(header.index('_')+1):] # drop second half of ncbi ID
                         header = '>' + acc + '_' + header[(header.index('_')+1):]
