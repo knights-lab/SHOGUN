@@ -154,7 +154,7 @@ if __name__ == "__main__":
     download_genomes(assemblypath,dbpath,taxpath)
 
     # create the gene ontology (taxonomy format) file from sequence headers
-    # create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None)
+    create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None)
 
     # build the db using requested tool
     # build_db(dbpath,taxpath,aligner='burst')
