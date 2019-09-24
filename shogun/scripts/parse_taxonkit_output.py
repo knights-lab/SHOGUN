@@ -17,20 +17,35 @@ with open(sys.argv[1],'r') as f:
             taxraw = cols[1]
             taxraw = taxraw.split(';')
             tax = 'k__' + taxraw[1]
-            tax += ';p__' + taxraw[2]
-            tax += ';c__' + taxraw[3]
-            tax += ';o__' + taxraw[4]
-            tax += ';f__' + taxraw[5]
-            tax += ';g__' + taxraw[6]
-            tax += ';s__' + taxraw[7]
-            if len(taxraw) == 10:
+            tax += ';p__'
+            if len(taxraw) > 2:
+                tax += taxraw[2]
+            tax += ';c__'
+            if len(taxraw) > 3:
+                tax += taxraw[3]
+            tax += ';o__'
+            if len(taxraw) > 4:
+                tax += taxraw[4]
+            tax += ';f__'
+            if len(taxraw) > 5:
+                tax += taxraw[5]
+            tax += ';g__'
+            if len(taxraw) > 6:
+                tax += taxraw[6]
+            tax += ';s__'
+            if len(taxraw) > 7:
+                tax += taxraw[7]
+            tax += ';t__'
+            if len(taxraw) > 9:
                 if len(taxraw[9]) > 0:
-                    tax += ';t__' + taxraw[9]
+                    tax += taxraw[9]
                 else:
-                    tax += ';t__' + taxraw[7]
-            else:
+                    tax += taxraw[7]
+            elif len(taxraw) == 9:
                 if len(taxraw[8]) > 0:
-                    tax += ';t__' + taxraw[8]
+                    tax += taxraw[8]
                 else:
-                    tax += ';t__' + taxraw[7]
+                    tax += taxraw[7]
+            else:
+                tax += 'None'
             g.write(taxid + '\t' + tax + '\n')
