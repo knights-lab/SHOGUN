@@ -33,17 +33,11 @@ if __name__ == "__main__":
     # install t2gg and make the taxonid:taxonomy map (unless exists)
     if not os.path.exists('tid2gg.txt'):
         print("Extracting taxid 2 taxonomy map using taxonkit")
-#        os.system("rm t2gg; wget " + T2GG_LINK)
-#        os.system("rm taxdump.tar.gz; wget " + NCBI_TAXONOMY_LINK)
-#        os.system("tar xvzf taxdump.tar.gz nodes.dmp")
-#        os.system("tar xvzf taxdump.tar.gz names.dmp")
         os.system("cut -f 6 " + assf + " > taxids.txt")
+        print('Creating taxonomy lineage file with taxonkit')
         os.system("taxonkit lineage -t taxids.txt > taxonkit_output.txt")
         os.system("parse_taxonkit_output.py taxonkit_output.txt tid2gg.txt")
-#        print('Creating taxonomy map from taxdump using t2gg')
-#        os.system("chmod a+x t2gg; ./t2gg nodes.dmp names.dmp tid2gg.bin")
-#        os.system("rm -rf tid2gg.txt ; head -n 8992 tid2gg.bin > tid2gg.txt; tail -n +9031 tid2gg.bin >> tid2gg.txt") # trick to deal with weird characters
-#to_remove = ['names.dmp','nodes.dmp','tid2gg.bin','taxdump.tar.gz']
+        #to_remove = ['names.dmp','nodes.dmp','tid2gg.bin','taxdump.tar.gz']
     else:
         print("tid2gg.txt found, skipping creation")
         
@@ -83,10 +77,11 @@ if __name__ == "__main__":
         for acc in ftplinks:
             sys.stdout.write(acc + ' ')
             sys.stdout.flush()
-            basename = os.basename(ftplinks[acc])
+            basename = os.path.basename(ftplinks[acc])
             filename = basename + '_cds_from_genomic.fna.gz'
-            os.system("wget " + ftplinks[acc] + '/' + filename)
-            os.system("gunzip " + filename)
+            os.system("wget -O " + filename + " " + ftplinks[acc] + '/' + filename)
+            os.system("gunzip -f " + filename)
+            filename = filename[:-3] # remove .gz
             # find-and-replace headers, write to master file
             with open(filename,'r') as g:
                 header = '' # will store the current header
@@ -99,8 +94,9 @@ if __name__ == "__main__":
                             seq = ''
                         header = line[:line.index(' ')] # before whitespace is header
                         comments = line.strip()[line.index(' '):] # comments after whitespace
-                        header = header[header.index('|'):header.rfind('_')] # drop ">lcl|" at start and "_1" at end
-                        header = acc + header[header.index('_')]
+                        header = header[:header.rfind('_')] # drop "_1" at end
+                        header = header[(header.index('_')+1):] # drop second half of ncbi ID
+                        header = acc + '_' + header[(header.index('_')+1):]
                     else:
                         seq += line.strip()
             f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
