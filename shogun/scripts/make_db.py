@@ -100,6 +100,7 @@ if __name__ == "__main__":
                     else:
                         seq += line.strip()
             f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
+            os.remove(filename)
         sys.stdout.write('\n')
         
     #    for f in to_remove:
