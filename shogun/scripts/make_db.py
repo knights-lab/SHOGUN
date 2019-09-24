@@ -21,14 +21,27 @@ if __name__ == "__main__":
     assf = sys.argv[1]
     outdir = sys.argv[2]
     dbname = sys.argv[3]
+    dbpath = os.path.join(outdir,dbname + '.fna') # full path
+    taxpath = os.path.join(outdir,dbname + '.tax') # full path
+    donelist = set()  # list of completed accessions
     
-    # make dir
-    print("Making output directory " + outdir)
-    try:
-        os.mkdir(outdir)
-    except OSError:
-        print ("Refusing to overwrite output dir %s" % outdir)
-        raise
+    # make dir or load partial db
+    if os.path.exists(dbpath):
+        print("Existing database found at " + dbpath + ". Loading...")
+        with open(dbpath,'r') as f:
+            for line in f:
+                if line.startswith('>'):
+                    acc = '_'.join(line[1:].split('_')[:2])
+                    donelist.add(acc)
+        print("Found " + str(len(donelist)) + " existing genomes to skip: ")
+        print(donelist)
+    else:
+        print("Making output directory " + outdir)
+        try:
+            os.mkdir(outdir)
+        except OSError:
+            print ("Refusing to overwrite output dir %s" % outdir)
+            raise
     
     # install t2gg and make the taxonid:taxonomy map (unless exists)
     if not os.path.exists('tid2gg.txt'):
@@ -79,14 +92,18 @@ if __name__ == "__main__":
     # for each strain, download file, rename headers with accID
     # example header: >lcl|NC_004061.1_cds_WP_011053539.1_1
     # make it pipe-delimited, e.g. >GCF_000010525.1|WP_011053539.1
+    count = 0
     print('Downloading and processing genomes')
-    with open(os.path.join(outdir,dbname + '.fna'),'w') as f:
+    with open(os.path.join(outdir,dbname + '.fna'),'a') as f:
         for acc in ftplinks:
-            sys.stdout.write(acc + ' ')
+            count += 1
+            sys.stdout.write(str(count) + '/' + str(len(acc2tax)) + ' ')
             sys.stdout.flush()
+            if acc in donelist:
+                continue
             basename = os.path.basename(ftplinks[acc])
             filename = basename + '_cds_from_genomic.fna.gz'
-            os.system("wget -O " + filename + " " + ftplinks[acc] + '/' + filename)
+            os.system("wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O " + filename + " " + ftplinks[acc] + '/' + filename + " >& /dev/null ")
             os.system("gunzip -f " + filename)
             filename = filename[:-3] # remove .gz
             # find-and-replace headers, write to master file
@@ -109,7 +126,8 @@ if __name__ == "__main__":
                         seq += line.strip()
             f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
             os.remove(filename)
-        sys.stdout.write('\n')
+    f.flush() # force write of current genome to output file
+    sys.stdout.write('\n')
         
     #    for f in to_remove:
     #        os.remove(f)
