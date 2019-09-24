@@ -96,7 +96,7 @@ if __name__ == "__main__":
                         comments = line.strip()[line.index(' '):] # comments after whitespace
                         header = header[:header.rfind('_')] # drop "_1" at end
                         header = header[(header.index('_')+1):] # drop second half of ncbi ID
-                        header = acc + '_' + header[(header.index('_')+1):]
+                        header = '>' + acc + '_' + header[(header.index('_')+1):]
                     else:
                         seq += line.strip()
             f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
