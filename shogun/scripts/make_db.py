@@ -14,7 +14,7 @@
 import sys
 import os
 from shogun.utils.refseq import make_refseq_fasta_and_taxonomy
-from shogun.utils.ontologies import create_gene_ontology
+#from shogun.utils.ontologies import create_gene_ontology
 
 if __name__ == "__main__":
     assemblypath = sys.argv[1]
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     make_refseq_fasta_and_taxonomy(assemblypath,dbpath,taxpath)
 
     # create the gene ontology (taxonomy format) file from sequence headers
-    create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None)
+    #create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None)
 
     # build the db using requested tool
     # build_db(dbpath,taxpath,aligner='burst')

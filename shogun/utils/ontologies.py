@@ -14,7 +14,42 @@ from collections import defaultdict
 
 IDMAPPING_LINK = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz"
 
-def create_gene_ontology(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
+# uses KEGG REST server to create
+# mapping from module to kos in that module
+def get_module2ko_mapping(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
+
+    # download kegg list of modules
+    modulelist = []
+    os.system('wget http://rest.kegg.jp/get/br:ko00002 -O kegg_module_list.txt')
+    with open('kegg_module_list.txt','r') as f:
+        for line in f:
+            if line.startswith('D'):
+                modulelist.append(line.split()[1])
+    print(str(len(modulelist)) + " modules found.")
+
+    # loop through modules to get module: KO mapping for each one
+    ko2module = defaultdict(set)
+    for module in modulelist:
+        os.system('wget http://rest.kegg.jp/get/' + module + ' -O singlemodule.txt')
+        with open('singlemodule.txt','r') as f:
+            lines = f.readlines()
+            i = 0
+            while not lines[i].startswith('ORTHOLOGY'):
+                i += 1
+            kolist = set()
+            while not lines[i].startswith('CLASS'):
+                kolist_i = lines[i].split()[0].split(',')
+                kolist = kolist.union(set(kolist_i))
+                i += 1
+            for ko in kolist:
+                ko2module[ko].add(module)
+            
+    print(str(len(ko2module)) + " KOs assigned to modules.")
+
+
+# uses KEGG REST server to create
+# mapping from ko to module containing that KO
+def get_ko2module_mapping(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
 
     # download kegg pathway raw file
     os.system('wget http://rest.kegg.jp/get/br:ko00001 -O kegg_orthology_raw.txt')
