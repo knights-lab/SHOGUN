@@ -208,7 +208,7 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath):
         with open(dbpath,'r') as f:
             for line in f:
                 if line.startswith('>'):
-                    acc = '_'.join(line[1:].split('_')[:2])
+                    acc = line[1:].split('|')[0]
                     donelist.add(acc)
         print("Found " + str(len(donelist)) + " existing genomes to skip.")
     else:
