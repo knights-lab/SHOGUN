@@ -58,6 +58,8 @@ def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
     print("Building assembly 2 taxonomy map")
     with open(assemblypath,'r') as f:
         for line in f:
+            if line.startswith('#'):
+                continue
             words = line.strip().split('\t')
             acc = words[0]
             taxid = words[5]
@@ -82,7 +84,7 @@ def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
 # uses taxonkit tool to download and make mapping of
 # RefSeq accession to taxonomy
 # 
-def get_locus2taxonomy(assemblypath,fnapath,delim="|",outfile=None):
+def get_locus2taxonomy(assemblypath,fnapath=None,loci=None,delim="|",outfile=None):
     """
     Makes a mapping of fna locus IDs to taxonomy strings.
     
@@ -99,8 +101,13 @@ def get_locus2taxonomy(assemblypath,fnapath,delim="|",outfile=None):
         the NCBI taxon ID in column 6.
 
     fnapath : str
-        The fna database file containing all relevant loci.
-        
+        The fna database file containing all relevant loci. 
+        If None, requires 'loci', list of locus FASTA headers
+
+    loci : list
+        List of locus FASTA headers; overwritten if 
+        fnapath is not None
+
     outfile : str, optional
         Output path for tab-delimited tax file.
 
@@ -111,26 +118,44 @@ def get_locus2taxonomy(assemblypath,fnapath,delim="|",outfile=None):
         outfile is passed).
     """
 
+    # get list of loci from FNA file if required
+    if fnapath is not None:
+        print("Gathering list of locus IDs...")
+        loci = []
+        count = 0
+        with open(fnapath,'r') as f:
+            for line in f:
+                if line.startswith('>'):
+                    count += 1
+                    if count % 100000 == 0:
+                        sys.stdout.write(str(count) + ' ')
+                        sys.stdout.flush()
+                    header = line[1:].strip().split()[0] # drop comments and ">"
+                    loci.append(header)
+            print('')
+    
     # get accession 2 taxonomy
     acc2tax = get_accession2taxonomy(assemblypath)
     locus2tax = {} # locusID : taxonomy
+    
     # loop through fna file, gather taxonomy map
     print("Building locus 2 taxonomy map")
     count = 0
-    with open(fnapath,'r') as f:
-        for line in f:
-            if line.startswith('>'):
-                count += 1
-                header = line[1:].split()[0] # drop comments and ">"
-                words = header.split(delim) # split on delimiter
-                acc = words[0]
-                if header in locus2tax:
-                    print("Warning: header already found previously: " + header)
-                try:
-                    locus2tax[header] = acc2tax[acc]
-                except KeyError:
-                    print('Warning: accesion " + header + " not found in acc2tax.')
-    print('Processed ' + str(count) + ' DNA sequences')
+    for locus in loci:
+        count += 1
+        if count % 100000 == 0:
+            sys.stdout.write(str(count) + ' ')
+            sys.stdout.flush()
+        words = locus.split(delim) # split on delimiter
+        acc = words[0]
+        if locus in locus2tax:
+            print("Warning: header already found previously: " + header)
+        try:
+            locus2tax[locus] = acc2tax[acc]
+        except KeyError:
+            print('Warning: accesion ' + locus + ' not found in acc2tax.')
+    print('')
+    print('Processed ' + str(count) + ' loci')
     print('There are ' + str(len(locus2tax)) + ' keys in the locus2tax dict.')
     
     # write taxonomy map
@@ -205,6 +230,7 @@ def parse_taxonkit_output(taxonkit_output,outfile=None):
 # and taxonomy file
 def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=True):
     donelist = set()  # list of completed accessions
+    loci = [] # list of all locus names/headers
     outdir = os.path.dirname(dbpath)
     
     # make dir or load partial db
@@ -215,12 +241,15 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
             for line in f:
                 if line.startswith('>'):
                     count += 1
-                    if count % 100000 == 0:
+                    if count % 10000000 == 0:
                         sys.stdout.write(str(count) + ' ')
                         sys.stdout.flush()
-                    acc = line[1:].split('|')[0]
+                    locus = line[1:].strip().split(' ')[0]
+                    acc = locus.split('|')[0]
+                    loci.append(locus)
                     donelist.add(acc)
-        print("\nFound " + str(len(donelist)) + " existing genomes to skip.")
+        print("\nFound " + str(len(loci)) + " existing loci to skip.")
+        print("Found " + str(len(donelist)) + " existing genomes to skip.")
     else:
         if not os.path.exists(outdir):
             print("Making output directory " + outdir)
@@ -256,7 +285,11 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
             if acc in donelist:
                 continue
             basename = os.path.basename(ftplinks[acc])
-            filename = basename + '_cds_from_genomic.fna.gz'
+            if coding_only:
+                filename = basename + '_cds_from_genomic.fna.gz'
+            else:
+                filename = basename + '_genomic.fna.gz'
+                
             successful_download = False
             while not successful_download:
                 os.system("wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O " + filename + " " + ftplinks[acc] + '/' + filename + " >& /dev/null ")
@@ -271,40 +304,51 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
             with open(filename,'r') as g:
                 header = '' # will store the current header
                 seq = '' # will store the current sequence
-                for line in g:
-                    if line.startswith('>'):
-                        # new sequence; print last one (if not empty)
-                        if seq != '':
-                            f.write(header + '\n' + seq + '\n')
-                            seq = ''
-                        header = line[:line.index(' ')] # before whitespace is header
-                        comments = line.strip()[(line.index(' ')+1):] # comments after whitespace
+                if coding_only:
+                    for line in g:
+                        if line.startswith('>'):
+                            # new sequence; print last one (if not empty)
+                            if seq != '':
+                                f.write(header + '\n' + seq + '\n')
+                                seq = ''
+                            header = line[:line.index(' ')] # before whitespace is header
+                            comments = line.strip()[(line.index(' ')+1):] # comments after whitespace
 
-                        # example before: >lcl|NC_004061.1_cds_WP_011053539.1_385
-                        # this is >lcl|<ncbi id>_cds_<refseq geneID>_<gene index>
-                        # sometimes there is no refseq geneID:
-                        # >lcl|<ncbi id>_cds_<gene index>
-                        # make it pipe-delimited, e.g. >GCF_000010525.1|WP_011053539.1|385
-                        # or, e.g. >GCF_000010525.1||385
-                        # Note: it is necessary to keep the gene index
-                        # because some genes show up twice
-                        # 1. get everything after "_cds_"
-                        genedesc = header[(header.index('_cds_')+5):]
-                        # 2. if there are "_" in the gene description,
-                        #    split the gene ID from the gene index at end.
-                        #    otherwise geneID is empty
-                        if '_' in genedesc:
-                            geneID = genedesc[:genedesc.rindex('_')]
-                            geneindex = genedesc[(genedesc.rindex('_')+1):]
+                            # example before: >lcl|NC_004061.1_cds_WP_011053539.1_385
+                            # this is >lcl|<ncbi id>_cds_<refseq geneID>_<gene index>
+                            # sometimes there is no refseq geneID:
+                            # >lcl|<ncbi id>_cds_<gene index>
+                            # make it pipe-delimited, e.g. >GCF_000010525.1|WP_011053539.1|385
+                            # or, e.g. >GCF_000010525.1||385
+                            # Note: it is necessary to keep the gene index
+                            # because some genes show up twice
+                            # 1. get everything after "_cds_"
+                            genedesc = header[(header.index('_cds_')+5):]
+                            # 2. if there are "_" in the gene description,
+                            #    split the gene ID from the gene index at end.
+                            #    otherwise geneID is empty
+                            if '_' in genedesc:
+                                geneID = genedesc[:genedesc.rindex('_')]
+                                geneindex = genedesc[(genedesc.rindex('_')+1):]
+                            else:
+                                geneID = ''
+                                geneindex = genedesc
+                            # 3. join the fields with delimiter "|"
+                            locusID = '|'.join([acc,geneID,geneindex])
+                            loci.append(locusID)
+                            header = '>' + locusID
+                            header += ' ' + comments # add back comments at end
                         else:
-                            geneID = ''
-                            geneindex = genedesc
-                        # 3. join the fields with delimiter "|"
-                        header = '>' + '|'.join([acc,geneID,geneindex])                        
-                        header += ' ' + comments # add back comments at end
-                    else:
-                        seq += line.strip()
-            f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
+                            seq += line.strip()
+                    f.write(header + '\n' + seq + '\n') # don't forget to write the last sequence
+                else:
+                    for line in g:
+                        # not just coding sequences; aggregate all genomic reads from this
+                        # file into one long concatenated genome with NNNNNNNNNNNN between
+                        if not line.startswith('>'):
+                            seq += line.strip()
+                    f.write('>' + acc + '\n' + seq + '\n')
+
             os.remove(filename)
         f.flush() # force write of current genome to output file
         sys.stdout.write('\n')
@@ -312,8 +356,15 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
     print('Finished downloading ' + str(count) + ' genomes.')
 
     # create and write taxonomy file if it doesn't exist
-    if not os.path.exists(taxpath):
-        print('Creating taxonomy file.')
-        get_locus2taxonomy(assemblypath,dbpath,outfile=taxpath)
+    if coding_only:
+        if not os.path.exists(taxpath):
+            print('Creating taxonomy file.')
+            get_locus2taxonomy(assemblypath,loci=loci,outfile=taxpath)
+        else:
+            print("Taxonomy file " + taxpath + " already exists; skipping creation.")
     else:
-        print("Taxonomy file " + taxpath + " already exists; skipping creation.")
+        if not os.path.exists(taxpath):
+            print('Creating taxonomy file.')
+            get_accession2taxonomy(assemblypath,outfile=taxpath)
+        else:
+            print("Taxonomy file " + taxpath + " already exists; skipping creation.")
