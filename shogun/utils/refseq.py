@@ -150,7 +150,12 @@ def parse_taxonkit_output(taxonkit_output,outfile=None):
     id2tax = {}
     with open(taxonkit_output,'r') as f:
         for line in f:
+            if line.startswith('#'):
+                continue
             cols = line.strip().split('\t')
+            if len(cols) < 2:
+                # invalid line or header line (not enough columns); skip
+                continue
             taxid = cols[0]
             taxraw = cols[1]
             taxraw = taxraw.split(';')
@@ -198,19 +203,24 @@ def parse_taxonkit_output(taxonkit_output,outfile=None):
 
 # download fasta-formatted gene-split genomes
 # and taxonomy file
-def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath):
+def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=True):
     donelist = set()  # list of completed accessions
     outdir = os.path.dirname(dbpath)
     
     # make dir or load partial db
     if os.path.exists(dbpath):
         print("Existing database found at " + dbpath + ". Loading...")
+        count = 0
         with open(dbpath,'r') as f:
             for line in f:
                 if line.startswith('>'):
+                    count += 1
+                    if count % 100000 == 0:
+                        sys.stdout.write(str(count) + ' ')
+                        sys.stdout.flush()
                     acc = line[1:].split('|')[0]
                     donelist.add(acc)
-        print("Found " + str(len(donelist)) + " existing genomes to skip.")
+        print("\nFound " + str(len(donelist)) + " existing genomes to skip.")
     else:
         if not os.path.exists(outdir):
             print("Making output directory " + outdir)
@@ -225,6 +235,8 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath):
     print("Loading ftp links for assemblies")
     with open(assemblypath,'r') as f:
         for line in f:
+            if line.startswith('#'):
+                continue
             words = line.strip().split('\t')
             acc = words[0]
             ftp = words[19]
@@ -245,9 +257,16 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath):
                 continue
             basename = os.path.basename(ftplinks[acc])
             filename = basename + '_cds_from_genomic.fna.gz'
-            os.system("wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O " + filename + " " + ftplinks[acc] + '/' + filename + " >& /dev/null ")
-            os.system("gunzip -f " + filename)
+            successful_download = False
+            while not successful_download:
+                os.system("wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O " + filename + " " + ftplinks[acc] + '/' + filename + " >& /dev/null ")
+                exit_status = os.system("gunzip -f " + filename)
+                successful_download = exit_status == 0
+                if not successful_download:
+                    sys.stdout.write(' download failed, retrying... ')
+                    sys.stdout.flush()
             filename = filename[:-3] # remove .gz
+
             # find-and-replace headers, write to master file
             with open(filename,'r') as g:
                 header = '' # will store the current header

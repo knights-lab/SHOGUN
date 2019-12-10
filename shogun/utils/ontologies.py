@@ -17,11 +17,153 @@ MODULE_LINK = 'http://rest.kegg.jp/get/br:ko00002'
 EC_LINK = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 PATHWAY_LINK = 'http://rest.kegg.jp/get/br:ko00001'
 
+# creates a functional ontology map "taxonomy" file from fasta headers
+def get_refseqfastq2ontology_map(fastafp, refseq2other, outfile=None, overwrite_existing_resources=False):
+
+    """
+    Example fasta header:
+    >GCF_000005825.2|WP_012957018.1|1 [locus_tag=BPOF4_RS00005] [protein=chromosomal replication initiator protein DnaA] [protein_id=WP_012957018.1] [location=816..2168] [gbkey=CDS]
+    """
+    outmap = {} # observed refeqID:other ontology
+    with open(fastqfp,'r') as f:
+        for line in f:
+            if not line[0] == '>':
+                continue
+            if not '[protein_id=' in line:
+                continue
+            refseqID = line[line.index('[protein_id=') + 13:]
+            refseqID = refseqID[:refseqID.index(']')]
+            if refseqID in refseq2other:
+                
+
+    # read file using gzip
+    # example:
+    # ...
+    # A9MC22  RefSeq  WP_002965908.1
+
+    
 # downloads or reads in idmapping.dat.gz from UniProt
 # finds a mapping from refseq2 other ontologies
-def get_refseq2pathway_map(outfile=None):
-    refseq2ko = get_refseq2ko_map()
-    ko2pathway = get_ko2pathway_map()
+def get_ontology2ontology_map(outfile=None,
+                              ontology1=['RefSeq','KO','UniRef100','UniRef90','UniRef50'][0],
+                              ontology2=['RefSeq','KO','UniRef100','UniRef90','UniRef50'][2],
+                              overwrite_existing_resources=False):
+    if not os.path.exists('idmapping.dat.gz') or overwrite_existing_resources:
+        os.system('wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 ' + IDMAPPING_LINK + ' -O idmapping.dat.gz')
+    
+    # read file using gzip
+    # example:
+    # ...
+    # A9MC22  RefSeq  WP_002965908.1
+    # A9MC22  KEGG    bcs:BCAN_B0743
+    # ...
+    count = 0
+    refseq2ko = {}
+    uniprotID = ""
+    refseqID = ""
+    koID = ""
+    count = 0
+    print("Parsing idmapping.dat.gz.")
+    with gzip.open('idmapping.dat.gz', 'rt') as f:
+        for line in f:
+            count += 1
+            if count % 1000000 == 0:
+                sys.stdout.write(str(count) + ' ')
+                sys.stdout.write('\n')
+            words = line.strip().split('\t')
+            if uniprotID != words[0]:
+                if uniprotID != "":
+                    # if not the first one, add to DB
+                    # (if ko and refseq ID present)
+                    if koID != "" and refseqID != "":
+                        refseq2ko[refseqID] = koID
+                    # reset
+                    uniprotID = words[0]
+                    refseqID = ""
+                    koID = ""
+                else:
+                    uniprotID = words[0]
+            if words[1] == ontology1:
+                refseqID = words[2]
+            elif words[1] == ontology2:
+                koID = words[2]            
+        # don't forget last one
+        if koID != "" and refseqID != "":
+            refseq2ko[refseqID] = koID
+    sys.stdout.write('\n')
+
+    print(str(len(refseq2ko)) + ' ' + ontology1 + ' IDs mapped to ' + str(len(set(refseq2ko.values()))) + ' ' + ontology2 + ' IDs')
+    if outfile is None:
+        return(refseq2ko)
+    else:
+        keys = sorted(refseq2ko.keys())
+        with open(outfile,'w') as f:
+            for refseq in keys:
+                f.write(refseq + '\t' + refseq2ko[refseq] + '\n')
+
+
+# downloads or reads in idmapping.dat.gz from UniProt
+# finds a mapping from refseq2 other ontologies
+def get_refseq2ko_map(outfile=None,overwrite_existing_resources=False):
+    if not os.path.exists('idmapping.dat.gz') or overwrite_existing_resources:
+        os.system('wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 ' + IDMAPPING_LINK + ' -O idmapping.dat.gz')
+    
+    # read file using gzip
+    # example:
+    # ...
+    # A9MC22  RefSeq  WP_002965908.1
+    # A9MC22  KEGG    bcs:BCAN_B0743
+    # ...
+    count = 0
+    refseq2ko = {}
+    uniprotID = ""
+    refseqID = ""
+    koID = ""
+    count = 0
+    print("Parsing idmapping.dat.gz.")
+    with gzip.open('idmapping.dat.gz', 'rt') as f:
+        for line in f:
+            count += 1
+            if count % 1000000 == 0:
+                sys.stdout.write(str(count) + ' ')
+                sys.stdout.write('\n')
+            words = line.strip().split('\t')
+            if uniprotID != words[0]:
+                if uniprotID != "":
+                    # if not the first one, add to DB
+                    # (if ko and refseq ID present)
+                    if koID != "" and refseqID != "":
+                        refseq2ko[refseqID] = koID
+                    # reset
+                    uniprotID = words[0]
+                    refseqID = ""
+                    koID = ""
+                else:
+                    uniprotID = words[0]
+            if words[1] == "RefSeq":
+                refseqID = words[2]
+            elif words[1] == "KO":
+                koID = words[2]            
+        # don't forget last one
+        if koID != "" and refseqID != "":
+            refseq2ko[refseqID] = koID
+    sys.stdout.write('\n')
+
+    print(str(len(refseq2ko)) + ' refseqIDs mapped to ' + str(len(set(refseq2ko.values()))) + ' KOs')
+    if outfile is None:
+        return(refseq2ko)
+    else:
+        keys = sorted(refseq2ko.keys())
+        with open(outfile,'w') as f:
+            for refseq in keys:
+                f.write(refseq + '\t' + refseq2ko[refseq] + '\n')
+
+
+# downloads or reads in idmapping.dat.gz from UniProt
+# finds a mapping from refseq2 other ontologies
+def get_refseq2pathway_map(outfile=None, overwrite_existing_resources=False):
+    refseq2ko = get_refseq2ko_map(overwrite_existing_resources=overwrite_existing_resources)
+    ko2pathway = get_ko2pathway_map(overwrite_existing_resources=overwrite_existing_resources)
     refseq2pathway = {}
     
     keys = sorted(refseq2ko.keys())
@@ -50,11 +192,12 @@ def get_refseq2pathway_map(outfile=None):
 # unless outfile provided, in which case
 # writes one ko:pathway mapping per line
 # Note: some KOs show up multiple times.
-def get_ko2pathway_map(outfile=None, skip=['Human Diseases','Not Included in Pathway or Brite','Organismal Systems']):
-    if os.path.exists('kegg_pathway_htext.txt'):
+def get_ko2pathway_map(outfile=None, skip=['Human Diseases','Not Included in Pathway or Brite','Organismal Systems'],
+                       overwrite_existing_resources=False):
+    if os.path.exists('kegg_pathway_htext.txt') and not overwrite_existing_resources:
         print('Warning: kegg_pathway_htext.txt exists; skipping download.')
     else:
-        os.system('wget ' + PATHWAY_LINK + ' -O kegg_pathway_htext.txt')
+        os.system('wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 ' + PATHWAY_LINK + ' -O kegg_pathway_htext.txt')
     print('Parsing KEGG pathway htext.')
     # start of file is
     # +D    KO
@@ -120,11 +263,12 @@ def get_ko2pathway_map(outfile=None, skip=['Human Diseases','Not Included in Pat
 
 # uses KEGG REST server to create
 # mapping from module to kos in that module
-def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
+def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None,overwrite_existing_resources=False):
 
     # download kegg list of modules
     modulelist = []
-    os.system('wget ' + MODULE_LINK + ' -O kegg_module_list.txt')
+    if not os.path.exists('kegg_module_list.txt') or overwrite_existing_resources:
+        os.system('wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 ' + MODULE_LINK + ' -O kegg_module_list.txt')
     with open('kegg_module_list.txt','r') as f:
         for line in f:
             if line.startswith('D'):
@@ -134,7 +278,7 @@ def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
     # loop through modules to get module: KO mapping for each one
     ko2module = defaultdict(set)
     for module in modulelist:
-        os.system('wget http://rest.kegg.jp/get/' + module + ' -O singlemodule.txt')
+        os.system('wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 http://rest.kegg.jp/get/' + module + ' -O singlemodule.txt')
         with open('singlemodule.txt','r') as f:
             lines = f.readlines()
             i = 0
@@ -147,14 +291,14 @@ def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
                 i += 1
             for ko in kolist:
                 ko2module[ko].add(module)
-            
+
     print(str(len(ko2module)) + " KOs assigned to modules.")
 
 
 # uses KEGG REST server to create
 # mapping from ko to module containing that KO
-def get_ko2module_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
-    m2k = get_module2ko_map(dbpath,genepath)
+def get_ko2module_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None,overwrite_existing_resources=False):
+    m2k = get_module2ko_map(dbpath,genepath,overwrite_existing_resources=overwrite_existing_resources)
     k2m = defaultdict(set)
     for module in m2k:
         for k in m2k[module]:
@@ -162,67 +306,11 @@ def get_ko2module_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None):
     return(k2m)
 
 
-# downloads or reads in idmapping.dat.gz from UniProt
-# finds a mapping from refseq2 other ontologies
-def get_refseq2ko_map(outfile=None):
-    if not os.path.exists('idmapping.dat.gz'):
-        os.system('wget ' + IDMAPPING_LINK + ' -O idmapping.dat.gz')
-    
-    # read file using gzip
-    # example:
-    # ...
-    # A9MC22  RefSeq  WP_002965908.1
-    # A9MC22  KEGG    bcs:BCAN_B0743
-    # ...
-    count = 0
-    refseq2ko = {}
-    uniprotID = ""
-    refseqID = ""
-    koID = ""
-    count = 0
-    print("Parsing idmapping.dat.gz.")
-    with gzip.open('idmapping.dat.gz', 'rt') as f:
-        for line in f:
-            count += 1
-            if count % 1000000 == 0:
-                sys.stdout.write(str(count) + ' ')
-                sys.stdout.write('\n')
-            words = line.strip().split('\t')
-            if uniprotID != words[0]:
-                if uniprotID != "":
-                    # if not the first one, add to DB
-                    # (if ko and refseq ID present)
-                    if koID != "" and refseqID != "":
-                        refseq2ko[refseqID] = koID
-                    # reset
-                    uniprotID = words[0]
-                    refseqID = ""
-                    koID = ""
-                else:
-                    uniprotID = words[0]
-            if words[1] == "RefSeq":
-                refseqID = words[2]
-            elif words[1] == "KO":
-                koID = words[2]            
-        # don't forget last one
-        if koID != "" and refseqID != "":
-            refseq2ko[refseqID] = koID
-    sys.stdout.write('\n')
-
-    print(str(len(refseq2ko)) + ' refseqIDs mapped to ' + str(len(set(refseq2ko.values()))) + ' KOs')
-    if outfile is None:
-        return(refseq2ko)
-    else:
-        keys = sorted(refseq2ko.keys())
-        with open(outfile,'w') as f:
-            for refseq in keys:
-                f.write(refseq + '\t' + refseq2ko[refseq] + '\n')
-
 # KO to Enzyme Commission Number(s)
 # Note: one KO can map to multiple ECs
-def get_ko2ec_map(outfile=None):
+def get_ko2ec_map(outfile=None,overwrite_existing_resources=False):
     # download kegg list of modules
-    ko2p = get_ko2pathway_map()
+    ko2p = get_ko2pathway_map(overwrite_existing_resources=overwrite_existing_resources)
     ko2ec = {} # {ko : [ec1, ec2,...]
 
     # for each KO, pull the EC out of the end of L4
@@ -253,14 +341,14 @@ def get_ko2ec_map(outfile=None):
     
 
 # KO to Enzyme Commission Number pathway
-def get_ko2ecpathway_map(outfile=None):
+def get_ko2ecpathway_map(outfile=None, overwrite_existing_resources=False):
     # download list of EC modules
-    ko2ec = get_ko2ec_map()
+    ko2ec = get_ko2ec_map(overwrite_existing_resources=overwrite_existing_resources)
     eclevels = {} # 1. 1. 2.-  :  With a cytochrome as acceptor.
-    if os.path.exists('ec_table_raw.txt'):
+    if os.path.exists('ec_table_raw.txt') and not overwrite_existing_resources:
         print('Warning, ec_table_raw.txt exists, skipping.')
     else: 
-        os.system('wget ' + EC_LINK + ' -O ec_table_raw.txt')
+        os.system('wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 ' + EC_LINK + ' -O ec_table_raw.txt')
     with open('ec_table_raw.txt','r') as f:
         # 1. -. -.-  Oxidoreductases.
         # 1. 1. -.-   Acting on the CH-OH group of donors.
@@ -292,12 +380,14 @@ def get_ko2ecpathway_map(outfile=None):
                 for p in ko2ecpath[ko]:
                     f.write(ko + '\t' + p + '\n')
 
+# main function included only for easy standalone testing purposes
 if __name__ == "__main__":
 
-#    refseq2ko = get_refseq2ko_map('refseq2ko.txt')
-    
-#    get_refseq2kegg_pathway_ontology(dbpath='tmp/tmp.fna',genepath='')
+    refseq2ko = get_ontology2ontology_map('refseq2ko.txt',ontology1='RefSeq',ontology2='KO')
+
 #    refseq2pathway = get_refseq2pathway_map(outfile='refseq2pathway.txt')
 #    get_ko2ec_map(outfile='ko2ec.txt')
-    get_ko2ecpathway_map(outfile='ko2ec.txt')
+#    get_ko2ecpathway_map(outfile='ko2ec.txt')
 #    get_ko2pathway_map(outfile='ko2pathway.txt')
+
+#    get_refseq2kegg_pathway_ontology(dbpath='tmp/tmp.fna',genepath='')

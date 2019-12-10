@@ -22,6 +22,7 @@ if __name__ == "__main__":
     dbname = sys.argv[3]
     dbpath = os.path.join(outdir,dbname + '.fna') # full path
     taxpath = os.path.join(outdir,dbname + '.tax') # full path
+    taxpath = os.path.join(outdir,dbname + '-ko.tax') # full path
 
     # download the raw CDS from genomes
     make_refseq_fasta_and_taxonomy(assemblypath,dbpath,taxpath)
