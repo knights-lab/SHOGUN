@@ -10,6 +10,7 @@ import numpy as np
 
 from shogun.utils import convert_to_relative_abundance, least_common_ancestor
 
+
 class TestRelativeAbundance(unittest.TestCase):
     def test_convert_relative_abundance(self):
         df = pd.DataFrame([[1, 1, 0], [1, 0, 0], [1, 0, 0]])
@@ -19,7 +20,7 @@ class TestRelativeAbundance(unittest.TestCase):
 
 
 class TestLeastCommonAncestor(unittest.TestCase):
-    def test_least_common_ancestor(self):
+    def test_lca_family(self):
         # normal scenario
         taxa = [
             'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
@@ -31,6 +32,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
         exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae'
         self.assertEqual(obs, exp)
 
+    def test_lca_kingdom(self):
         # scenario 1: lowest level is unclassified
         taxa = [
             'k__Bacteria;p__Deinococcus-Thermus;c__Deinococci;o__Thermales;f__Thermaceae;g__Thermus;s__Thermus thermophilus;t__',
@@ -42,6 +44,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
         exp = 'k__Bacteria'
         self.assertEqual(obs, exp)
 
+    def test_lca_phylum(self):
         # scenario 2: middle level is unclassified
         taxa = [
             'k__Viruses;p__ssDNA_viruses;c__Geminiviridae;o__;f__;g__Begomovirus;s__Sida_mosaic_Sinaloa_virus',
@@ -53,6 +56,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
         exp = 'k__Viruses;p__ssDNA_viruses'
         self.assertEqual(obs, exp)
 
+    def test_lca_none(self):
         # scenario 3: top level is inconsistent
         taxa = [
             'k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;o__Vibrionales;f__Vibrionaceae;g__Vibrio;s__Vibrio_tasmaniensis;t__Vibrio_tasmaniensis_LGP32',
@@ -62,3 +66,28 @@ class TestLeastCommonAncestor(unittest.TestCase):
         ]
         obs = least_common_ancestor(taxa)
         self.assertIsNone(obs)
+
+    def test_blank_class(self):
+        # normal scenario
+        taxa = [
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium botulinum',
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium aldrichii',
+            'k__Bacteria;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Caminicella;s__Caminicella sporogenes'
+        ]
+        obs = least_common_ancestor(taxa)
+        exp = 'k__Bacteria;p__Firmicutes'
+        self.assertEqual(obs, exp)
+
+    def test_blanks_kingdom_class(self):
+        # normal scenario
+        taxa = [
+            'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
+            'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
+            'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
+            'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Caminicella'
+        ]
+        obs = least_common_ancestor(taxa)
+        exp = 'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae'
+        # self.assertEqual(obs, exp)
+        self.assertEquals(obs, None)
