@@ -89,5 +89,16 @@ class TestLeastCommonAncestor(unittest.TestCase):
         ]
         obs = least_common_ancestor(taxa)
         exp = 'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae'
-        # self.assertEqual(obs, exp)
-        self.assertEquals(obs, None)
+        self.assertEqual(obs, exp)
+
+    def test_continued_blanks(self):
+        # normal scenario
+        taxa = [
+            'k__;p__Firmicutes;c__;o__;f__;g__Clostridium',
+            'k__;p__Firmicutes;c__;o__;f__;g__Clostridium',
+            'k__;p__Firmicutes;c__;o__;f__;g__Clostridium',
+            'k__;p__Firmicutes;c__;o__;f__;g__Caminicella'
+        ]
+        obs = least_common_ancestor(taxa)
+        exp = 'k__;p__Firmicutes'
+        self.assertEqual(obs, exp)
