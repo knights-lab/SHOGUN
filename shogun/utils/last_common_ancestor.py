@@ -35,7 +35,7 @@ def least_common_ancestor(taxa_set):
     taxa_set = [_.split(';') for _ in taxa_set]
     unclassified_flag = False
     lca_classified = []
-    for i, level in enumerate(zip(*taxa_set)):
+    for level in zip(*taxa_set):
         if len(set(level)) > 1:
             if unclassified_flag:
                 lca = lca_classified

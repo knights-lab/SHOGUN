@@ -80,7 +80,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
         self.assertEqual(obs, exp)
 
     def test_blanks_kingdom_class(self):
-        # normal scenario
+        # unclassified until family
         taxa = [
             'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
             'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
@@ -92,7 +92,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
         self.assertEqual(obs, exp)
 
     def test_continued_blanks(self):
-        # normal scenario
+        # unclassified until phylum
         taxa = [
             'k__;p__Firmicutes;c__;o__;f__;g__Clostridium',
             'k__;p__Firmicutes;c__;o__;f__;g__Clostridium',
