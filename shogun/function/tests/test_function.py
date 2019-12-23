@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 import pkg_resources
-from yaml import load
+import yaml
 
 from shogun.__main__ import _function
 from shogun.function import parse_function_db
@@ -26,7 +26,7 @@ class TestFunctionCheck(unittest.TestCase):
     def test_check_database(self):
         database = pkg_resources.resource_filename('shogun.tests', os.path.join('data'))
         with open(os.path.join(database, 'metadata.yaml'), 'r') as stream:
-            data_files = load(stream)
+            data_files = yaml.load(stream, Loader=yaml.SafeLoader)
         results = parse_function_db(data_files, database)
         self.assertTrue(results is not None)
 

@@ -6,7 +6,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import os
 
-from yaml import load
+import yaml
 
 from shogun import logger
 
@@ -20,7 +20,7 @@ class Aligner:
         check, msg = self.check_database(database_dir)
 
         with open(os.path.join(database_dir, 'metadata.yaml')) as stream:
-            self.data_files = load(stream)
+            self.data_files = yaml.load(stream, Loader=yaml.SafeLoader)
 
         if not check:
             raise Exception("Database %s is not formatted correctly: %s" % (database_dir, msg))
@@ -37,7 +37,7 @@ class Aligner:
     @classmethod
     def check_database(cls, dir):
         with open(os.path.join(dir, 'metadata.yaml'), 'r') as stream:
-            data_files = load(stream)
+            data_files = yaml.load(stream, Loader=yaml.SafeLoader)
 
         SUFFICES = {
             'burst': ['.edx'],

@@ -31,9 +31,21 @@ def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:
 
 
 def least_common_ancestor(taxa_set):
+    lca = []
     taxa_set = [_.split(';') for _ in taxa_set]
-    for i, level in enumerate(reversed(list(zip(*taxa_set)))):
-        if len(set(level)) == 1:
-            convert_i = lambda x: None if x == 0 else -x
-            return ';'.join([taxon_level[0] for taxon_level in list(zip(*taxa_set))[:convert_i(i)]])
-    return None
+    unclassified_flag = False
+    lca_classified = []
+    for level in zip(*taxa_set):
+        if len(set(level)) > 1:
+            if unclassified_flag:
+                lca = lca_classified
+            return ';'.join(lca) if lca else None
+        elif len(level[0]) == 3 and level[0].endswith("__"):
+            # hit an unclassified level
+            if not unclassified_flag:
+                lca_classified = lca.copy()
+                unclassified_flag = True
+        else:
+            # reset classified flag
+            unclassified_flag = False
+        lca.append(level[0])
