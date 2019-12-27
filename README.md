@@ -7,13 +7,13 @@ Shallow seq pipeline for optimal shotgun data usage
 
 ![alt-tag](docs/shogun_schematic.png)
 
-Schematic overview of the shallow-shotgun computational pipeline SHOGUN. For every step in the SHOGUN pipeline, the user must supply the pre-formatted SHOGUN database folder. To run every step shown here in a single command, the user can select the pipeline subcommand. Otherwise, the analysis modules can be run independently. 
+Schematic overview of the shallow-shotgun computational pipeline SHOGUN. For every step in the SHOGUN pipeline, the user must supply the pre-formatted SHOGUN database folder. To run every step shown here in a single command, the user can select the pipeline subcommand. Otherwise, the analysis modules can be run independently.
 
 a. *filter* - The input quality-controlled reads are aligned against the contaminate database using BURST to filter out all reads that hit human associated genome content.
 
 b. *align* - The input contaminate filtered reads are aligned against the reference database. The user has the option to select one or all of the three alignment tools BURST, Bowtie2, or UTree.
 
-c. *assign_taxonomy* - Given the data artifacts from a SHOGUN alignment tool, output a Biological Observation Matrix ![(BIOM)](http://biom-format.org/) format taxatable with the rows being rank-flexible taxonomies, the columns are samples, and the entries are counts for each given taxonomy per sample. The alignment tool BURST has two run modes, taxonomy and capitalist. If the capitalist mode is enabled, a rank-specific BIOM file is output instead. 
+c. *assign_taxonomy* - Given the data artifacts from a SHOGUN alignment tool, output a Biological Observation Matrix ![(BIOM)](http://biom-format.org/) format taxatable with the rows being rank-flexible taxonomies, the columns are samples, and the entries are counts for each given taxonomy per sample. The alignment tool BURST has two run modes, taxonomy and capitalist. If the capitalist mode is enabled, a rank-specific BIOM file is output instead.
 
 d. *coverage* - The output from BURST can be utilized to analyze the coverage of each taxonomy across all samples in your alignment file. This can useful for reducing the number of false positive taxonomies.
 
@@ -168,7 +168,7 @@ Options:
   -h, --help                      Show this message and exit.
 ```
 
-### normalize
+#### normalize
 
 ```
 Usage: shogun normalize [OPTIONS]
@@ -272,4 +272,10 @@ All database files for BURST, Bowtie2, and Utree should be in the same parent fo
 shogun pipeline -i input.fna -d /path/to/database/parent/folder/ -o output -m burst
 shogun pipeline -i input.fna -d /path/to/database/parent/folder/ -o output -m utree
 shogun pipeline -i input.fna -d /path/to/database/parent/folder/ -o output -m bowtie2
+```
+
+For a prebuilt database, download the file locations [here](https://github.com/knights-lab/SHOGUN/tree/master/docs/shogun_db_links.txt) and run the command:
+
+```
+wget -i <path_to_folder>/shogun_db_links.txt
 ```

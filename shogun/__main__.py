@@ -9,7 +9,7 @@ import logging
 from datetime import date
 from multiprocessing import cpu_count
 import click
-from yaml import load
+import yaml
 import pandas as pd
 
 from shogun import __version__, logger
@@ -306,7 +306,7 @@ def _load_metadata(database):
         with open(metadata_file, 'r') as stream:
             logger.debug(
                 "Attempting to load the database metadata file at %s" % (os.path.abspath(metadata_file)))
-            data_files = load(stream)
+            data_files = yaml.load(stream, Loader=yaml.SafeLoader)
         return data_files
     else:
         logger.critical("Unable to load database at %s" % os.path.abspath(metadata_file))

@@ -37,6 +37,12 @@ If you are on MSI the database for SHOGUN is located at:
 /home/knightsd/hillm096/globus/SHOGUN/rep82
 ```
 
+Else you can access the rep82 database on AWS by running :
+
+```
+wget <path_to_folder>/shogun_db_links.txt
+```
+
 If everything up to the testing is working, below is the location of an example shallow shotgun file.
 ```
 /home/grad00/hillm096/combined_seqs.fna
