@@ -274,8 +274,8 @@ shogun pipeline -i input.fna -d /path/to/database/parent/folder/ -o output -m ut
 shogun pipeline -i input.fna -d /path/to/database/parent/folder/ -o output -m bowtie2
 ```
 
-For a prebuilt database, download the file locations [here](https://github.com/knights-lab/SHOGUN/tree/master/docs/shogun_db_links.txt) and run the command:
+Pre-built database files can be downloaded by running the following command:
 
 ```
-wget -i <path_to_folder>/shogun_db_links.txt
+wget -i https://raw.githubusercontent.com/knights-lab/SHOGUN/master/docs/shogun_db_links.txt
 ```
