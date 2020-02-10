@@ -10,6 +10,7 @@ import subprocess
 from collections import defaultdict
 from contextlib import contextmanager
 from timeit import default_timer
+import zlib
 
 import pandas as pd
 import numpy as np
@@ -151,3 +152,12 @@ def convert_to_relative_abundance(df: pd.DataFrame) -> pd.DataFrame:
     :return: relative abundance (features x samples)
     """
     return df.apply(lambda col: col/col.sum(), axis=0)
+
+
+def stream_gzip_decompress(stream):
+    dec = zlib.decompressobj(32 + zlib.MAX_WBITS)  # offset 32 to skip the header
+    for chunk in stream:
+        rv = dec.decompress(chunk)
+        if rv:
+            yield rv
+

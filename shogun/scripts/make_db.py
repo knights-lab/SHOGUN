@@ -15,7 +15,7 @@
 
 import sys
 import os
-from shogun.utils.refseq import make_refseq_fasta_and_taxonomy
+from shogun.database.refseq import make_refseq_fasta_and_taxonomy
 #from shogun.utils.ontologies import create_gene_ontology
 
 if __name__ == "__main__":
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     # perform shearing/mapping operation
     # make_sheared_bayes_file(dbpath,shearedbayespath,aligner='burst')
-    
+
     # create yaml file
     # make_db_yaml_file(dbpath,taxpath,genepath)
-    
+

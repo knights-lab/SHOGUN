@@ -7,10 +7,11 @@ import os
 NCBI_TAXONOMY_LINK = "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXONKIT_LINK = 'https://github.com/shenwei356/taxonkit/releases/download/v0.5.0/taxonkit_linux_amd64.tar.gz'
 
-def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
+
+def get_accession2taxonomy(assemblypath, save_taxonkit_output=True, outfile=None):
     """
     Makes a mapping of RefSeq accession IDs to taxonomy strings.
-    
+
     Note: The output tax file is not appropriate for a
     gene-split database because that would require mapping
     /loci/ (e.g. GCF_000007365.1_cds_WP_011053539.1) to taxonomy
@@ -23,7 +24,7 @@ def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
         The file location of the assembly summary from refseq
         containing the accessions of interest in column one and
         the NCBI taxon ID in column 6.
-        
+
     outfile : str, optional
         Output path for tab-delimited tax file.
 
@@ -41,11 +42,11 @@ def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
         os.system('wget ' + TAXONKIT_LINK)
         os.system('tar xvzf taxonkit_linux_amd64.tar.gz')
         os.system('chmod a+x taxonkit')
-        
+
         print("Downloading and extracting taxdump.tar.gz")
         os.system('wget ' + NCBI_TAXONOMY_LINK)
         os.system('tar xvzf taxdump.tar.gz nodes.dmp names.dmp delnodes.dmp merged.dmp')
-        
+
         print("Extracting taxid 2 taxonomy map for assemblies of interest using taxonkit")
         os.system("cut -f 6 " + assemblypath + " > taxids.txt")
         os.system("./taxonkit --data-dir . lineage -t taxids.txt > taxonkit_output.txt")
@@ -53,7 +54,7 @@ def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
     # parse the taxonkit output into ncbi ID : taxonomy
     ncbi2tax = parse_taxonkit_output('taxonkit_output.txt') # taxid : taxonomy
     acc2tax = {} # accession number : taxonomy
-    
+
     # loop through assembly file, gather ftp link and taxonomy
     print("Building assembly 2 taxonomy map")
     with open(assemblypath,'r') as f:
@@ -83,14 +84,14 @@ def get_accession2taxonomy(assemblypath,save_taxonkit_output=True,outfile=None):
 
 # uses taxonkit tool to download and make mapping of
 # RefSeq accession to taxonomy
-# 
+#
 def get_locus2taxonomy(assemblypath,fnapath=None,loci=None,delim="|",outfile=None):
     """
     Makes a mapping of fna locus IDs to taxonomy strings.
-    
+
     Note: The output tax file is for a gene-split database
     mapping loci (e.g. GCF_000007365.1|WP_011053539.1) to taxonomy.
-    Assumes headers are delimited with accession first and 
+    Assumes headers are delimited with accession first and
     gene ID second.
 
     Parameters
@@ -101,11 +102,11 @@ def get_locus2taxonomy(assemblypath,fnapath=None,loci=None,delim="|",outfile=Non
         the NCBI taxon ID in column 6.
 
     fnapath : str
-        The fna database file containing all relevant loci. 
+        The fna database file containing all relevant loci.
         If None, requires 'loci', list of locus FASTA headers
 
     loci : list
-        List of locus FASTA headers; overwritten if 
+        List of locus FASTA headers; overwritten if
         fnapath is not None
 
     outfile : str, optional
@@ -133,11 +134,11 @@ def get_locus2taxonomy(assemblypath,fnapath=None,loci=None,delim="|",outfile=Non
                     header = line[1:].strip().split()[0] # drop comments and ">"
                     loci.append(header)
             print('')
-    
+
     # get accession 2 taxonomy
     acc2tax = get_accession2taxonomy(assemblypath)
     locus2tax = {} # locusID : taxonomy
-    
+
     # loop through fna file, gather taxonomy map
     print("Building locus 2 taxonomy map")
     count = 0
@@ -157,7 +158,7 @@ def get_locus2taxonomy(assemblypath,fnapath=None,loci=None,delim="|",outfile=Non
     print('')
     print('Processed ' + str(count) + ' loci')
     print('There are ' + str(len(locus2tax)) + ' keys in the locus2tax dict.')
-    
+
     # write taxonomy map
     if outfile is not None:
         print('Writing taxonomy map')
@@ -232,7 +233,7 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
     donelist = set()  # list of completed accessions
     loci = [] # list of all locus names/headers
     outdir = os.path.dirname(dbpath)
-    
+
     # make dir or load partial db
     if os.path.exists(dbpath):
         print("Existing database found at " + dbpath + ". Loading...")
@@ -289,7 +290,7 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
                 filename = basename + '_cds_from_genomic.fna.gz'
             else:
                 filename = basename + '_genomic.fna.gz'
-                
+
             successful_download = False
             while not successful_download:
                 os.system("wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O " + filename + " " + ftplinks[acc] + '/' + filename + " >& /dev/null ")
