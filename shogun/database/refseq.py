@@ -4,11 +4,17 @@
 import sys
 import os
 
+
 NCBI_TAXONOMY_LINK = "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
+ASSEMBLY_SUMMARY_LINK = "ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt"
 TAXONKIT_LINK = 'https://github.com/shenwei356/taxonkit/releases/download/v0.5.0/taxonkit_linux_amd64.tar.gz'
 
 
-def get_accession2taxonomy(assemblypath, save_taxonkit_output=True, outfile=None):
+def get_accession2taxonomy(
+    assemblypath,
+    save_taxonkit_output=True,
+    outfile=None
+):
     """
     Makes a mapping of RefSeq accession IDs to taxonomy strings.
 
@@ -366,6 +372,6 @@ def make_refseq_fasta_and_taxonomy(assemblypath, dbpath, taxpath, coding_only=Tr
     else:
         if not os.path.exists(taxpath):
             print('Creating taxonomy file.')
-            get_accession2taxonomy(assemblypath,outfile=taxpath)
+            get_accession2taxonomy(assemblypath, outfile=taxpath)
         else:
             print("Taxonomy file " + taxpath + " already exists; skipping creation.")

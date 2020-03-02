@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -11,6 +11,9 @@ from collections import defaultdict
 from contextlib import contextmanager
 from timeit import default_timer
 import zlib
+from os import PathLike
+import tarfile
+from urllib.request import urlopen
 
 import pandas as pd
 import numpy as np
@@ -160,4 +163,3 @@ def stream_gzip_decompress(stream):
         rv = dec.decompress(chunk)
         if rv:
             yield rv
-

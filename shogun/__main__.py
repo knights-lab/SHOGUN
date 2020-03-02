@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -359,6 +359,7 @@ def filter(ctx, input, database, output, threads, percent_id, alignment):
 
     aligner_cl = BurstAlignerBest(database, threads=threads, post_align=True, shell=ctx.obj['shell'], percent_id=percent_id)
     aligner_cl.align(input, output, align=alignment)
+
 
 if __name__ == '__main__':
     cli(obj={})
