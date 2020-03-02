@@ -267,7 +267,7 @@ def normalize(input, output):
     outdf.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
-@cli.command(help="Show confidence of coverage of microbes, must a be b6 file.")
+@cli.command(help="Show confidence of coverage of microbes, must be a b6 file.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST alignment (b6).")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
