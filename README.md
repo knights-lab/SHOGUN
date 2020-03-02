@@ -151,6 +151,28 @@ Options:
   -h, --help                      Show this message and exit.
 ```
 
+#### filter
+
+This command will filter contaminate reads from the combined sequences fna. Typically, this is done for removing human reads from WGS data. This is done by aligning the reads to a contiminate only database, and splitting out the reads that aligned.
+
+ ```
+ Usage: shogun filter [OPTIONS]
+
+  Filter out contaminate reads.
+
+Options:
+  -i, --input PATH         The file containing the combined seqs.  [required]
+  -d, --database PATH      The path to the database folder.
+  -o, --output PATH        The output folder directory  [default:
+                           /home/bhillmann/results-200302]
+  -t, --threads INTEGER    Number of threads to use.
+  -p, --percent_id FLOAT   The percent id to align to.  [default: 0.98]
+  -a, --alignment BOOLEAN  Run alignment. If FALSE then alignment files must
+                           be named <output_folder>/alignment.filter.b6.
+                           [default: True]
+  -h, --help               Show this message and exit.
+ ```
+
 #### functional
 
 This command assigns function at a certain taxonomic level. Lower level KEGG IDs are assigned to higher level KEGG IDs through plurality voting. Note that plasmids are not included the KEGG ID annotation.
