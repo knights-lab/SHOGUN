@@ -46,7 +46,7 @@ class BowtieAligner(Aligner):
         align_gen = yield_alignments_from_sam_inf(sam_file)
         lca_map = build_lowest_common_ancestor_map(align_gen, self.tree)
         samples_lca_map = defaultdict(Counter)
-        for key, value in valfilter(lambda x: x is not -1, lca_map).items():
+        for key, value in valfilter(lambda x: x is not 0, lca_map).items():
             samples_lca_map['_'.join(key.split('_')[:-1])].update([value])
 
         df = pd.DataFrame(samples_lca_map, dtype=int)

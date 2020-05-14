@@ -57,7 +57,7 @@ def build_lowest_common_ancestor_map(gen: typing.Iterator, tree: NXTaxonomy):
         node_id = tree.ref_to_node_id[rname]
         if qname in lca_map:
             current_node_id = lca_map[qname]
-            if current_node_id != -1:
+            if current_node_id != 0:
                 if current_node_id != node_id:
                     lca_map[qname] = tree.lowest_common_ancestor(node_id, current_node_id)
         else:
