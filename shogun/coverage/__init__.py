@@ -10,7 +10,8 @@ import pandas as pd
 import csv
 
 from shogun import logger
-from shogun.redistribute import summarize_bayes_at_level, Taxonomy
+from shogun.redistribute import summarize_bayes_at_level
+from shogun.utils.tree import Taxonomy
 
 
 def zero_runs(a):

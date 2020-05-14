@@ -6,7 +6,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import typing
 
-from shogun.redistribute import Taxonomy
+from shogun.utils.tree import Taxonomy, NXTaxonomy
 
 
 def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:
@@ -18,7 +18,7 @@ def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:
     :return: dict key (query name: string) value (ncbi_tid: int)
     """
     lca_map = {}
-    for qname, rname in gen:
+    for ix, (qname, rname) in enumerate(gen):
         tax = tree(rname)
         if qname in lca_map:
             current_tax = lca_map[qname]
@@ -49,3 +49,17 @@ def least_common_ancestor(taxa_set):
             # reset classified flag
             unclassified_flag = False
         lca.append(level[0])
+
+
+def build_lowest_common_ancestor_map(gen: typing.Iterator, tree: NXTaxonomy):
+    lca_map = {}
+    for ix, (qname, rname) in enumerate(gen):
+        node_id = tree.ref_to_node_id[rname]
+        if qname in lca_map:
+            current_node_id = lca_map[qname]
+            if current_node_id != -1:
+                if current_node_id != node_id:
+                    lca_map[qname] = tree.lowest_common_ancestor(node_id, current_node_id)
+        else:
+            lca_map[qname] = node_id
+    return lca_map

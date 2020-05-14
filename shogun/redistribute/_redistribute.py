@@ -4,36 +4,11 @@ Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import csv
 import pandas as pd
-from collections import defaultdict
 import numpy as np
 
 from shogun import logger
-
-
-class Taxonomy:
-    def __init__(self, filename: str):
-        self.tax = self.parse_taxonomy(filename)
-
-    @classmethod
-    def parse_taxonomy(cls, filename: str) -> dict:
-        with open(filename) as inf:
-            csv_inf = csv.reader(inf, delimiter='\t')
-            return dict(csv_inf)
-
-    def __call__(self, id: str):
-        return self.tax[id]
-
-TAX_LEVELS = ['k', 'p', 'c', 'o', 'f', 'g', 's', 't']
-
-
-def tree(): return defaultdict(tree)
-
-
-def add_tree(t, path):
-  for node in path.split(';'):
-    t = t[node]
+from shogun.utils.tree import TAX_LEVELS, tree, add_tree
 
 
 def longest_path_tree(t, path):

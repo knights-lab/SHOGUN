@@ -13,6 +13,7 @@ dependencies:
   - numpy
   - cytoolz
   - taxonkit
+  - networkx
   - pip
   - pip:
     - "git+https://github.com/knights-lab/SHOGUN.git"

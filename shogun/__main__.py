@@ -16,7 +16,8 @@ from shogun import __version__, logger
 from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlignerBest
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db, summarize_kegg_table
-from shogun.redistribute import redistribute_taxatable, parse_bayes, Taxonomy
+from shogun.redistribute import redistribute_taxatable, parse_bayes
+from shogun.utils.tree import Taxonomy
 from shogun.utils import normalize_by_median_depth, convert_to_relative_abundance
 
 ROOT_COMMAND_HELP = """\

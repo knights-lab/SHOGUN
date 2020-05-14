@@ -8,7 +8,9 @@ import unittest
 import pkg_resources
 import os
 
-from shogun.redistribute import Taxonomy, parse_bayes, redistribute_taxatable
+from shogun.redistribute import parse_bayes, redistribute_taxatable
+from shogun.utils.tree import Taxonomy
+
 
 class TestRedistribute(unittest.TestCase):
     def setUp(self):

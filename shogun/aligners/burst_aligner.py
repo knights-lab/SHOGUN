@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from shogun import logger
-from shogun.redistribute import Taxonomy
+from ..utils.tree import Taxonomy
 from shogun.wrappers import burst_align
 from ._aligner import Aligner
 
