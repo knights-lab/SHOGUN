@@ -31,7 +31,8 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_thread
            '--very-sensitive',
            '-k', str(alignments_to_report),
            '-p', str(num_threads),
-           '--no-hd']
+           '--no-hd',
+           '--reorder']
     return run_command(cmd, shell=shell)
 
 
