@@ -14,6 +14,7 @@ import glob
 
 from shogun.__main__ import cli
 
+
 class TestAligner(unittest.TestCase):
     def setUp(self):
         prefix = 'shogun-temp-dir-'

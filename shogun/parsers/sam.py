@@ -22,7 +22,7 @@ def yield_alignments_from_sam_inf(inf):
                 qname, rname = line[0], line[2]
                 if qname != c_qname:
                     yield record
-                    record = []
+                    record = [(qname, rname)]
                     c_qname = qname
                 else:
                     record.append((qname, rname))

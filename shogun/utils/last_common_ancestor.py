@@ -7,6 +7,9 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 import typing
 
 from shogun.redistribute import Taxonomy
+from shogun.utils.tree import LCATaxonomy
+
+import numpy as np
 
 
 def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:
@@ -51,15 +54,13 @@ def least_common_ancestor(taxa_set):
         lca.append(level[0])
 
 
-def build_lowest_common_ancestor_map(gen: typing.Iterator, tree: NXTaxonomy):
+def build_lowest_common_ancestor_map(gen: typing.Iterator, tree: LCATaxonomy, confidence_threshold=1):
     lca_map = {}
-    for ix, (qname, rname) in enumerate(gen):
-        node_id = tree.ref_to_node_id[rname]
-        if qname in lca_map:
-            current_node_id = lca_map[qname]
-            if current_node_id != 0:
-                if current_node_id != node_id:
-                    lca_map[qname] = tree.lowest_common_ancestor(node_id, current_node_id)
-        else:
-            lca_map[qname] = node_id
-    return lca_map
+    for ix, record in enumerate(gen):
+        l_node_ids_ixs_levels = [tree.ref_to_node_id_ix_level[read[1]] for read in record]
+        # fetch the ancestors
+        ancestors = [tree.ix_to_ancestors[ix][:level] for node_id, ix, level in l_node_ids_ixs_levels]
+        unique_elements, counts_elements = np.unique(np.vstack(ancestors), return_counts=True)
+        counts_elements = counts_elements / len(record)
+        mask = counts_elements >= confidence_threshold
+        yield record[0][0], unique_elements[mask].max()
