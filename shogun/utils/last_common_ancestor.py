@@ -18,15 +18,15 @@ def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:
     :return: dict key (query name: string) value (ncbi_tid: int)
     """
     lca_map = {}
-    for qname, rname in gen:
-        tax = tree(rname)
-        if qname in lca_map:
-            current_tax = lca_map[qname]
-            if current_tax:
-                if current_tax != tax:
-                    lca_map[qname] = least_common_ancestor((tax, current_tax))
-        else:
-            lca_map[qname] = tax
+    for record in gen:
+        taxs = (tree(rname) for qname, rname in record)
+        # if qname in lca_map:
+        #     current_tax = lca_map[qname]
+        #     if current_tax:
+        #         if current_tax != tax:
+        #             lca_map[qname] = least_common_ancestor((tax, current_tax))
+        # else:
+        #     lca_map[qname] = tax
     return lca_map
 
 
