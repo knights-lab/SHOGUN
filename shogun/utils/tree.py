@@ -61,7 +61,7 @@ def build_tree_from_tax_file(filename: str) -> LCATaxonomy:
         for level in range(len(split)):
             taxa_name = ";".join(split[:level+1])
             if taxa_name in taxa_name_to_node_id_ix_level:
-                found_node_id, ix, level = taxa_name_to_node_id_ix_level[taxa_name]
+                found_node_id, _, _ = taxa_name_to_node_id_ix_level[taxa_name]
                 ancestors.append(found_node_id)
                 continue
             else:
