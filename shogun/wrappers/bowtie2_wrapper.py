@@ -31,7 +31,11 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_thread
            '--very-sensitive',
            '-k', str(alignments_to_report),
            '-p', str(num_threads),
-           '--no-hd']
+           # guarantee sort order at the expense of more time and RAM
+           # http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+           '--reorder',
+           '--no-hd'
+        ]
     return run_command(cmd, shell=shell)
 
 
