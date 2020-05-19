@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -16,7 +16,8 @@ from shogun import __version__, logger
 from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlignerBest
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db, summarize_kegg_table
-from shogun.redistribute import redistribute_taxatable, parse_bayes, Taxonomy
+from shogun.redistribute import redistribute_taxatable, parse_bayes
+from shogun.utils.tree import Taxonomy
 from shogun.utils import normalize_by_median_depth, convert_to_relative_abundance
 
 ROOT_COMMAND_HELP = """\
@@ -267,7 +268,7 @@ def normalize(input, output):
     outdf.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
-@cli.command(help="Show confidence of coverage of microbes, must a be b6 file.")
+@cli.command(help="Show confidence of coverage of microbes, must be a b6 file.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST alignment (b6).")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
@@ -359,6 +360,7 @@ def filter(ctx, input, database, output, threads, percent_id, alignment):
 
     aligner_cl = BurstAlignerBest(database, threads=threads, post_align=True, shell=ctx.obj['shell'], percent_id=percent_id)
     aligner_cl.align(input, output, align=alignment)
+
 
 if __name__ == '__main__':
     cli(obj={})

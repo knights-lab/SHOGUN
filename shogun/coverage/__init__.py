@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -10,7 +10,8 @@ import pandas as pd
 import csv
 
 from shogun import logger
-from shogun.redistribute import summarize_bayes_at_level, Taxonomy
+from shogun.redistribute import summarize_bayes_at_level
+from shogun.utils.tree import Taxonomy
 
 
 def zero_runs(a):

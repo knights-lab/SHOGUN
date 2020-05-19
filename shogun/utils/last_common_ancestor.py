@@ -49,3 +49,17 @@ def least_common_ancestor(taxa_set):
             # reset classified flag
             unclassified_flag = False
         lca.append(level[0])
+
+
+def build_lowest_common_ancestor_map(gen: typing.Iterator, tree: NXTaxonomy):
+    lca_map = {}
+    for ix, (qname, rname) in enumerate(gen):
+        node_id = tree.ref_to_node_id[rname]
+        if qname in lca_map:
+            current_node_id = lca_map[qname]
+            if current_node_id != 0:
+                if current_node_id != node_id:
+                    lca_map[qname] = tree.lowest_common_ancestor(node_id, current_node_id)
+        else:
+            lca_map[qname] = node_id
+    return lca_map

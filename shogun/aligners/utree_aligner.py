@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -38,7 +38,7 @@ class UtreeAligner(Aligner):
         if self.post_align:
             df = self._post_align(outfile)
             self.outfile = os.path.join(outdir, 'taxatable.utree.txt')
-            df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+            df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
     def _post_align(self, utree_out: str) -> pd.DataFrame:
@@ -53,6 +53,7 @@ class UtreeAligner(Aligner):
                 samples_lca_map['_'.join(line[0].split('_')[:-1])].update([taxonomy])
         df = pd.DataFrame(samples_lca_map, dtype=int)
         return df
+
 
 def split_utree_taxonomy(tax):
     output = []

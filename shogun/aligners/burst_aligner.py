@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from shogun import logger
-from shogun.redistribute import Taxonomy
+from ..utils.tree import Taxonomy
 from shogun.wrappers import burst_align
 from ._aligner import Aligner
 

@@ -1,39 +1,14 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import csv
 import pandas as pd
-from collections import defaultdict
 import numpy as np
 
 from shogun import logger
-
-
-class Taxonomy:
-    def __init__(self, filename: str):
-        self.tax = self.parse_taxonomy(filename)
-
-    @classmethod
-    def parse_taxonomy(cls, filename: str) -> dict:
-        with open(filename) as inf:
-            csv_inf = csv.reader(inf, delimiter='\t')
-            return dict(csv_inf)
-
-    def __call__(self, id: str):
-        return self.tax[id]
-
-TAX_LEVELS = ['k', 'p', 'c', 'o', 'f', 'g', 's', 't']
-
-
-def tree(): return defaultdict(tree)
-
-
-def add_tree(t, path):
-  for node in path.split(';'):
-    t = t[node]
+from shogun.utils.tree import TAX_LEVELS, tree, add_tree
 
 
 def longest_path_tree(t, path):
@@ -109,10 +84,10 @@ def redistribute_taxatable(filename: str, counts_bayes: pd.DataFrame, level=8):
             tmp_leaves = leaf_counts_df[leave_filter].sort_index()
             tmp_bayes = counts_bayes_sum.loc[tmp_leaves.index]
             # Series 1xn where n is the number of leave nodes below tax
-            prob_tax_given_level = (tmp_bayes.iloc[:,tmp_level] + 1)/(tmp_bayes['genome_length'] + 1)
+            prob_tax_given_level = (tmp_bayes.iloc[:, tmp_level] + 1)/(tmp_bayes['genome_length'] + 1)
             prob_tax_given_level = prob_tax_given_level/np.sum(prob_tax_given_level)
             # Series 1xn where n is the number of unique reads for a given taxa
-            uniqueness_per_genome = tmp_bayes.iloc[:,level-1]/tmp_bayes['genome_length']
+            uniqueness_per_genome = tmp_bayes.iloc[:, level-1]/tmp_bayes['genome_length']
             # Matrix divide each observed count by uniqueness
             counts_over_uniqueness = tmp_leaves.T / uniqueness_per_genome.values
             # Matrix divide each uniqueness count by sum of sample
