@@ -95,5 +95,6 @@ class TestAligner(unittest.TestCase):
         # Assert the type is float
         self.assertTrue(len(df_infile.select_dtypes(include=['float']).columns) == 3)
 
+
 if __name__ == '__main__':
     unittest.main()
