@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 from shogun.utils.lowest_common_ancestor import gen_confidence_lowest_common_ancestor, build_lca_df
-from shogun.utils.tree import build_tree_from_ax_file
+from shogun.utils.tree import build_tree_from_tax_file
 
 class TestLowestCommonAncestor(unittest.TestCase):
     def test_num_samples_greater_than(self):
