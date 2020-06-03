@@ -32,7 +32,7 @@ def build_lca_df(sam_file: str, tree: LCATaxonomy, confidence_threshold: float =
             mat_counts[node_id, c_ix] += 1
         else:
             if ix >= max_samples:
-                b = np.zeros((max_samples, max_samples + samples_iter))
+                b = np.zeros((tree.num_nodes, max_samples + samples_iter))
                 b[:, :-samples_iter] = mat_counts
                 mat_counts = b
                 max_samples += samples_iter
