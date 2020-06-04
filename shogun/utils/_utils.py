@@ -163,3 +163,19 @@ def stream_gzip_decompress(stream):
         rv = dec.decompress(chunk)
         if rv:
             yield rv
+
+
+class SparseMatrix:
+    def __init__(self, matrix, rows: set, columns):
+        self.matrix = matrix
+        self.rows = rows
+        self.columns = columns
+
+    def to_csv(self, outfile, sep: str = ",", index_label: str = "", float_format: str = "%s", na_rep = ""):
+        with open(outfile, 'w') as outf:
+            header = sep.join([index_label] + self.columns)
+            outf.write(header + '\n')
+            for row in self.rows:
+                r = self.matrix[row].todense()
+                np.savetxt(outf, r, float_format, delimiter=sep)
+                print(r)

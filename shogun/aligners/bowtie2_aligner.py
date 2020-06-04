@@ -12,8 +12,7 @@ from cytoolz import valfilter
 import numpy as np
 
 from shogun import logger
-from shogun.parsers import yield_alignments_from_sam_inf
-from shogun.utils.tree import Taxonomy
+# from shogun.utils._utils import write_sparse_matrix_to_file
 from shogun.utils.lowest_common_ancestor import build_lca_df
 from shogun.wrappers import bowtie2_align
 from shogun.utils.tree import build_tree_from_tax_file
@@ -37,12 +36,12 @@ class BowtieAligner(Aligner):
         proc, out, err = bowtie2_align(infile, outfile, self.prefix,
                              num_threads=self.threads, alignments_to_report=alignments_to_report, shell=self.shell, percent_id=self.percent_id)
         if self.post_align:
-            df = self._post_align(outfile)
+            sm = self._post_align(outfile)
             self.outfile = os.path.join(outdir, 'taxatable.bowtie2.txt')
-            df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
+            sm.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
-    def _post_align(self, sam_file: str, samples_iter: int = 50, confidence_threshold: float = 1.0) -> pd.DataFrame:
+    def _post_align(self, sam_file: str, samples_iter: int = 1_000_000, confidence_threshold: float = 1.0) -> pd.DataFrame:
         logger.debug("Beginning post align with aligner %s" % self._name)
         df = build_lca_df(sam_file, self.tree, confidence_threshold=confidence_threshold, samples_iter=samples_iter)
         return df
