@@ -5,15 +5,10 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 """
 
 import os
-from collections import defaultdict, Counter
 
 import pandas as pd
-from cytoolz import valfilter
-import numpy as np
 
 from shogun import logger
-from shogun.parsers import yield_alignments_from_sam_inf
-from shogun.utils.tree import Taxonomy
 from shogun.utils.lowest_common_ancestor import build_lca_df
 from shogun.wrappers import bowtie2_align
 from shogun.utils.tree import build_tree_from_tax_file
