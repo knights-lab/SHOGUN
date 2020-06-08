@@ -183,3 +183,5 @@ sftp-config.json
 # Custom entries
 SETTINGS.json
 !src/lib
+
+scratch

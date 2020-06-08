@@ -24,13 +24,13 @@ def build_lca_map(gen: typing.Iterator, tree: Taxonomy) -> dict:
             current_tax = lca_map[qname]
             if current_tax:
                 if current_tax != tax:
-                    lca_map[qname] = least_common_ancestor((tax, current_tax))
+                    lca_map[qname] = lowest_common_ancestor((tax, current_tax))
         else:
             lca_map[qname] = tax
     return lca_map
 
 
-def least_common_ancestor(taxa_set):
+def lowest_common_ancestor(taxa_set):
     lca = []
     taxa_set = [_.split(';') for _ in taxa_set]
     unclassified_flag = False
@@ -49,3 +49,5 @@ def least_common_ancestor(taxa_set):
             # reset classified flag
             unclassified_flag = False
         lca.append(level[0])
+    # all the levels match
+    return ';'.join(lca) if lca else None
