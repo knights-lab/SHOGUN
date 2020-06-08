@@ -50,11 +50,13 @@ def build_lca_df(sam_file: str, tree: LCATaxonomy, confidence_threshold: float =
 
 
 def gen_lowest_common_ancestor(gen: typing.Iterator, tree: LCATaxonomy):
-    for ix, record in enumerate(gen):
+    for num_records, record in enumerate(gen):
         num_alignments = len(record)
         if num_alignments > 1:
             l_node_ids_ixs_levels = [tree.ref_to_node_id_ix_level[read[1]] for read in record]
             node_id = max(reduce(lambda x, y: x.intersection(y), (tree.node_id_to_ancestors[node_id] for node_id, ix, level in l_node_ids_ixs_levels)))
+            tax = tree.node_id_to_taxa_name[node_id]
+            taxs = [tree.node_id_to_taxa_name[node_id] for node_id, ix, level in l_node_ids_ixs_levels]
             yield record[0][0], node_id
         else:
             node_id, ix, level = tree.ref_to_node_id_ix_level[record[0][1]]
