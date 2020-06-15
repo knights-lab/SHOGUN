@@ -50,10 +50,6 @@ def build_lca_df(sam_file: str, tree: LCATaxonomy, confidence_threshold: float =
     return df
 
 
-def gen_lowest_common_ancestor_str(gen: typing.Iterator, tree: LCATaxonomy):
-    pass
-
-
 def gen_lowest_common_ancestor(gen: typing.Iterator, tree: LCATaxonomy):
     for num_records, record in enumerate(gen):
         num_alignments = len(record)

@@ -61,17 +61,16 @@ def build_tree_from_tax_file(filename: str) -> LCATaxonomy:
             taxa_name = ";".join(split[:level+1])
             if taxa_name in taxa_name_to_node_id_ix_level:
                 found_node_id, _, _ = taxa_name_to_node_id_ix_level[taxa_name]
-                ancestors.append(found_node_id)
-                continue
+                # Check if blank level
+                if len(split[level]) > 3:
+                    ancestors.append(found_node_id)
             else:
                 taxa_name_to_node_id_ix_level[taxa_name] = (current_node_id, ix, level + 1)
-                parent_name = ";".join(split[:level])
-                if not parent_name:
-                    parent_name = "root"
-                parent_node_id, _, _ = taxa_name_to_node_id_ix_level[parent_name]
-                ancestors.append(current_node_id)
-                node_id_to_ancestors.append(set(ancestors))
+                # Check if blank level
+                if len(split[level]) > 3:
+                    ancestors.append(current_node_id)
                 current_node_id += 1
+                node_id_to_ancestors.append(set(ancestors))
 
     ref_to_node_id_ix_level = {ref: taxa_name_to_node_id_ix_level[taxa_name] for ref, taxa_name in ref_to_taxa_name.items()}
     node_id_to_taxa_name = {node_id: taxa_name for taxa_name, (node_id, ix, level) in taxa_name_to_node_id_ix_level.items()}
