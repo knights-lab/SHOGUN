@@ -148,10 +148,13 @@ class TestLowestCommonAncestor(unittest.TestCase):
         self.assertEqual(exp, obs)
 
     def test_all_match(self):
+        # all match
+
         # taxa = [
         #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
         #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
         # ]
+
         taxa = (('29', '30'),)
 
         obs = next(gen_lowest_common_ancestor(self.yield_records(taxa), self.tree))
@@ -160,15 +163,18 @@ class TestLowestCommonAncestor(unittest.TestCase):
         self.assertEqual(exp, obs)
 
     def test_all_match_different_length(self):
+        # all match but different levels of the tree
+
         # taxa = [
         #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
         #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
         #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
         #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
         # ]
+
         taxa = (('31', '32', '33', '34'),)
 
-        obs = next(gen_low est_common_ancestor(self.yield_records(taxa), self.tree))
+        obs = next(gen_lowest_common_ancestor(self.yield_records(taxa), self.tree))
         obs = self.tree.node_id_to_taxa_name[obs[1]]
         exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium'
         self.assertEqual(exp, obs)
