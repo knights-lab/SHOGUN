@@ -41,7 +41,7 @@ class UtreeAligner(Aligner):
             df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
-    def _post_align(self, utree_out: str) -> pd.DataFrame:
+    def _post_align(self, utree_out: str, **kwargs) -> pd.DataFrame:
         logger.debug("Beginning post align with aligner %s" % self._name)
         samples_lca_map = defaultdict(Counter)
         with open(utree_out) as utree_f:

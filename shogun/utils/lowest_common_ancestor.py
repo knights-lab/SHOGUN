@@ -6,6 +6,7 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 import typing
 from functools import reduce
+from collections import Counter
 
 from shogun.parsers import yield_alignments_from_sam_inf
 from shogun.utils.tree import LCATaxonomy
@@ -68,11 +69,15 @@ def gen_confidence_lowest_common_ancestor(gen: typing.Iterator, tree: LCATaxonom
         if num_alignments > 1:
             l_node_ids_ixs_levels = [tree.ref_to_node_id_ix_level[read[1]] for read in record]
             # fetch the ancestors
-            ancestors = [tree.ix_to_ancestors[ix][:level] for node_id, ix, level in l_node_ids_ixs_levels]
-            unique_elements, counts_elements = np.unique(np.concatenate(ancestors), return_counts=True)
-            counts_elements = counts_elements / num_alignments
-            mask = counts_elements >= confidence_threshold
-            yield record[0][0], unique_elements[mask].max()
+            ancestors = [tree.node_id_to_ancestors[node_id] for node_id, ix, level in l_node_ids_ixs_levels]
+            c = Counter((x for y in ancestors for x in y))
+            threshold = confidence_threshold * len(ancestors)
+            max_node_id = 0
+            for k, v in c.items():
+                if v >= threshold:
+                    if k > max_node_id:
+                        max_node_id = k
+            yield record[0][0], max_node_id
         else:
-            node_id, ix, level = tree.ref_to_node_id_ix_level[record[0][1]]
+            node_id, _, _ = tree.ref_to_node_id_ix_level[record[0][1]]
             yield record[0][0], node_id

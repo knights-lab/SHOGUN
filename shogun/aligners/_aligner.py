@@ -58,5 +58,5 @@ class Aligner:
     def align(self, infile, outdir):
         raise NotImplementedError
 
-    def _post_align(self, outf):
+    def _post_align(self, outf, **kwargs):
         raise NotImplementedError

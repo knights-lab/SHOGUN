@@ -43,7 +43,7 @@ class BurstAlignerBest(BurstAligner):
                                 outf_post_unfiltered.write(">%s\n%s\n" % (title, seq))
         return proc, out, err
 
-    def _post_align(self, outf):
+    def _post_align(self, outf, **kwargs):
         alignments = set()
         i = 0
         with open(outf) as alignment_file:

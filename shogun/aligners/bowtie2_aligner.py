@@ -37,7 +37,7 @@ class BowtieAligner(Aligner):
             df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
-    def _post_align(self, sam_file: str, samples_iter: int = 50, confidence_threshold: float = 1.0) -> pd.DataFrame:
+    def _post_align(self, sam_file: str, samples_iter: int = 50, confidence_threshold: float = 1.0, **kwargs) -> pd.DataFrame:
         logger.debug("Beginning post align with aligner %s" % self._name)
         df = build_lca_df(sam_file, self.tree, confidence_threshold=confidence_threshold, samples_iter=samples_iter)
         return df
