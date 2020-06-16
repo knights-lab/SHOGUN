@@ -8,7 +8,7 @@ import unittest
 import pandas as pd
 import numpy as np
 
-from shogun.utils import convert_to_relative_abundance, least_common_ancestor
+from shogun.utils import convert_to_relative_abundance, lowest_common_ancestor
 
 
 class TestRelativeAbundance(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestRelativeAbundance(unittest.TestCase):
         pd.testing.assert_frame_equal(df_ra, df_expected)
 
 
-class TestLeastCommonAncestor(unittest.TestCase):
+class TestLowestCommonAncestor(unittest.TestCase):
     def test_lca_family(self):
         # normal scenario
         taxa = [
@@ -28,7 +28,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium aldrichii',
             'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Caminicella;s__Caminicella sporogenes'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae'
         self.assertEqual(obs, exp)
 
@@ -40,7 +40,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__',
             'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium botulinum;t__'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         exp = 'k__Bacteria'
         self.assertEqual(obs, exp)
 
@@ -52,7 +52,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__Viruses;p__ssDNA_viruses;c__Geminiviridae;o__;f__;g__Begomovirus;s__Cotton_leaf_crumple_virus',
             'k__Viruses;p__ssDNA_viruses;c__Nanoviridae;o__;f__;g__Babuvirus;s__Banana_bunchy_top_virus'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         exp = 'k__Viruses;p__ssDNA_viruses'
         self.assertEqual(obs, exp)
 
@@ -64,7 +64,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;o__Vibrionales;f__Vibrionaceae;g__Aliivibrio;s__Aliivibrio_wodanis;t__',
             'k__BacteriaPlasmid;p__Proteobacteria;c__Gammaproteobacteria;o__Vibrionales;f__Vibrionaceae;g__Aliivibrio;s__Aliivibrio_wodanis;t__'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         self.assertIsNone(obs)
 
     def test_blank_class(self):
@@ -75,7 +75,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium aldrichii',
             'k__Bacteria;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Caminicella;s__Caminicella sporogenes'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         exp = 'k__Bacteria;p__Firmicutes'
         self.assertEqual(obs, exp)
 
@@ -87,7 +87,7 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
             'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae;g__Caminicella'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         exp = 'k__;p__Firmicutes;c__;o__Clostridiales;f__Clostridiaceae'
         self.assertEqual(obs, exp)
 
@@ -99,6 +99,26 @@ class TestLeastCommonAncestor(unittest.TestCase):
             'k__;p__Firmicutes;c__;o__;f__;g__Clostridium',
             'k__;p__Firmicutes;c__;o__;f__;g__Caminicella'
         ]
-        obs = least_common_ancestor(taxa)
+        obs = lowest_common_ancestor(taxa)
         exp = 'k__;p__Firmicutes'
+        self.assertEqual(obs, exp)
+
+    def test_all_match(self):
+        taxa = [
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
+        ]
+        obs = lowest_common_ancestor(taxa)
+        exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum'
+        self.assertEqual(obs, exp)
+
+    def test_all_match_different_length(self):
+        taxa = [
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium',
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum',
+            'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
+        ]
+        obs = lowest_common_ancestor(taxa)
+        exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium'
         self.assertEqual(obs, exp)
