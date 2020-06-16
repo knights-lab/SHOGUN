@@ -47,7 +47,7 @@ class UtreeAligner(Aligner):
         with open(utree_out) as utree_f:
             csv_utree = csv.reader(utree_f, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_utree:
+            for line in csv_utree:
                 #TODO confidence/support filter
                 taxonomy = split_utree_taxonomy(line[1])
                 samples_lca_map['_'.join(line[0].split('_')[:-1])].update([taxonomy])
