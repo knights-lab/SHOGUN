@@ -2,6 +2,7 @@ import unittest
 import pkg_resources
 import os
 import tempfile
+from functools import reduce
 
 import pandas as pd
 
@@ -30,7 +31,6 @@ class TestLowestCommonAncestor(unittest.TestCase):
     def yield_records(self, l):
         for ix, align in enumerate(l):
             yield [(ix, _) for _ in align]
-
 
     def test_lca_family(self):
         # normal scenario

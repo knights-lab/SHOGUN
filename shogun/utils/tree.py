@@ -31,11 +31,6 @@ class LCATaxonomy:
         self.num_nodes = len(self.node_id_to_taxa_name)
         self.node_id_to_ancestors = node_id_to_ancestors
 
-    def lowest_common_ancestor(self, node_id_1, node_id_2):
-        lca = max(self.node_id_to_ancestors[node_id_1] & self.node_id_to_ancestors[node_id_2])
-        return lca
-
-
 TAX_LEVELS = ['k', 'p', 'c', 'o', 'f', 'g', 's', 't']
 
 

@@ -13,12 +13,6 @@ from shogun.utils.tree import Taxonomy
 
 
 class TestRedistribute(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_read_taxonomy(self):
         tax = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.tax'))
         d = Taxonomy.parse_taxonomy(tax)
