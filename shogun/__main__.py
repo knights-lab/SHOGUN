@@ -332,8 +332,8 @@ def assign_taxonomy(ctx, aligner, capitalist, input, database, output, confidenc
         # Set to not run Burst post-align in capitalist mode
         ALIGNERS['burst'] = lambda database, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], capitalist=False)
 
-    if .5 < confidence or confidence > 1:
-        raise Exception("Confidence is set to {confidence} must be in the range [.5, 1).")
+    if confidence < .5 or confidence > 1:
+        raise Exception(f"Confidence is set to {confidence} must be in the range (.5, 1].")
 
     # Sniff aligner based on file extension
     if aligner == 'auto':
