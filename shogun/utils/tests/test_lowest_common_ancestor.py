@@ -2,7 +2,6 @@ import unittest
 import pkg_resources
 import os
 import tempfile
-from functools import reduce
 
 import pandas as pd
 
@@ -179,6 +178,21 @@ class TestLowestCommonAncestor(unittest.TestCase):
         exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium'
         self.assertEqual(exp, obs)
 
+    def test_all_match_same_strain(self):
+        # all match but different levels of the tree
+
+        # taxa = [
+        #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
+        #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
+        # ]
+
+        taxa = (('34', '34'),)
+
+        obs = next(gen_lowest_common_ancestor(self.yield_records(taxa), self.tree))
+        obs = self.tree.node_id_to_taxa_name[obs[1]]
+        exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
+        self.assertEqual(exp, obs)
+
     def test_end_to_end_lca(self):
         alignment_file = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'truth.sam'))
         df_test = build_lca_df(alignment_file, self.genomes_small_taxatree, samples_iter=2)
@@ -333,6 +347,22 @@ class TestLowestCommonAncestor(unittest.TestCase):
         obs = next(gen_confidence_lowest_common_ancestor(self.yield_records(taxa), self.tree, confidence_threshold=.9))
         obs = self.tree.node_id_to_taxa_name[obs[1]]
         exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium'
+        self.assertEqual(exp, obs)
+
+    def test_confidence_all_match_same_strain(self):
+        # all match but different levels of the tree
+
+        # taxa = [
+        #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
+        #     'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
+        # ]
+
+        taxa = (('34', '34'),)
+
+        obs = next(
+            gen_confidence_lowest_common_ancestor(self.yield_records(taxa), self.tree, confidence_threshold=.9))
+        obs = self.tree.node_id_to_taxa_name[obs[1]]
+        exp = 'k__Bacteria;p__Firmicutes;c__Clostridia;o__Clostridiales;f__Clostridiaceae;g__Clostridium;s__Clostridium acetobutylicum;t__'
         self.assertEqual(exp, obs)
 
     def test_confidence_end_to_end_lca(self):
