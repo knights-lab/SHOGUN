@@ -4,7 +4,7 @@ Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-import typing
+from typing import Iterator, Generator, Tuple
 from functools import reduce
 from collections import Counter
 
@@ -51,21 +51,24 @@ def build_lca_df(sam_file: str, tree: LCATaxonomy, confidence_threshold: float =
     return df
 
 
-def gen_lowest_common_ancestor(gen: typing.Iterator, tree: LCATaxonomy):
+def gen_lowest_common_ancestor(gen: Iterator, tree: LCATaxonomy) -> Generator[Tuple[str, int], None, None]:
     for record in gen:
         sequence_id = record[0][0]
         alignments = {_[1] for _ in record}
         if len(alignments) > 1:
             l_node_ids_ixs_levels = [tree.ref_to_node_id_ix_level[alignment] for alignment in alignments]
-            node_id = max(reduce(lambda x, y: x.intersection(y), (tree.node_id_to_ancestors[node_id] for node_id, ix, level in l_node_ids_ixs_levels)))
+            node_id = max(reduce(lambda x, y: x.intersection(y),
+                                 (tree.node_id_to_ancestors[node_id] for node_id, ix, level in l_node_ids_ixs_levels)))
             yield sequence_id, node_id
         else:
             node_id, ix, level = tree.ref_to_node_id_ix_level[alignments.pop()]
             yield sequence_id, node_id
 
 
-def gen_confidence_lowest_common_ancestor(gen: typing.Iterator, tree: LCATaxonomy, confidence_threshold: float):
-    for ix, record in enumerate(gen):
+def gen_confidence_lowest_common_ancestor(
+    gen: Iterator, tree: LCATaxonomy, confidence_threshold: float
+) -> Generator[Tuple[str, int], None, None]:
+    for record in gen:
         sequence_id = record[0][0]
         alignments = {_[1] for _ in record}
         if len(alignments) > 1:
