@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -38,21 +38,22 @@ class UtreeAligner(Aligner):
         if self.post_align:
             df = self._post_align(outfile)
             self.outfile = os.path.join(outdir, 'taxatable.utree.txt')
-            df.to_csv(self.outfile, sep='\t', float_format="%d",na_rep=0, index_label="#OTU ID")
+            df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
-    def _post_align(self, utree_out: str) -> pd.DataFrame:
+    def _post_align(self, utree_out: str, **kwargs) -> pd.DataFrame:
         logger.debug("Beginning post align with aligner %s" % self._name)
         samples_lca_map = defaultdict(Counter)
         with open(utree_out) as utree_f:
             csv_utree = csv.reader(utree_f, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_utree:
+            for line in csv_utree:
                 #TODO confidence/support filter
                 taxonomy = split_utree_taxonomy(line[1])
                 samples_lca_map['_'.join(line[0].split('_')[:-1])].update([taxonomy])
         df = pd.DataFrame(samples_lca_map, dtype=int)
         return df
+
 
 def split_utree_taxonomy(tax):
     output = []

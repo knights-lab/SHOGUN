@@ -1,10 +1,10 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-from shogun.utils import run_command
+from shogun.utils._utils import run_command
 
 
 def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_threads=1, shell=False, percent_id=.98):
@@ -31,7 +31,11 @@ def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_thread
            '--very-sensitive',
            '-k', str(alignments_to_report),
            '-p', str(num_threads),
-           '--no-hd']
+           # guarantee sort order at the expense of more time and RAM
+           # http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+           '--reorder',
+           '--no-hd'
+        ]
     return run_command(cmd, shell=shell)
 
 

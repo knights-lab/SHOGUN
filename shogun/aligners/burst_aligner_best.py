@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -43,7 +43,7 @@ class BurstAlignerBest(BurstAligner):
                                 outf_post_unfiltered.write(">%s\n%s\n" % (title, seq))
         return proc, out, err
 
-    def _post_align(self, outf):
+    def _post_align(self, outf, **kwargs):
         alignments = set()
         i = 0
         with open(outf) as alignment_file:

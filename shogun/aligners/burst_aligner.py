@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from shogun import logger
-from shogun.redistribute import Taxonomy
+from ..utils.tree import Taxonomy
 from shogun.wrappers import burst_align
 from ._aligner import Aligner
 
@@ -39,7 +39,7 @@ class BurstAligner(Aligner):
     def parse_taxacut(f):
         return int(1/(1-f))
 
-    def _post_align(self, outf):
+    def _post_align(self, outf, **kwargs):
         if self.capitalist:
             return self._post_align_capitalist(outf)
         else:
@@ -71,7 +71,7 @@ class BurstAligner(Aligner):
         with open(outf) as emb_inf:
             csv_embalm = csv.reader(emb_inf, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_embalm:
+            for line in csv_embalm:
                 tax = self.tree(line[1])
                 #TODO confidence/support filter
                 samples_lca_map['_'.join(line[0].split('_')[:-1])][tax] += 1
@@ -85,7 +85,7 @@ class BurstAligner(Aligner):
         with open(outf) as utree_f:
             csv_embalm = csv.reader(utree_f, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_embalm:
+            for line in csv_embalm:
                 if line[-1] is not None:
                     #TODO confidence/support filter
                     samples_lca_map['_'.join(line[0].split('_')[:-1])][line[-1]] += 1

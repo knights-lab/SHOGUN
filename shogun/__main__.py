@@ -1,5 +1,5 @@
 """
-Copyright 2015-2017 Knights Lab, Regents of the University of Minnesota.
+Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
@@ -16,7 +16,8 @@ from shogun import __version__, logger
 from shogun.aligners import BurstAligner, UtreeAligner, BowtieAligner, BurstAlignerBest
 from shogun.coverage import get_coverage_of_microbes
 from shogun.function import function_run_and_save, parse_function_db, summarize_kegg_table
-from shogun.redistribute import redistribute_taxatable, parse_bayes, Taxonomy
+from shogun.redistribute import redistribute_taxatable, parse_bayes
+from shogun.utils.tree import Taxonomy
 from shogun.utils import normalize_by_median_depth, convert_to_relative_abundance
 
 ROOT_COMMAND_HELP = """\
@@ -243,6 +244,7 @@ def _function(inputs, database, output, levels, save_median_taxatable=False):
         else:
             continue
 
+
 @cli.command(help="Normalize a taxonomic profile using relative abundance.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output taxatable.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The count taxatable output as relative abundance.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable.ra-%y%m%d.txt')), show_default=True)
@@ -267,7 +269,7 @@ def normalize(input, output):
     outdf.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
-@cli.command(help="Show confidence of coverage of microbes, must a be b6 file.")
+@cli.command(help="Show confidence of coverage of microbes, must be a b6 file.")
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help="The output BURST alignment (b6).")
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), required=True, help="The path to the folder containing the database.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('coverage-%y%m%d.txt')), show_default=True)
@@ -320,14 +322,18 @@ def _load_metadata(database):
 @click.option('-i', '--input', type=click.Path(resolve_path=True, exists=True, allow_dash=True), required=True, help='The alignment output file.')
 @click.option('-d', '--database', type=click.Path(resolve_path=True, exists=True), default=os.getcwd(), help="The path to the database folder.")
 @click.option('-o', '--output', type=click.Path(resolve_path=True, writable=True), help="The coverage table.", default=os.path.join(os.getcwd(), date.today().strftime('taxatable-%y%m%d.txt')), show_default=True)
+@click.option('-c', '--confidence', type=click.FLOAT, default=1.0, show_default=True, help="The confidence to of the LCA (anything other than 1 will take longer). Must be > .5")
 @click.pass_context
-def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
+def assign_taxonomy(ctx, aligner, capitalist, input, database, output, confidence):
     if not os.path.exists(os.path.dirname(output)):
         os.makedirs(os.path.dirname(output))
 
     if not capitalist:
         # Set to not run Burst post-align in capitalist mode
         ALIGNERS['burst'] = lambda database, shell=ctx.obj['shell']: BurstAligner(database, shell=ctx.obj['shell'], capitalist=False)
+
+    if confidence < .5 or confidence > 1:
+        raise Exception(f"Confidence is set to {confidence} must be in the range (.5, 1].")
 
     # Sniff aligner based on file extension
     if aligner == 'auto':
@@ -341,7 +347,7 @@ def assign_taxonomy(ctx, aligner, capitalist, input, database, output):
 
     aligner_cl = ALIGNERS[aligner](database, shell=ctx.obj['shell'])
 
-    df = aligner_cl._post_align(input)
+    df = aligner_cl._post_align(input, confidence_threshold=confidence)
     df.to_csv(output, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
 
 
@@ -359,6 +365,7 @@ def filter(ctx, input, database, output, threads, percent_id, alignment):
 
     aligner_cl = BurstAlignerBest(database, threads=threads, post_align=True, shell=ctx.obj['shell'], percent_id=percent_id)
     aligner_cl.align(input, output, align=alignment)
+
 
 if __name__ == '__main__':
     cli(obj={})
