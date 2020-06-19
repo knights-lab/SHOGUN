@@ -81,13 +81,16 @@ Options:
   -h, --help                      Show this message and exit.
 
 Commands:
-  align            Run a SHOGUN alignment algorithm.
-  assign_taxonomy  Run the SHOGUN taxonomic profile algorithm on...
-  coverage         Show confidence of coverage of microbes.
-  functional       Run the SHOGUN functional algorithm on a...
-  normalize        Normalize a taxonomic profile by median...
-  pipeline         Run the SHOGUN pipeline, including taxonomic...
-  redistribute     Run the SHOGUN redistribution algorithm on a...
+  align                 Run a SHOGUN alignment algorithm.
+  assign_taxonomy       Run the SHOGUN taxonomic profile algorithm on an...
+  convert               Normalize a taxonomic profile using relative...
+  coverage              Show confidence of coverage of microbes, must a be...
+  filter                Filter out contaminate reads.
+  functional            Run the SHOGUN functional algorithm on a taxonomic...
+  normalize             Normalize a taxonomic profile by median depth.
+  pipeline              Run the SHOGUN pipeline, including taxonomic and...
+  redistribute          Run the SHOGUN redistribution algorithm on a...
+  summarize_functional  Run the SHOGUN functional algorithm on a taxonomic...
 ```
 
 #### align
@@ -147,6 +150,28 @@ Options:
                                   The level to collapse to.
   -h, --help                      Show this message and exit.
 ```
+
+#### filter
+
+This command will filter contaminate reads from the combined sequences fna. Typically, this is done for removing human reads from WGS data. This is done by aligning the reads to a contiminate only database, and splitting out the reads that aligned.
+
+ ```
+ Usage: shogun filter [OPTIONS]
+
+  Filter out contaminate reads.
+
+Options:
+  -i, --input PATH         The file containing the combined seqs.  [required]
+  -d, --database PATH      The path to the database folder.
+  -o, --output PATH        The output folder directory  [default:
+                           /home/bhillmann/results-200302]
+  -t, --threads INTEGER    Number of threads to use.
+  -p, --percent_id FLOAT   The percent id to align to.  [default: 0.98]
+  -a, --alignment BOOLEAN  Run alignment. If FALSE then alignment files must
+                           be named <output_folder>/alignment.filter.b6.
+                           [default: True]
+  -h, --help               Show this message and exit.
+ ```
 
 #### functional
 

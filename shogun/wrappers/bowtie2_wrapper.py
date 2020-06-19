@@ -4,7 +4,7 @@ Copyright 2015-2020 Knights Lab, Regents of the University of Minnesota.
 This software is released under the GNU Affero General Public License (AGPL) v3.0 License.
 """
 
-from shogun.utils import run_command
+from shogun.utils._utils import run_command
 
 
 def bowtie2_align(infile, outfile, database, alignments_to_report=16, num_threads=1, shell=False, percent_id=.98):

@@ -41,13 +41,13 @@ class UtreeAligner(Aligner):
             df.to_csv(self.outfile, sep='\t', float_format="%d", na_rep=0, index_label="#OTU ID")
         return proc, out, err
 
-    def _post_align(self, utree_out: str) -> pd.DataFrame:
+    def _post_align(self, utree_out: str, **kwargs) -> pd.DataFrame:
         logger.debug("Beginning post align with aligner %s" % self._name)
         samples_lca_map = defaultdict(Counter)
         with open(utree_out) as utree_f:
             csv_utree = csv.reader(utree_f, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_utree:
+            for line in csv_utree:
                 #TODO confidence/support filter
                 taxonomy = split_utree_taxonomy(line[1])
                 samples_lca_map['_'.join(line[0].split('_')[:-1])].update([taxonomy])

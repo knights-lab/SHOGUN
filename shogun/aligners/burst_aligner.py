@@ -39,7 +39,7 @@ class BurstAligner(Aligner):
     def parse_taxacut(f):
         return int(1/(1-f))
 
-    def _post_align(self, outf):
+    def _post_align(self, outf, **kwargs):
         if self.capitalist:
             return self._post_align_capitalist(outf)
         else:
@@ -71,7 +71,7 @@ class BurstAligner(Aligner):
         with open(outf) as emb_inf:
             csv_embalm = csv.reader(emb_inf, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_embalm:
+            for line in csv_embalm:
                 tax = self.tree(line[1])
                 #TODO confidence/support filter
                 samples_lca_map['_'.join(line[0].split('_')[:-1])][tax] += 1
@@ -85,7 +85,7 @@ class BurstAligner(Aligner):
         with open(outf) as utree_f:
             csv_embalm = csv.reader(utree_f, delimiter='\t')
             # qname, lca, confidence, support
-            for line  in csv_embalm:
+            for line in csv_embalm:
                 if line[-1] is not None:
                     #TODO confidence/support filter
                     samples_lca_map['_'.join(line[0].split('_')[:-1])][line[-1]] += 1

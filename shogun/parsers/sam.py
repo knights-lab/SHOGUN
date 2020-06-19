@@ -6,11 +6,28 @@ This software is released under the GNU Affero General Public License (AGPL) v3.
 
 
 def yield_alignments_from_sam_inf(inf):
+    # this function yields qname, rname
     with open(inf) as fh:
+        try:
+            i = next(fh)
+            line = i.split('\t')
+            c_qname, rname = line[0], line[2]
+            record = [(c_qname, rname)]
+        except BaseException as e:
+            print('Incorrect SAM input %s' % inf)
+            raise e
         for i in fh:
             line = i.split('\t')
-            # this function yields qname, rname
             try:
-                yield line[0], line[2]
-            except IndexError:
+                qname, rname = line[0], line[2]
+                if qname != c_qname:
+                    yield record
+                    record = [(qname, rname)]
+                    c_qname = qname
+                else:
+                    record.append((qname, rname))
+            except IndexError as e:
                 print('Incorrect SAM input %s' % inf)
+                raise e
+        # final record
+        yield record

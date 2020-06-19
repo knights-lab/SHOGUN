@@ -14,4 +14,4 @@ class TestTree(unittest.TestCase):
     def test_build_tree_from_tax_file(self):
         tax = pkg_resources.resource_filename('shogun.tests', os.path.join('data', 'genomes.small.tax'))
         taxatree = build_tree_from_tax_file(tax)
-        assert 1
+        assert taxatree.num_nodes == len(taxatree.node_id_to_ancestors) == len(taxatree.node_id_to_taxa_name)

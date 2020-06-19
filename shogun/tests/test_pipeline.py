@@ -14,6 +14,7 @@ import glob
 
 from shogun.__main__ import cli
 
+
 class TestAligner(unittest.TestCase):
     def setUp(self):
         prefix = 'shogun-temp-dir-'
@@ -93,6 +94,7 @@ class TestAligner(unittest.TestCase):
 
         # Assert the type is float
         self.assertTrue(len(df_infile.select_dtypes(include=['float']).columns) == 3)
+
 
 if __name__ == '__main__':
     unittest.main()

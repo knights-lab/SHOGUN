@@ -35,7 +35,7 @@ setup(
         ]
     },
     extras_require={
-        'develop': ['ipython', 'ipdb'],
+        'develop': ['ipython', 'ipdb', 'networkx'],
         'demo': ['jupyter', 'jupyter_client', 'ipython'],
         'doc': ['sphinx'],
     },

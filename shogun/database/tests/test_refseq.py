@@ -25,8 +25,8 @@ class TestRefSeq(unittest.TestCase):
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_taxonkit_in_path(self):
-        self.assertTrue(shutil.which("taxonkit") is not None)
+    # def test_taxonkit_in_path(self):
+    #     self.assertTrue(shutil.which("taxonkit") is not None)
 
     # def test_get_taxdmp(self):
     #     """
