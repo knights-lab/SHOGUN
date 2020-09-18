@@ -50,7 +50,7 @@ currentdna = ''
 count = 0
 print('Reading/writing FASTA...')
 with open(infna,'r') as f:
-    with open(outfna,'w') as g:
+    with open(outfna, 'w') as g:
         for line in f:            
             if line.startswith('>'):
                 count += 1

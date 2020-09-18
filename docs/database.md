@@ -37,15 +37,16 @@ unzip taxdmp.zip
 t2gg nodes.dmp names.dmp tid2gg.txt SUBONLY
 sort -k1,1 tid2gg.txt > tid2gg.srt.txt
 
+# TODO comment what we are doing
 cd ../fna
 for f in *.fna.gz; do echo "${f/.fna.gz/}"; done | grep -F -f - ../assembly_summary.txt | cut -f 1,6,7,8 | sort -k2,2 > ../rawtax.tsv
 
 cd ..
+# TODO comment what we are doing
 join -t $'\t' -12 -21 -e0 -o'1.1,2.2,1.4,0,1.3' ./rawtax.tsv taxtmp/tid2gg.srt.txt | sort -k2 > alltax.tsv
 
 # Remove the dangling taxonomy identifiers
 /usr/bin/time -v python /mnt/nvidia/pkr/code/helix/helix/strip_taxamap.py --input ./alltax.tsv --output ./taxmap.tsv
-`
 ```
 
 ### Build the BURST database
@@ -58,6 +59,7 @@ join -t $'\t' -12 -21 -e0 -o'1.1,2.2,1.4,0,1.3' ./rawtax.tsv taxtmp/tid2gg.srt.t
 ``` 
 # Shear the database
 # This is from HELIX
+# TODO 100 100 shear size
 /usr/bin/time -v python shear_db -f ./gtdb.fna -r 300 -s 200 -o ./shear_300_200.fna
 
 # align to the database
@@ -87,7 +89,6 @@ shogun align -a burst -i /project/flatiron2/ben/projects/type_1/data/hmp_mock_co
 shogun assign_taxonomy --no-capitalist -a burst -i ./results-200918/alignment.burst.b6 -d ./rep201_ab
 
 # assign a rank-specific taxonomy
-
 shogun redistribute --input ./results-200918/taxatable-200918.txt --level strain -o ./results-200918/taxatable-200918.strain.txt -d ./rep201_ab
 ```
 
