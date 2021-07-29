@@ -43,6 +43,7 @@ for f in *.fna.gz; do echo "${f/.fna.gz/}"; done | grep -F -f - ../assembly_summ
 
 cd ..
 # TODO comment what we are doing
+join -t $'\t' -12 -21 -e0 -o'1.1,2.2,1.4,0,1.3' ./rawtax.tsv taxtmp/tid2gg.srt.txt | sort -k2 > alltax.tsv
 
 # Remove the dangling taxonomy identifiers
 /usr/bin/time -v python /mnt/nvidia/pkr/code/helix/helix/strip_taxamap.py --input ./alltax.tsv --output ./taxmap.tsv
