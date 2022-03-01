@@ -18,28 +18,29 @@ EC_LINK = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 PATHWAY_LINK = 'http://rest.kegg.jp/get/br:ko00001'
 
 # creates a functional ontology map "taxonomy" file from fasta headers
-def get_refseqfastq2ontology_map(fastafp, refseq2other, outfile=None, overwrite_existing_resources=False):
+# NOT implemented yet
+# def get_refseqfastq2ontology_map(fastafp, refseq2other, outfile=None, overwrite_existing_resources=False):
 
-    """
-    Example fasta header:
-    >GCF_000005825.2|WP_012957018.1|1 [locus_tag=BPOF4_RS00005] [protein=chromosomal replication initiator protein DnaA] [protein_id=WP_012957018.1] [location=816..2168] [gbkey=CDS]
-    """
-    outmap = {} # observed refeqID:other ontology
-    with open(fastqfp,'r') as f:
-        for line in f:
-            if not line[0] == '>':
-                continue
-            if not '[protein_id=' in line:
-                continue
-            refseqID = line[line.index('[protein_id=') + 13:]
-            refseqID = refseqID[:refseqID.index(']')]
-            if refseqID in refseq2other:
+#     """
+#     Example fasta header:
+#     >GCF_000005825.2|WP_012957018.1|1 [locus_tag=BPOF4_RS00005] [protein=chromosomal replication initiator protein DnaA] [protein_id=WP_012957018.1] [location=816..2168] [gbkey=CDS]
+#     """
+#     outmap = {} # observed refeqID:other ontology
+#     with open(fastqfp,'r') as f:
+#         for line in f:
+#             if not line[0] == '>':
+#                 continue
+#             if not '[protein_id=' in line:
+#                 continue
+#             refseqID = line[line.index('[protein_id=') + 13:]
+#             refseqID = refseqID[:refseqID.index(']')]
+#             if refseqID in refseq2other:
                 
 
-    # read file using gzip
-    # example:
-    # ...
-    # A9MC22  RefSeq  WP_002965908.1
+#     # read file using gzip
+#     # example:
+#     # ...
+#     # A9MC22  RefSeq  WP_002965908.1
 
     
 # downloads or reads in idmapping.dat.gz from UniProt
