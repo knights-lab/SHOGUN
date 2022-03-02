@@ -12,7 +12,9 @@ import sys
 import gzip
 from collections import defaultdict
 
-IDMAPPING_LINK = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz"
+#IDMAPPING_LINK = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz"
+# Note: changing to old version of idmapping.dat because newest one does not have KO's
+IDMAPPING_LINK = "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.2015_03.gz"
 MODULE_LINK = 'http://rest.kegg.jp/get/br:ko00002'
 EC_LINK = 'ftp://ftp.expasy.org/databases/enzyme/enzclass.txt'
 PATHWAY_LINK = 'http://rest.kegg.jp/get/br:ko00001'
@@ -169,15 +171,17 @@ def get_refseq2pathway_map(outfile=None, overwrite_existing_resources=False):
     
     keys = sorted(refseq2ko.keys())
     missing_kos = 0
+    pathway_count = 0
     for r in keys:
         ko = refseq2ko[r]
         if ko in ko2pathway:
             pathway = ko2pathway[ko]
+            pathway_count += len(pathway)
             refseq2pathway[r] = pathway
         else:
             missing_kos += 1
             
-    print(str(len(refseq2pathway)) + ' refseqIDs mapped to ' + str(len(set(refseq2pathway.values()))) + ' Pathways')
+    print(str(len(refseq2pathway)) + ' refseqIDs mapped to ' + str(pathway_count) + ' Pathways')
     if missing_kos > 0:
         print("Warning: there were " + str(missing_kos) + ' KOs present in the UniProt DB but not in the KEGG pathway mapping.')
     if outfile is None:
@@ -186,7 +190,10 @@ def get_refseq2pathway_map(outfile=None, overwrite_existing_resources=False):
         keys = sorted(refseq2pathway.keys())
         with open(outfile,'w') as f:
             for refseq in keys:
-                f.write(refseq + '\t' + refseq2pathway[refseq] + '\n')
+                pathways = refseq2pathway[refseq]
+                # pathways are lists, print one mapping per line if > 1
+                for pathway in pathways:
+                    f.write(refseq + '\t' + pathway + '\n')
 
 # returns KO 2 KEGG Pathway map
 # returns dict of lists of pathways,
@@ -222,7 +229,7 @@ def get_ko2pathway_map(outfile=None, skip=['Human Diseases','Not Included in Pat
     # Human Diseases
     # Not Included in Pathway or Brite
     # Organismal Systems
-    ko2pathway = defaultdict(set)
+    ko2pathway = defaultdict(list)
     allpathways = set()
     with open('kegg_pathway_htext.txt','r') as f:
         pathway = ['','','',''] # will contain list of entries L1-L4
@@ -250,7 +257,7 @@ def get_ko2pathway_map(outfile=None, skip=['Human Diseases','Not Included in Pat
                     pathway_string = pathway_string.replace("'","").replace('"','')
                     allpathways.add(pathway_string)
                     pathway_string += ';' + ko
-                    ko2pathway[ko].add(pathway_string)                        
+                    ko2pathway[ko].append(pathway_string)                        
 
     print(str(len(ko2pathway)) + ' KOs mapped to ' + str(len(allpathways)) + ' Pathways')
     if outfile is None:
@@ -385,10 +392,10 @@ def get_ko2ecpathway_map(outfile=None, overwrite_existing_resources=False):
 if __name__ == "__main__":
 
     refseq2ko = get_ontology2ontology_map('refseq2ko.txt',ontology1='RefSeq',ontology2='KO')
-
 #    refseq2pathway = get_refseq2pathway_map(outfile='refseq2pathway.txt')
 #    get_ko2ec_map(outfile='ko2ec.txt')
-#    get_ko2ecpathway_map(outfile='ko2ec.txt')
 #    get_ko2pathway_map(outfile='ko2pathway.txt')
 
-#    get_refseq2kegg_pathway_ontology(dbpath='tmp/tmp.fna',genepath='')
+    
+#    not implemented: get_refseq2kegg_pathway_ontology(dbpath='tmp/tmp.fna',genepath='')
+#    not implemented: get_ko2ecpathway_map(outfile='ko2ecpathway.txt') 
