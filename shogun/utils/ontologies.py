@@ -271,7 +271,7 @@ def get_ko2pathway_map(outfile=None, skip=['Human Diseases','Not Included in Pat
 
 # uses KEGG REST server to create
 # mapping from module to kos in that module
-def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None,overwrite_existing_resources=False):
+def get_ko2module_map(outfile=None,ko2pathwaypath=None,idmappingpath=None,overwrite_existing_resources=False):
 
     # download kegg list of modules
     modulelist = []
@@ -292,6 +292,9 @@ def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None,ove
             i = 0
             while not lines[i].startswith('ORTHOLOGY'):
                 i += 1
+            # get rid of "ORTHOLOGY" at start of line
+            lines[i] = lines[i].replace('ORTHOLOGY','')
+            
             kolist = set()
             while not lines[i].startswith('CLASS'):
                 kolist_i = lines[i].split()[0].split(',')
@@ -301,17 +304,35 @@ def get_module2ko_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None,ove
                 ko2module[ko].add(module)
 
     print(str(len(ko2module)) + " KOs assigned to modules.")
-
+    if outfile is not None:
+        keys = sorted(ko2module.keys())
+        with open(outfile,'w') as f:
+            for ko in keys:
+                f.write(ko)
+                for m in ko2module[ko]:
+                    f.write('\t' + m)
+                f.write('\n')
+    return ko2module
 
 # uses KEGG REST server to create
 # mapping from ko to module containing that KO
-def get_ko2module_map(dbpath,genepath,ko2pathwaypath=None,idmappingpath=None,overwrite_existing_resources=False):
-    m2k = get_module2ko_map(dbpath,genepath,overwrite_existing_resources=overwrite_existing_resources)
-    k2m = defaultdict(set)
-    for module in m2k:
-        for k in m2k[module]:
-            k2m[k].add(module)
-    return(k2m)
+def get_module2ko_map(outfile=None,ko2pathwaypath=None,idmappingpath=None,overwrite_existing_resources=False):
+    k2m = get_ko2module_map(outfile=None,overwrite_existing_resources=overwrite_existing_resources)
+    m2k = defaultdict(set)
+    for ko in k2m:
+        for m in k2m[ko]:
+            m2k[m].add(ko)
+
+    print(str(len(m2k)) + " modules processed.")
+    if outfile is not None:
+        keys = sorted(m2k.keys())
+        with open(outfile,'w') as f:
+            for m in keys:
+                f.write(m)
+                for k in m2k[m]:
+                    f.write('\t' + k)
+                f.write('\n')
+    return(m2k)
 
 
 # KO to Enzyme Commission Number(s)
@@ -391,10 +412,13 @@ def get_ko2ecpathway_map(outfile=None, overwrite_existing_resources=False):
 # main function included only for easy standalone testing purposes
 if __name__ == "__main__":
 
+    # By default this runs all mappings.
+    # Comment any of these out to skip them.
     refseq2ko = get_ontology2ontology_map('refseq2ko.txt',ontology1='RefSeq',ontology2='KO')
-#    refseq2pathway = get_refseq2pathway_map(outfile='refseq2pathway.txt')
-#    get_ko2ec_map(outfile='ko2ec.txt')
-#    get_ko2pathway_map(outfile='ko2pathway.txt')
+    refseq2pathway = get_refseq2pathway_map(outfile='refseq2pathway.txt')
+    get_ko2ec_map(outfile='ko2ec.txt')
+    get_ko2pathway_map(outfile='ko2pathway.txt')
+    get_module2ko_map(outfile='module2ko.txt')
 
     
 #    not implemented: get_refseq2kegg_pathway_ontology(dbpath='tmp/tmp.fna',genepath='')
